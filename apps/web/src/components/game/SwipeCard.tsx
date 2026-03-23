@@ -218,7 +218,7 @@ export default function SwipeCard({
                 ))}
               </div>
 
-              {card.providers.length > 0 && <StreamingLogos providers={card.providers} />}
+              {card.providers.length > 0 && <StreamingLogos providers={card.providers} searchTitle={card.title} />}
             </div>
           </motion.div>
 
