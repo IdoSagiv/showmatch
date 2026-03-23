@@ -168,8 +168,11 @@ export default function SwipeCard({
             {/* Top vignette — keeps controls readable */}
             <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/70 via-black/20 to-transparent pointer-events-none" />
 
-            {/* Bottom gradient + info overlay */}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/98 via-black/80 to-transparent pt-20 pb-4 px-4 pointer-events-none">
+            {/* Bottom gradient + info overlay — strong multi-stop for full readability */}
+            <div
+              className="absolute inset-x-0 bottom-0 pb-4 px-4 pointer-events-none"
+              style={{ paddingTop: '6rem', background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.98) 30%, rgba(0,0,0,0.88) 55%, rgba(0,0,0,0.45) 75%, transparent 92%)' }}
+            >
               {/* Badges row */}
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-[10px] font-bold text-white/60 bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-full tracking-wide uppercase">
@@ -183,7 +186,7 @@ export default function SwipeCard({
               </div>
 
               {/* Title */}
-              <h2 className="text-white font-black leading-tight tracking-tight" style={{ fontSize: card.title.length > 28 ? '1.1rem' : '1.35rem' }}>
+              <h2 className="text-white font-black leading-tight tracking-tight" style={{ fontSize: card.title.length > 28 ? '1.1rem' : '1.35rem', textShadow: '0 2px 12px rgba(0,0,0,0.9)' }}>
                 {card.title}
               </h2>
               <p className="text-white/45 text-sm font-medium mt-0.5">{card.year}</p>

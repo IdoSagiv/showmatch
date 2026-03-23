@@ -79,6 +79,7 @@ export default function GamePage() {
     const tmdbId = titlePool[currentCardIndex].tmdbId;
 
     soundForDecision(decision);
+    setDragDirection(null); // clear button highlight immediately
     socket.emit('submitSwipe', tmdbId, decision);
     recordSwipe({ tmdbId, decision, timestamp: Date.now() });
     setFlipped(false);
@@ -92,7 +93,7 @@ export default function GamePage() {
         navigator.vibrate?.(50);
       }
     } catch {}
-  }, [socket, titlePool, currentCardIndex, recordSwipe, soundForDecision]);
+  }, [socket, titlePool, currentCardIndex, recordSwipe, soundForDecision, setDragDirection]);
 
   const handleUndo = useCallback(() => {
     const undone = undoLastSwipe();
@@ -128,7 +129,7 @@ export default function GamePage() {
   const otherPlayers = room.players.filter(p => p.id !== playerId);
 
   return (
-    <main className="flex flex-col overflow-hidden" style={{ height: gameHeight, touchAction: 'pan-y', background: '#08080f' }}>
+    <main className="flex flex-col overflow-hidden" style={{ height: gameHeight, touchAction: 'pan-y' }}>
       <TutorialOverlay onDismiss={() => setShowTutorial(false)} forceShow={showTutorial} />
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-2.5 border-b border-dark-border bg-dark/90 backdrop-blur-md">
@@ -143,16 +144,14 @@ export default function GamePage() {
         {/* Progress */}
         <ProgressBar current={currentCardIndex} total={titlePool.length} />
 
-        {/* Timer */}
+        {/* Timer — sits flush under progress bar as a thin accent strip */}
         {room.settings.timerSeconds && !isFinished && (
-          <div className="mt-2">
-            <TimerBar
-              seconds={room.settings.timerSeconds}
-              isPaused={flipped}
-              onExpired={handleTimerExpired}
-              cardKey={currentCardIndex}
-            />
-          </div>
+          <TimerBar
+            seconds={room.settings.timerSeconds}
+            isPaused={flipped}
+            onExpired={handleTimerExpired}
+            cardKey={currentCardIndex}
+          />
         )}
 
         {/* Card Stack */}
