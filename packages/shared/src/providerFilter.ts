@@ -54,17 +54,33 @@ export const EXCLUDED_PROVIDER_PATTERNS: RegExp[] = [
 
 /**
  * Normalize a provider name for deduplication.
- * Strips tier suffixes ("Basic", "Standard with Ads", etc.) and
- * platform-distribution suffixes so "Netflix" and "Netflix Basic"
- * map to the same key.
+ * Strips tier/plan suffixes ("Basic", "Standard with Ads", "Essential", etc.)
+ * and platform-distribution suffixes so all variants of the same service
+ * (e.g. "Netflix", "Netflix Basic", "Netflix Standard with Ads") map to the
+ * same dedup key.
+ *
+ * Uses an iterative strip loop so multi-part suffixes like
+ * "Standard with Ads" → "standardwithads" → "standard" → "" all resolve:
+ *   1. "netflixstandardwithads" → strip "withads" → "netflixstandard"
+ *   2. "netflixstandard"        → strip "standard" → "netflix"  ✓
  */
 export function normalizeProviderName(name: string): string {
-  return name
+  // 1. Strip platform-distribution suffix first (e.g. "Starz Amazon Channel")
+  let norm = name
     .toLowerCase()
-    .replace(/\s+(apple tv|amazon|prime video|roku).*$/i, '') // strip platform suffix
-    .replace(/[^a-z0-9]/g, '')
-    .replace(/(basic|standard|premium|essential|kids|plus|hd|4k|withadvertisements|withads|adsupported|ads)$/g, '')
-    .trim();
+    .replace(/\s+(apple tv|amazon|prime video|roku).*$/i, '')
+    .replace(/[^a-z0-9]/g, '');
+
+  // 2. Iteratively strip tier/variant suffixes until stable.
+  //    Order matters: longest compound tokens first (withads before ads).
+  const suffixRe = /(withadvertisements|withads|adsupported|advertisements|standard|premium|essential|basic|kids|plus|hd|4k|ads|with)$/;
+  let prev: string;
+  do {
+    prev = norm;
+    norm = norm.replace(suffixRe, '');
+  } while (norm !== prev && norm.length > 3); // guard: don't over-strip to empty
+
+  return norm;
 }
 
 /**
