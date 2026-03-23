@@ -74,13 +74,30 @@ export default function ResultsPage() {
   const handleShare = useCallback(async () => {
     if (!winner) return;
     const text = `We're watching "${winner.title}" (${winner.year})! Decided on ShowMatch 🎬`;
+
+    // navigator.share works on mobile (HTTPS or localhost)
     if (navigator.share) {
       try {
         await navigator.share({ title: 'ShowMatch Result', text });
         return;
       } catch {}
     }
-    await navigator.clipboard.writeText(text);
+
+    // navigator.clipboard requires HTTPS/localhost — falls back to execCommand
+    // which works on any origin (including LAN HTTP)
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.focus();
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+    }
     setShareCopied(true);
     setTimeout(() => setShareCopied(false), 2000);
   }, [winner]);

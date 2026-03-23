@@ -153,17 +153,14 @@ class RoomManager {
 
     player.connected = false;
 
-    // No grace period for finished games — fire immediately
-    if (room.status === 'finished') {
-      onExpire(room, player);
-      return { room, player };
-    }
-
     const timerKey = `${room.code}:${socketId}`;
+    // Finished rooms: 5s grace (feels responsive, survives brief reconnects).
+    // Active rooms: 60s grace (allows reconnect mid-game).
+    const graceMs = room.status === 'finished' ? 5_000 : 60_000;
     const timer = setTimeout(() => {
       this.disconnectTimers.delete(timerKey);
       onExpire(room, player);
-    }, 60 * 1000);
+    }, graceMs);
 
     this.disconnectTimers.set(timerKey, timer);
 

@@ -67,6 +67,9 @@ export function useSocket() {
     });
 
     (socket as any).on('roomReset', (room: any) => {
+      // Reset game-specific flags so the new game starts clean.
+      // Don't call store.reset() — that would wipe playerId.
+      store.setGameOver(false);
       store.setRoom(room);
     });
 
