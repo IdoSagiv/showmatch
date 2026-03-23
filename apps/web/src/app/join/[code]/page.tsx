@@ -31,16 +31,25 @@ export default function JoinPage() {
     setJoining(true);
     setError(null);
 
-    socket.emit('joinRoom', code, name.trim(), (response: any) => {
-      if ('error' in response) {
-        setError(response.error);
-        setJoining(false);
-        return;
-      }
-      setRoom(response.room);
-      setPlayerId(socket.id || '');
-      router.push(`/lobby/${code}`);
-    });
+    const doJoin = () => {
+      socket.emit('joinRoom', code, name.trim(), (response: any) => {
+        if ('error' in response) {
+          setError(response.error);
+          setJoining(false);
+          return;
+        }
+        setRoom(response.room);
+        setPlayerId(socket.id || '');
+        router.push(`/lobby/${code}`);
+      });
+    };
+
+    if (socket.connected) {
+      doJoin();
+    } else {
+      socket.once('connect', doJoin);
+      socket.connect();
+    }
   };
 
   return (
