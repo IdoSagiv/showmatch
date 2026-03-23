@@ -39,13 +39,34 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
         {!revealed ? (
           <motion.div
             key={countdown}
-            className="text-8xl font-bold text-primary"
-            initial={{ scale: 2, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.5, opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, scale: 1.4 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.35 }}
+            className="flex justify-center"
           >
-            {countdown}
+            <motion.div
+              className="w-44 h-44 rounded-full border-4 border-primary/40 flex items-center justify-center"
+              animate={{
+                boxShadow: [
+                  '0 0 20px rgba(229,9,20,0.2)',
+                  '0 0 50px rgba(229,9,20,0.55)',
+                  '0 0 20px rgba(229,9,20,0.2)',
+                ],
+              }}
+              transition={{ duration: 1, repeat: Infinity }}
+            >
+              <span
+                className="text-8xl font-black"
+                style={{
+                  background: 'linear-gradient(135deg, #e50914, #ff6b35)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                {countdown}
+              </span>
+            </motion.div>
           </motion.div>
         ) : (
           <motion.div
@@ -55,10 +76,28 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
           >
             <Confetti />
-            <h2 className="text-2xl font-bold mb-4">Tonight&apos;s Pick! 🎉</h2>
 
-            {/* Same card as in the game — preview mode: tappable to flip, not swipeable */}
+            <h2 className="text-3xl font-black mb-1">
+              🎬{' '}
+              <span
+                style={{
+                  background: 'linear-gradient(135deg, #e50914, #ff6b35)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Tonight&apos;s Pick!
+              </span>
+            </h2>
+            <p className="text-sm text-gray-500 mb-5">Everyone agreed on this one</p>
+
+            {/* Winner card */}
             <div className="relative mx-auto" style={{ width: 280, height: 420 }}>
+              {/* Glow ring behind card */}
+              <div
+                className="absolute inset-0 rounded-2xl"
+                style={{ boxShadow: '0 0 60px rgba(229,9,20,0.35)', borderRadius: '1rem' }}
+              />
               <SwipeCard
                 card={winner}
                 onSwipe={() => {}}
@@ -67,6 +106,12 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
                 preview
               />
             </div>
+
+            {/* Floor glow */}
+            <div
+              className="mx-auto mt-3 w-36 h-4 rounded-full"
+              style={{ background: 'rgba(229,9,20,0.25)', filter: 'blur(12px)' }}
+            />
           </motion.div>
         )}
       </AnimatePresence>

@@ -28,30 +28,46 @@ export default function CardStack({
 }: CardStackProps) {
   if (currentIndex >= cards.length) {
     const total = totalCards ?? cards.length;
+    const connectedOthers = otherPlayers.filter(p => p.connected);
     return (
       <div className="flex items-center justify-center h-full text-center px-6">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="space-y-6"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          className="w-full max-w-xs"
         >
-          <p className="text-2xl font-bold">✅ All done!</p>
-          {otherPlayers.length > 0 ? (
-            <div className="space-y-3">
-              {otherPlayers.filter(p => p.connected).map(p => {
+          <div className="text-5xl mb-3">🎉</div>
+          <p
+            className="text-2xl font-black mb-1"
+            style={{
+              background: 'linear-gradient(135deg, #e50914, #ff6b35)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            All Done!
+          </p>
+          <p className="text-sm text-gray-500 mb-5">Waiting for your friends…</p>
+
+          {connectedOthers.length > 0 ? (
+            <div className="bg-dark-card/80 backdrop-blur-sm border border-dark-border rounded-2xl p-4 space-y-3 text-left">
+              {connectedOthers.map(p => {
                 const pct = total > 0 ? Math.min(100, Math.round((p.progress / total) * 100)) : 0;
                 const done = p.progress >= total;
                 return (
-                  <div key={p.id} className="text-left">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-300">{p.displayName}</span>
-                      <span className={done ? 'text-accent-green font-medium' : 'text-gray-500'}>
-                        {done ? '✓ Done' : `${pct}%`}
+                  <div key={p.id}>
+                    <div className="flex justify-between text-sm mb-1.5">
+                      <span className="text-gray-200 font-medium">
+                        {done ? '✓ ' : ''}{p.displayName}
+                      </span>
+                      <span className={`text-xs font-semibold ${done ? 'text-accent-green' : 'text-gray-500'}`}>
+                        {done ? 'Done!' : `${pct}%`}
                       </span>
                     </div>
-                    <div className="h-1.5 bg-dark-border rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-dark-surface rounded-full overflow-hidden">
                       <motion.div
-                        className={`h-full rounded-full ${done ? 'bg-accent-green' : 'bg-primary'}`}
+                        className={`h-full rounded-full ${done ? 'bg-accent-green' : 'bg-gradient-to-r from-primary to-[#ff6b35]'}`}
                         animate={{ width: `${pct}%` }}
                         transition={{ type: 'spring', stiffness: 80 }}
                       />
@@ -61,7 +77,7 @@ export default function CardStack({
               })}
             </div>
           ) : (
-            <p className="text-gray-400">Waiting for others to finish…</p>
+            <p className="text-gray-500 text-sm">Calculating results…</p>
           )}
         </motion.div>
       </div>
