@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import type { GameSettings, StreamingProvider } from '@/types/game';
 import { GENRES, CONTENT_RATINGS, TIMER_OPTIONS, SORT_OPTIONS } from '@/lib/constants';
+import RangeSlider from '@/components/ui/RangeSlider';
 
 interface FilterPanelProps {
   settings: GameSettings;
@@ -166,27 +167,20 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
 
       {/* Year Range */}
       <div>
-        <div className="flex justify-between items-center mb-1">
+        <div className="flex justify-between items-center mb-2">
           <label className="text-sm text-gray-400">Year Range</label>
-          <span className="text-sm font-mono">{settings.yearRange[0]} - {settings.yearRange[1]}</span>
+          <span className="text-sm font-mono text-white">{settings.yearRange[0]} – {settings.yearRange[1]}</span>
         </div>
-        <div className="flex gap-2">
-          <input
-            type="range"
-            min={1950}
-            max={new Date().getFullYear()}
-            value={settings.yearRange[0]}
-            onChange={e => update({ yearRange: [parseInt(e.target.value), settings.yearRange[1]] })}
-            className="flex-1 accent-primary"
-          />
-          <input
-            type="range"
-            min={1950}
-            max={new Date().getFullYear()}
-            value={settings.yearRange[1]}
-            onChange={e => update({ yearRange: [settings.yearRange[0], parseInt(e.target.value)] })}
-            className="flex-1 accent-primary"
-          />
+        <RangeSlider
+          min={1950}
+          max={new Date().getFullYear()}
+          value={settings.yearRange}
+          onChange={(val) => update({ yearRange: val })}
+          step={1}
+        />
+        <div className="flex justify-between mt-1 text-xs text-gray-600">
+          <span>1950</span>
+          <span>{new Date().getFullYear()}</span>
         </div>
       </div>
 
