@@ -10,14 +10,26 @@ interface SwipeRevealProps {
   }>;
 }
 
+function decisionScore(d: string): number {
+  if (d === 'superlike') return 2;
+  if (d === 'like') return 1;
+  return 0;
+}
+
 export default function SwipeReveal({ reveals }: SwipeRevealProps) {
   if (reveals.length === 0) return null;
+
+  const sorted = [...reveals].sort((a, b) => {
+    const scoreA = a.playerDecisions.reduce((sum, pd) => sum + decisionScore(pd.decision), 0);
+    const scoreB = b.playerDecisions.reduce((sum, pd) => sum + decisionScore(pd.decision), 0);
+    return scoreB - scoreA;
+  });
 
   return (
     <div>
       <h3 className="text-lg font-bold mb-3">Who Liked What</h3>
       <div className="space-y-2 max-h-[400px] overflow-y-auto">
-        {reveals.slice(0, 20).map(({ title, playerDecisions }, i) => (
+        {sorted.slice(0, 20).map(({ title, playerDecisions }, i) => (
           <motion.div
             key={title.tmdbId}
             className="flex items-center gap-3 bg-dark-surface rounded-lg p-2"
