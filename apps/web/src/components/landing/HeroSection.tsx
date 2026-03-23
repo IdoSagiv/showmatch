@@ -21,7 +21,7 @@ export default function HeroSection() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
       >
-        Pick movies everyone agrees on — swipe with friends, match wins.
+        Pick what to watch — swipe with friends, match wins.
       </motion.p>
     </div>
   );
