@@ -15,6 +15,7 @@ export function registerRoomHandlers(io: Server, socket: Socket) {
   });
 
   socket.on('joinRoom', (code: string, playerName: string, callback: Function) => {
+    console.log(`[joinRoom] code=${code} name=${playerName} socket=${socket.id} activeRooms=${roomManager.getRoomCodes().join(',')}`);
     if (!playerName || playerName.length < 1 || playerName.length > 50) {
       callback({ error: 'Name must be 1-50 characters' });
       return;

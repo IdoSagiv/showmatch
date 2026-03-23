@@ -1,9 +1,11 @@
 import { GameSettings, TitleCard } from '../types';
 
-const TMDB_TOKEN = process.env.TMDB_READ_ACCESS_TOKEN || '';
-const OMDB_KEY = process.env.OMDB_API_KEY || '';
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
+
+// Read lazily so dotenv.config() has time to run before these are accessed
+const getToken = () => process.env.TMDB_READ_ACCESS_TOKEN || '';
+const getOmdbKey = () => process.env.OMDB_API_KEY || '';
 
 const GENRE_MAP: Record<number, string> = {
   28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime',
@@ -17,7 +19,7 @@ const GENRE_MAP: Record<number, string> = {
 function tmdbFetch(path: string): Promise<Response> {
   return fetch(`${TMDB_BASE}${path}`, {
     headers: {
-      'Authorization': `Bearer ${TMDB_TOKEN}`,
+      'Authorization': `Bearer ${getToken()}`,
       'Content-Type': 'application/json',
     },
   });
@@ -135,9 +137,9 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
     // External IDs + OMDB (movies only)
     if (type === 'movie' && externalRes.status === 'fulfilled' && externalRes.value.ok) {
       const external = await externalRes.value.json();
-      if (external.imdb_id && OMDB_KEY) {
+      if (external.imdb_id && getOmdbKey()) {
         try {
-          const omdbRes = await fetch(`https://www.omdbapi.com/?i=${external.imdb_id}&apikey=${OMDB_KEY}`);
+          const omdbRes = await fetch(`https://www.omdbapi.com/?i=${external.imdb_id}&apikey=${getOmdbKey()}`);
           if (omdbRes.ok) {
             const omdb = await omdbRes.json();
             const rt = (omdb.Ratings || []).find((r: any) => r.Source === 'Rotten Tomatoes');

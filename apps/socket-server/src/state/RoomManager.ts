@@ -195,6 +195,10 @@ class RoomManager {
     }
   }
 
+  getRoomCodes(): string[] {
+    return [...this.rooms.keys()];
+  }
+
   isCreator(socketId: string): boolean {
     const room = this.getRoomBySocket(socketId);
     if (!room) return false;

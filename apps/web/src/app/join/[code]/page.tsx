@@ -7,7 +7,6 @@ import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
 import { NAME_ADJECTIVES, NAME_NOUNS } from '@/lib/constants';
 import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
 import Logo from '@/components/ui/Logo';
 
 function randomName(): string {
@@ -71,19 +70,29 @@ export default function JoinPage() {
 
           <div>
             <label className="text-sm text-gray-400 mb-2 block">Display Name</label>
-            <Input
-              value={name}
-              onChange={setName}
-              maxLength={50}
-              className="w-full text-center text-lg"
-              autoFocus
-            />
-            <button
-              onClick={() => setName(randomName())}
-              className="mt-2 text-xs text-primary hover:text-primary-light transition-colors w-full text-center"
-            >
-              Generate new name
-            </button>
+            <div className="relative">
+              <input
+                value={name}
+                onChange={e => setName(e.target.value.slice(0, 50))}
+                onKeyDown={e => e.key === 'Enter' && handleJoin()}
+                placeholder="Your name"
+                maxLength={50}
+                autoFocus
+                className="
+                  w-full bg-dark-surface border border-dark-border rounded-xl
+                  px-4 py-3 text-center text-lg font-medium text-white
+                  focus:outline-none focus:border-primary transition-colors
+                "
+              />
+              <button
+                type="button"
+                onClick={() => setName(randomName())}
+                title="Random name"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors text-lg"
+              >
+                🎲
+              </button>
+            </div>
           </div>
 
           {error && (
