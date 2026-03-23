@@ -138,7 +138,7 @@ export default function GamePage() {
         )}
 
         {/* Card Stack */}
-        <div className="flex-1 flex items-center justify-center mt-4 overflow-hidden">
+        <div className="flex-1 flex items-stretch justify-center mt-4 overflow-hidden">
           <CardStack
             cards={titlePool}
             currentIndex={currentCardIndex}
