@@ -136,6 +136,8 @@ export default function SwipeCard({
             likeOpacity={likeOpacity}
             nopeOpacity={nopeOpacity}
             superLikeOpacity={superLikeUsed ? undefined : superLikeOpacity}
+            x={x}
+            y={y}
           />
         )}
 
