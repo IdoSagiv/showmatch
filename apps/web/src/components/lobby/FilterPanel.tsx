@@ -111,7 +111,7 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
         )}
 
         <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto">
-          {providers.slice(0, 20).map(p => (
+          {providers.map(p => (
             <button
               key={p.id}
               onClick={() => update({ providers: toggleInArray(settings.providers, p.id) })}
