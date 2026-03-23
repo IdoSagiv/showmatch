@@ -18,6 +18,8 @@ export interface TitleCard {
   mediaType: 'movie' | 'tv';
   title: string;
   year: number;
+  endYear?: number;           // TV only — last season year
+  seriesStatus?: 'running' | 'ended'; // TV only
   posterPath: string;
   overview: string;
   voteAverage: number;

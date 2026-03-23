@@ -195,10 +195,16 @@ export default function SwipeCard({
                 {card.title}
               </h2>
 
-              {/* Year + ratings on one compact line */}
+              {/* Year (range for TV) + ratings on one compact line */}
               <div className="flex items-center gap-3 mt-1 flex-wrap">
                 <span className="text-white/50 text-sm font-medium" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.9)' }}>
-                  {card.year}
+                  {card.mediaType === 'tv' ? (
+                    card.seriesStatus === 'running'
+                      ? <>{card.year} – <span className="text-primary/80 font-bold">ongoing</span></>
+                      : card.endYear
+                        ? `${card.year} – ${card.endYear}`
+                        : card.year
+                  ) : card.year}
                 </span>
                 {card.voteAverage > 0 && (
                   <span className="flex items-center gap-1.5">
@@ -299,7 +305,15 @@ export default function SwipeCard({
             <div ref={backScrollRef} className="relative p-5 h-full overflow-y-auto space-y-4" style={{ touchAction: 'pan-y', overscrollBehavior: 'none' }}>
               <h2 className="text-xl font-black leading-tight tracking-tight">
                 {card.title}{' '}
-                <span className="text-gray-500 font-normal text-base">({card.year})</span>
+                <span className="text-gray-500 font-normal text-base">
+                  ({card.mediaType === 'tv'
+                    ? card.seriesStatus === 'running'
+                      ? `${card.year} – ongoing`
+                      : card.endYear
+                        ? `${card.year} – ${card.endYear}`
+                        : card.year
+                    : card.year})
+                </span>
               </h2>
 
               {/* Stats grid */}

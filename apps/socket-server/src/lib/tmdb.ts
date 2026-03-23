@@ -122,11 +122,12 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
   const id = title.tmdbId;
 
   try {
-    const [creditsRes, videosRes, providersRes, externalRes] = await Promise.allSettled([
+    const [creditsRes, videosRes, providersRes, externalRes, detailRes] = await Promise.allSettled([
       tmdbFetch(`/${type}/${id}/credits`),
       tmdbFetch(`/${type}/${id}/videos`),
       tmdbFetch(`/${type}/${id}/watch/providers`),
       tmdbFetch(`/${type}/${id}/external_ids`),
+      type === 'tv' ? tmdbFetch(`/tv/${id}`) : Promise.resolve(null as any),
     ]);
 
     // Credits
@@ -175,6 +176,15 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
           }
         } catch { /* OMDB failure is non-critical */ }
       }
+    }
+
+    // TV series — end year + status
+    if (type === 'tv' && detailRes.status === 'fulfilled' && detailRes.value && detailRes.value.ok) {
+      const detail = await detailRes.value.json();
+      const lastAir = detail.last_air_date ? parseInt(detail.last_air_date.split('-')[0]) : undefined;
+      if (lastAir && lastAir !== title.year) title.endYear = lastAir;
+      const s = detail.status as string | undefined;
+      title.seriesStatus = (s === 'Ended' || s === 'Canceled') ? 'ended' : 'running';
     }
 
     // Content rating
