@@ -168,59 +168,65 @@ export default function SwipeCard({
             {/* Top vignette — keeps controls readable */}
             <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/70 via-black/20 to-transparent pointer-events-none" />
 
-            {/* Bottom gradient + info overlay — strong multi-stop for full readability */}
+            {/* Bottom gradient + info overlay — short, light, shows poster above */}
             <div
               className="absolute inset-x-0 bottom-0 pb-4 px-4 pointer-events-none"
-              style={{ paddingTop: '6rem', background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.98) 30%, rgba(0,0,0,0.88) 55%, rgba(0,0,0,0.45) 75%, transparent 92%)' }}
+              style={{
+                paddingTop: '4.5rem',
+                background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.78) 25%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.08) 68%, transparent 80%)',
+              }}
             >
-              {/* Badges row */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] font-bold text-white/60 bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-full tracking-wide uppercase">
+              {/* Type + rating badge row */}
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-[10px] font-bold text-white/60 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full tracking-wide uppercase">
                   {card.mediaType === 'movie' ? '🎬 Film' : '📺 Series'}
                 </span>
                 {card.contentRating && (
-                  <span className="text-[10px] font-bold text-white/50 bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold text-white/40 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full">
                     {card.contentRating}
                   </span>
                 )}
               </div>
 
               {/* Title */}
-              <h2 className="text-white font-black leading-tight tracking-tight" style={{ fontSize: card.title.length > 28 ? '1.1rem' : '1.35rem', textShadow: '0 2px 12px rgba(0,0,0,0.9)' }}>
+              <h2
+                className="text-white font-black leading-tight tracking-tight"
+                style={{
+                  fontSize: card.title.length > 28 ? '1.1rem' : '1.3rem',
+                  textShadow: '0 1px 16px rgba(0,0,0,1), 0 2px 6px rgba(0,0,0,0.9)',
+                }}
+              >
                 {card.title}
               </h2>
-              <p className="text-white/45 text-sm font-medium mt-0.5">{card.year}</p>
 
-              {/* Ratings */}
-              <div className="flex gap-3 items-center mt-2 flex-wrap">
+              {/* Year + ratings on one compact line */}
+              <div className="flex items-center gap-3 mt-1 flex-wrap">
+                <span className="text-white/50 text-sm font-medium" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.9)' }}>
+                  {card.year}
+                </span>
                 {card.voteAverage > 0 && (
                   <span className="flex items-center gap-1.5">
                     <span className="bg-[#F5C518] text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded leading-none">IMDb</span>
-                    <span className="text-white font-bold text-sm">{card.voteAverage.toFixed(1)}</span>
+                    <span className="text-white font-bold text-sm" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.9)' }}>
+                      {card.voteAverage.toFixed(1)}
+                    </span>
                   </span>
                 )}
                 {card.rottenTomatoesScore !== null ? (
-                  <span className="flex items-center gap-1 text-white text-sm font-bold">🍅 {card.rottenTomatoesScore}%</span>
+                  <span className="flex items-center gap-1 text-white text-sm font-bold" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.9)' }}>
+                    🍅 {card.rottenTomatoesScore}%
+                  </span>
                 ) : card.metacriticScore !== null ? (
                   <span className="flex items-center gap-1.5 text-white text-sm font-bold">
                     <span className="bg-[#FFCC34] text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded leading-none">MC</span>
-                    {card.metacriticScore}
+                    <span style={{ textShadow: '0 1px 8px rgba(0,0,0,0.9)' }}>{card.metacriticScore}</span>
                   </span>
                 ) : null}
               </div>
 
-              {/* Genre chips */}
-              <div className="flex flex-wrap gap-1 mt-2">
-                {card.genres.slice(0, 4).map(g => (
-                  <span key={g} className="px-2 py-0.5 bg-white/12 backdrop-blur-sm rounded-full text-[11px] text-white/75 font-medium">
-                    {g}
-                  </span>
-                ))}
-              </div>
-
               {/* Providers */}
               {card.providers.length > 0 && (
-                <div className="mt-2.5 pointer-events-auto">
+                <div className="mt-2 pointer-events-auto">
                   <StreamingLogos providers={card.providers} searchTitle={card.title} />
                 </div>
               )}
