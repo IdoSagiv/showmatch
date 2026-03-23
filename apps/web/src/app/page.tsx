@@ -76,7 +76,7 @@ export default function Home() {
 
           {/* ═══ LEFT: Brand + CTAs ═══ */}
           <motion.div
-            className="flex flex-col items-center lg:items-start"
+            className="flex flex-col items-center lg:items-start w-full max-w-sm lg:max-w-none mx-auto lg:mx-0"
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 24 }}
@@ -121,7 +121,7 @@ export default function Home() {
 
             {/* Action buttons */}
             <motion.div
-              className="w-full max-w-sm flex flex-col gap-3"
+              className="w-full flex flex-col gap-3"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.18, type: 'spring', stiffness: 240, damping: 24 }}
