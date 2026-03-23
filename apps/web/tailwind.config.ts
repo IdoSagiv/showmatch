@@ -16,12 +16,13 @@ const config: Config = {
           green: '#00c853',
           red: '#ff1744',
           gold: '#ffd700',
+          orange: '#ff6b35',
         },
         dark: {
           DEFAULT: '#0a0a0a',
-          card: '#1a1a2e',
-          surface: '#16213e',
-          border: '#2a2a4a',
+          card: '#1c1b33',
+          surface: '#17162d',
+          border: '#2d2b4e',
         },
       },
       fontFamily: {

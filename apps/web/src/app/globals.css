@@ -102,16 +102,28 @@ input[type="range"].range-thumb::-moz-range-track {
   background: transparent;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 4px;
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #e50914, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* Glow utilities */
+.glow-red   { box-shadow: 0 0 20px rgba(229, 9, 20, 0.3); }
+.glow-green { box-shadow: 0 0 20px rgba(0, 200, 83, 0.3); }
+.glow-gold  { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+
+/* Gradient border */
+.gradient-border {
+  border: 1px solid transparent;
+  background: linear-gradient(#1c1b33, #1c1b33) padding-box,
+              linear-gradient(135deg, #e50914, #ff6b35) border-box;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #2a2a4a;
-  border-radius: 2px;
-}
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #2d2b4e; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #e50914; }

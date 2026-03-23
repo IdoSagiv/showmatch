@@ -25,6 +25,8 @@ interface SwipeCardProps {
   /** Undo last swipe — shown as a small button on the card */
   onUndo?: () => void;
   canUndo?: boolean;
+  /** Preview mode: static card, tap to flip, no swiping */
+  preview?: boolean;
 }
 
 export default function SwipeCard({
@@ -32,6 +34,7 @@ export default function SwipeCard({
   superLikeUsed = false,
   pendingDecision, onPendingConsumed,
   onUndo, canUndo = false,
+  preview = false,
 }: SwipeCardProps) {
   const [flipped, setFlipped] = useState(false);
   const [exiting, setExiting] = useState(false);
@@ -102,13 +105,13 @@ export default function SwipeCard({
   };
 
   const handleTap = () => {
-    if (isTop && !exiting) setFlipped(f => !f);
+    if (preview || (isTop && !exiting)) setFlipped(f => !f);
   };
 
   return (
     <motion.div
       className="absolute w-full h-full"
-      style={{ zIndex: 10 - stackIndex }}
+      style={{ zIndex: 10 - stackIndex, filter: isTop ? 'drop-shadow(0 8px 40px rgba(229,9,20,0.12))' : undefined }}
       initial={{ scale: scale * 0.95, opacity: 0, y: yOffset + 10 }}
       animate={{ scale, opacity: 1 - stackIndex * 0.1, y: yOffset }}
       transition={{ type: 'spring', stiffness: 300, damping: 28 }}
@@ -116,7 +119,7 @@ export default function SwipeCard({
       <motion.div
         className="relative cursor-grab active:cursor-grabbing select-none h-full"
         style={{ x, y, rotate, touchAction: flipped ? 'pan-y' : 'none' }}
-        drag={isTop && !exiting ? (flipped ? 'x' : true) : false}
+        drag={!preview && isTop && !exiting ? (flipped ? 'x' : true) : false}
         dragElastic={0.8}
         onDragEnd={isTop ? handleDragEnd : undefined}
         onClick={handleTap}
@@ -164,7 +167,7 @@ export default function SwipeCard({
               )}
 
               {/* Undo button — top-left, only on top card when there's something to undo */}
-              {isTop && onUndo && (
+              {!preview && isTop && onUndo && (
                 <button
                   onClick={e => { e.stopPropagation(); onUndo(); }}
                   disabled={!canUndo}
@@ -188,8 +191,8 @@ export default function SwipeCard({
 
             {/* Info strip — fixed height, never shrinks or grows */}
             <div className="p-4 space-y-2 shrink-0">
-              <h2 className="text-lg font-bold truncate" title={card.title}>
-                {card.title} <span className="text-gray-500 font-normal text-base">({card.year})</span>
+              <h2 className="font-bold leading-tight" style={{ fontSize: card.title.length > 25 ? '0.95rem' : '1.125rem' }}>
+                {card.title} <span className="text-gray-500 font-normal text-sm">({card.year})</span>
               </h2>
 
               <div className="flex gap-3 text-sm items-center flex-wrap">
@@ -218,7 +221,7 @@ export default function SwipeCard({
                 ))}
               </div>
 
-              {card.providers.length > 0 && <StreamingLogos providers={card.providers} />}
+              {card.providers.length > 0 && <StreamingLogos providers={card.providers} searchTitle={card.title} />}
             </div>
           </motion.div>
 

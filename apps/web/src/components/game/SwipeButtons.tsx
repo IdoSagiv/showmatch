@@ -17,7 +17,7 @@ export default function SwipeButtons({ onPass, onLike, onSuperLike, superLikeUse
       <motion.button
         onClick={onPass}
         disabled={disabled}
-        className="w-16 h-16 rounded-full bg-dark-surface border-2 border-accent-red flex items-center justify-center text-accent-red text-2xl disabled:opacity-30 transition-opacity"
+        className="w-16 h-16 rounded-full bg-dark-surface border-2 border-accent-red flex items-center justify-center text-accent-red text-2xl disabled:opacity-30 transition-all hover:shadow-[0_0_20px_rgba(255,23,68,0.4)]"
         whileTap={{ scale: 0.85 }}
         title="Nope"
       >
@@ -36,7 +36,7 @@ export default function SwipeButtons({ onPass, onLike, onSuperLike, superLikeUse
           className={`relative w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl transition-all ${
             superLikeUsed
               ? 'bg-dark-surface border-gray-600 text-gray-600 opacity-40'
-              : 'bg-dark-surface border-accent-gold text-accent-gold'
+              : 'bg-dark-surface border-accent-gold text-accent-gold hover:shadow-[0_0_20px_rgba(255,215,0,0.4)]'
           }`}
           whileTap={{ scale: 0.85 }}
         >
@@ -48,7 +48,7 @@ export default function SwipeButtons({ onPass, onLike, onSuperLike, superLikeUse
       <motion.button
         onClick={onLike}
         disabled={disabled}
-        className="w-16 h-16 rounded-full bg-dark-surface border-2 border-accent-green flex items-center justify-center text-accent-green text-2xl disabled:opacity-30 transition-opacity"
+        className="w-16 h-16 rounded-full bg-dark-surface border-2 border-accent-green flex items-center justify-center text-accent-green text-2xl disabled:opacity-30 transition-all hover:shadow-[0_0_20px_rgba(0,200,83,0.4)]"
         whileTap={{ scale: 0.85 }}
         title="Like"
       >

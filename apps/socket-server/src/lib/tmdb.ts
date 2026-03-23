@@ -76,7 +76,22 @@ export async function fetchDiscoverResults(
     }
   }
 
-  const trimmed = allResults.slice(0, fetchSize);
+  // Interleave media types so the pool isn't all-movies when both are selected.
+  // Without this, movies fill the first N slots and TV is nearly absent.
+  const byType: Record<string, TitleCard[]> = {};
+  for (const item of allResults) {
+    (byType[item.mediaType] = byType[item.mediaType] ?? []).push(item);
+  }
+  const types = Object.keys(byType);
+  const interleaved: TitleCard[] = [];
+  const maxLen = types.reduce((m, t) => Math.max(m, byType[t].length), 0);
+  for (let i = 0; i < maxLen; i++) {
+    for (const t of types) {
+      if (byType[t]?.[i]) interleaved.push(byType[t][i]);
+    }
+  }
+
+  const trimmed = interleaved.slice(0, fetchSize);
   const total = trimmed.length;
   let done = 0;
 

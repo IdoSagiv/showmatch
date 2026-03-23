@@ -56,12 +56,13 @@ export default function LobbyPage() {
       <div className="max-w-lg mx-auto p-4 space-y-4">
         {/* Room Code */}
         <motion.div
-          className="text-center bg-dark-card rounded-2xl p-4 border border-dark-border"
+          className="text-center bg-gradient-to-b from-dark-card to-dark-surface rounded-2xl p-5 border border-dark-border relative overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
+          <div className="absolute inset-0 bg-primary/5 pointer-events-none rounded-2xl" />
           <p className="text-sm text-gray-400 mb-1">Room Code</p>
-          <p className="text-3xl font-mono font-bold tracking-[0.3em]">{room.code}</p>
+          <p className="relative text-4xl font-mono font-black tracking-[0.35em]" style={{ textShadow: '0 0 40px rgba(229,9,20,0.5)' }}>{room.code}</p>
           <div className="mt-2 flex justify-center">
             <ShareButton code={room.code} />
           </div>

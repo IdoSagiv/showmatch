@@ -17,7 +17,7 @@ export default function CreateGameButton() {
       <Button
         size="lg"
         onClick={() => router.push('/create')}
-        className="w-full text-lg py-4"
+        className="w-full text-lg py-4 rounded-2xl"
       >
         Create Game
       </Button>
