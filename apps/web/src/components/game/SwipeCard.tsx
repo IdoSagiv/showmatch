@@ -104,19 +104,26 @@ export default function SwipeCard({
         <div style={{ perspective: 1200 }}>
           {/* Front face */}
           <motion.div
-            className="bg-dark-card rounded-2xl overflow-hidden border border-dark-border shadow-2xl"
+            className="bg-dark-card rounded-2xl overflow-hidden border border-dark-border shadow-2xl flex flex-col"
             animate={{ rotateY: flipped ? 180 : 0 }}
             transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-            style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
+            style={{
+              backfaceVisibility: 'hidden',
+              transformStyle: 'preserve-3d',
+              // Cap the card so the info strip is always on-screen.
+              // poster gets flex-1 so it fills whatever space remains.
+              maxHeight: 'calc(100svh - 185px)',
+            }}
           >
-            {/* Poster — aspect-[2/3] matches TMDB poster ratio, no maxHeight so nothing gets cropped */}
-            <div className="relative bg-dark-surface w-full overflow-hidden"
-              style={{ aspectRatio: '2/3' }}>
+            {/* Poster — flex-1 so it fills the space above the info strip.
+                object-contain shows the full poster; TMDB posters are 2:3 so
+                bars (if any) will be tiny on a portrait phone. */}
+            <div className="relative bg-dark-surface w-full overflow-hidden flex-1 min-h-0">
               {card.posterPath ? (
                 <img
                   src={card.posterPath}
                   alt={card.title}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-contain object-center"
                   draggable={false}
                 />
               ) : (
@@ -124,8 +131,8 @@ export default function SwipeCard({
               )}
             </div>
 
-            {/* Info strip */}
-            <div className="p-4 space-y-2">
+            {/* Info strip — always visible, never shrinks */}
+            <div className="p-4 space-y-2 shrink-0">
               <h2 className="text-lg font-bold truncate" title={card.title}>
                 {card.title} <span className="text-gray-500 font-normal text-base">({card.year})</span>
               </h2>
