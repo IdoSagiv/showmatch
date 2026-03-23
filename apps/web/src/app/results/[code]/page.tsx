@@ -20,7 +20,7 @@ export default function ResultsPage() {
   const socket = useSocket();
   const {
     room, matchedTitles, winner, fullRankings, wildcardCandidates,
-    isFirstMatch, playerId, swipeReveal, gameStats, gameOver, setWinner,
+    isFirstMatch, playerId, swipeReveal, gameStats, gameOver, setWinner, reset,
   } = useGameStore();
   const [rankingSubmitted, setRankingSubmitted] = useState(false);
   const [historySaved, setHistorySaved] = useState(false);
@@ -70,7 +70,11 @@ export default function ResultsPage() {
 
   const handleEndGame = useCallback(() => {
     (socket as any).emit('endGame', { playerId });
-  }, [socket, playerId]);
+    // Host navigates themselves — server will notify guests via socket.to() (not io.to())
+    // so the host won't receive the roomClosed toast.
+    reset();
+    router.push('/');
+  }, [socket, playerId, reset, router]);
 
   const handleShare = useCallback(async () => {
     if (!winner) return;

@@ -46,7 +46,8 @@ export function registerRoomHandlers(io: Server, socket: Socket) {
     if (!player) return;
 
     if (player.isCreator) {
-      io.to(room.code).emit('roomClosed', 'Host left the game');
+      // socket.to() excludes the sender — host navigates themselves on the client
+      socket.to(room.code).emit('roomClosed', 'Host left the game');
       roomManager.destroyRoom(room.code);
     } else {
       roomManager.removePlayer(room.code, player.id);
@@ -66,7 +67,8 @@ export function registerRoomHandlers(io: Server, socket: Socket) {
     )?.isCreator ?? false;
     if (!isCreator) return;
 
-    io.to(room.code).emit('roomClosed', 'Game ended by host');
+    // socket.to() excludes the sender — host navigates themselves on the client
+    socket.to(room.code).emit('roomClosed', 'Game ended by host');
     roomManager.destroyRoom(room.code);
   });
 
