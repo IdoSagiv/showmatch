@@ -130,6 +130,14 @@ class RoomManager {
     return this.rooms.get(code) || null;
   }
 
+  /** Find the room that has a player with this ID (survives socket reconnects). */
+  getRoomByPlayerId(playerId: string): Room | null {
+    for (const room of this.rooms.values()) {
+      if (room.players.some(p => p.id === playerId)) return room;
+    }
+    return null;
+  }
+
   getPlayerBySocket(socketId: string): Player | null {
     const room = this.getRoomBySocket(socketId);
     if (!room) return null;
@@ -144,6 +152,12 @@ class RoomManager {
     if (!player) return null;
 
     player.connected = false;
+
+    // No grace period for finished games — fire immediately
+    if (room.status === 'finished') {
+      onExpire(room, player);
+      return { room, player };
+    }
 
     const timerKey = `${room.code}:${socketId}`;
     const timer = setTimeout(() => {

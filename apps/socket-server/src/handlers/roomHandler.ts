@@ -51,21 +51,30 @@ export function registerRoomHandlers(io: Server, socket: Socket) {
     socket.leave(room.code);
   });
 
-  socket.on('endGame', () => {
-    if (!roomManager.isCreator(socket.id)) return;
-
-    const room = roomManager.getRoomBySocket(socket.id);
+  socket.on('endGame', (payload?: { playerId?: string }) => {
+    // Find room by current socket or by stored playerId (survives reconnects)
+    const room = roomManager.getRoomBySocket(socket.id)
+      ?? (payload?.playerId ? roomManager.getRoomByPlayerId(payload.playerId) : null);
     if (!room) return;
+
+    const isCreator = room.players.find(
+      p => p.id === socket.id || p.id === payload?.playerId
+    )?.isCreator ?? false;
+    if (!isCreator) return;
 
     io.to(room.code).emit('roomClosed', 'Game ended by host');
     roomManager.destroyRoom(room.code);
   });
 
-  socket.on('playAgain', () => {
-    if (!roomManager.isCreator(socket.id)) return;
-
-    const room = roomManager.getRoomBySocket(socket.id);
+  socket.on('playAgain', (payload?: { playerId?: string }) => {
+    const room = roomManager.getRoomBySocket(socket.id)
+      ?? (payload?.playerId ? roomManager.getRoomByPlayerId(payload.playerId) : null);
     if (!room) return;
+
+    const isCreator = room.players.find(
+      p => p.id === socket.id || p.id === payload?.playerId
+    )?.isCreator ?? false;
+    if (!isCreator) return;
 
     room.status = 'lobby';
     room.titlePool = [];
