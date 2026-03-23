@@ -140,15 +140,22 @@ export default function SwipeCard({
           />
         )}
 
-        {/* 3D flip wrapper */}
-        <div className="relative h-full" style={{ perspective: 1200 }}>
+        {/* 3D flip wrapper — perspective on parent, single rotation on inner */}
+        <div className="relative h-full" style={{ perspective: '1400px' }}>
+          {/* ── Single rotating stage — one animation drives both faces ── */}
+          <motion.div
+            className="absolute inset-0"
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            style={{ transformStyle: 'preserve-3d', willChange: 'transform' } as any}
+            animate={{ rotateY: flipped ? 180 : 0 }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          >
 
           {/* ── FRONT FACE — full-bleed cinematic poster ── */}
-          <motion.div
+          <div
             className="absolute inset-0 rounded-3xl overflow-hidden"
-            style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d', boxShadow: cardShadow }}
-            animate={{ rotateY: flipped ? 180 : 0 }}
-            transition={{ duration: 0.42, ease: [0.4, 0, 0.2, 1] }}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', boxShadow: cardShadow } as any}
           >
             {/* Poster — full bleed */}
             {card.posterPath ? (
@@ -248,20 +255,20 @@ export default function SwipeCard({
             <div className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center text-white/65 text-sm select-none pointer-events-none">
               ⓘ
             </div>
-          </motion.div>
+          </div>{/* end FRONT FACE */}
 
           {/* ── BACK FACE — scrollable detail view ── */}
-          <motion.div
+          <div
             className="absolute inset-0 rounded-3xl overflow-hidden"
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             style={{
               backfaceVisibility: 'hidden',
-              transformStyle: 'preserve-3d',
+              WebkitBackfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
               background: 'linear-gradient(160deg, #0f0e1f 0%, #1a192f 60%, #0f0e1f 100%)',
               boxShadow: cardShadow,
               border: '1px solid rgba(255,255,255,0.07)',
-            }}
-            animate={{ rotateY: flipped ? 360 : 180 }}
-            transition={{ duration: 0.42, ease: [0.4, 0, 0.2, 1] }}
+            } as any}
           >
             {/* Subtle poster blur as back background */}
             {card.posterPath && (
@@ -349,8 +356,10 @@ export default function SwipeCard({
 
               <p className="text-xs text-gray-600 text-center pb-2">Tap anywhere to flip back</p>
             </div>
-          </motion.div>
-        </div>
+          </div>{/* end BACK FACE */}
+
+          </motion.div>{/* end rotating stage */}
+        </div>{/* end perspective container */}
       </motion.div>
     </motion.div>
   );
