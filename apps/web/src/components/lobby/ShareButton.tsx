@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { safeCopy } from '@/lib/clipboard';
+import { shareText } from '@/lib/share';
 
 interface ShareButtonProps {
   code: string;
@@ -16,18 +17,9 @@ export default function ShareButton({ code }: ShareButtonProps) {
   };
 
   const handleShare = async () => {
-    const text = `Join my ShowMatch game! Code: ${code}`;
-    const url = `${window.location.origin}/join/${code}`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'ShowMatch', text, url });
-        return;
-      } catch { /* User cancelled or not supported */ }
-    }
-
-    await safeCopy(`${text}\n${url}`);
-    flash();
+    const text = `Join my ShowMatch game! Enter code: ${code}`;
+    const result = await shareText(text);
+    if (result === 'copied') flash();
   };
 
   const handleCopy = async () => {

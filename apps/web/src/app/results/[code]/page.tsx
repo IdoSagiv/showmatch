@@ -12,6 +12,7 @@ import GameStats from '@/components/results/GameStats';
 import Logo from '@/components/ui/Logo';
 import { saveGameToHistory } from '@/lib/history';
 import { safeCopy } from '@/lib/clipboard';
+import { shareText } from '@/lib/share';
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -78,19 +79,12 @@ export default function ResultsPage() {
 
   const handleShare = useCallback(async () => {
     if (!winner) return;
-    const text = `We're watching "${winner.title}" (${winner.year})! Decided on ShowMatch 🎬`;
-
-    // navigator.share works on mobile (HTTPS or localhost)
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'ShowMatch Result', text });
-        return;
-      } catch {}
+    const text = `We're watching "${winner.title}" (${winner.year})! 🎬 Picked on ShowMatch`;
+    const result = await shareText(text);
+    if (result === 'copied') {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
     }
-
-    await safeCopy(text);
-    setShareCopied(true);
-    setTimeout(() => setShareCopied(false), 2000);
   }, [winner]);
 
   if (!room) return null;
