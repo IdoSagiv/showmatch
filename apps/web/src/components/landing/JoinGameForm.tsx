@@ -20,11 +20,8 @@ export default function JoinGameForm() {
     const doCheck = () => {
       socket.emit('checkRoom', trimmed, (response: any) => {
         setChecking(false);
-        if ('error' in response) {
-          setError(response.error);
-        } else {
-          router.push(`/join/${trimmed}?v=1`);
-        }
+        if ('error' in response) setError(response.error);
+        else router.push(`/join/${trimmed}?v=1`);
       });
     };
     if (socket.connected) doCheck();
@@ -48,23 +45,105 @@ export default function JoinGameForm() {
           className="flex-1 min-w-0 bg-dark-surface/80 border border-dark-border rounded-xl px-4 py-4 text-center font-mono text-xl tracking-[0.35em] text-white placeholder:text-gray-700 placeholder:tracking-normal placeholder:text-sm focus:outline-none focus:border-primary/60 focus:bg-dark-surface transition-all"
         />
 
-        {/* Join button */}
-        <motion.button
-          onClick={handleJoin}
-          disabled={!ready || checking}
-          className="px-6 py-4 rounded-xl font-bold text-sm text-white shrink-0 transition-all"
-          style={{
-            background: ready
-              ? 'linear-gradient(135deg, #1a1939, #2d2b6e)'
-              : undefined,
-            backgroundColor: ready ? undefined : '#13122a',
-            border: ready ? '1px solid rgba(229,9,20,0.4)' : '1px solid rgba(45,43,78,0.6)',
-            opacity: ready ? 1 : 0.45,
-          }}
-          whileTap={ready ? { scale: 0.95 } : {}}
-        >
-          {checking ? '…' : 'Join'}
-        </motion.button>
+        {/* Join button — springs to life when 5 chars entered */}
+        <div className="relative shrink-0">
+          {/* Pulsing glow ring — only when ready */}
+          <AnimatePresence>
+            {ready && !checking && (
+              <motion.span
+                key="ring"
+                className="absolute inset-0 rounded-xl pointer-events-none"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                style={{ boxShadow: '0 0 0 0 rgba(229,9,20,0.7)' }}
+              >
+                <span className="absolute inset-0 rounded-xl border-2 border-primary/60 animate-ping" />
+              </motion.span>
+            )}
+          </AnimatePresence>
+
+          <motion.button
+            onClick={handleJoin}
+            disabled={!ready || checking}
+            className="relative px-6 py-4 rounded-xl font-black text-sm text-white overflow-hidden"
+            animate={
+              ready
+                ? { scale: 1, opacity: 1 }
+                : { scale: 0.96, opacity: 0.35 }
+            }
+            initial={false}
+            transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+            whileTap={ready ? { scale: 0.88 } : {}}
+            whileHover={ready ? { scale: 1.04 } : {}}
+            style={{
+              background: ready
+                ? 'linear-gradient(135deg, #e50914 0%, #ff4b2b 60%, #ff6b35 100%)'
+                : '#0f0e1f',
+              border: ready ? 'none' : '1px solid rgba(45,43,78,0.6)',
+              boxShadow: ready ? '0 4px 24px rgba(229,9,20,0.5), 0 1px 0 rgba(255,255,255,0.1) inset' : 'none',
+            }}
+          >
+            {/* Shimmer — fires once when button becomes ready */}
+            <AnimatePresence>
+              {ready && !checking && (
+                <motion.span
+                  key="shimmer"
+                  className="absolute inset-y-0 w-1/2 pointer-events-none"
+                  style={{ background: 'linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.22) 50%, transparent 100%)' }}
+                  initial={{ x: '-100%' }}
+                  animate={{ x: '300%' }}
+                  transition={{ duration: 0.7, ease: 'easeOut' }}
+                />
+              )}
+            </AnimatePresence>
+
+            {/* Label */}
+            <AnimatePresence mode="wait">
+              {checking ? (
+                <motion.span
+                  key="checking"
+                  className="flex items-center gap-1.5"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                >
+                  {/* Three-dot spinner */}
+                  {[0, 1, 2].map(i => (
+                    <motion.span
+                      key={i}
+                      className="w-1.5 h-1.5 rounded-full bg-white block"
+                      animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
+                      transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
+                    />
+                  ))}
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="label"
+                  className="flex items-center gap-1"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                >
+                  Join
+                  <AnimatePresence>
+                    {ready && (
+                      <motion.span
+                        initial={{ opacity: 0, x: -4 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -4 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+                      >
+                        →
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
       </div>
 
       <AnimatePresence>
