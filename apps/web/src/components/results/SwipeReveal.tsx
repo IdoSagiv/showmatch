@@ -29,7 +29,7 @@ export default function SwipeReveal({ reveals }: SwipeRevealProps) {
               <img src={title.posterPath} alt={title.title} className="w-8 h-12 rounded object-cover" />
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm truncate">{title.title}</p>
+              <p className="text-sm truncate" title={title.title}>{title.title}</p>
               <div className="flex gap-1 mt-1 flex-wrap">
                 {playerDecisions.map(pd => (
                   <span

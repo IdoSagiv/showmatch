@@ -41,7 +41,7 @@ export default function RankingBoard({ titles, onSubmit, submitted }: RankingBoa
                 <img src={item.posterPath} alt={item.title} className="w-10 h-14 rounded object-cover" />
               )}
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{item.title}</p>
+                <p className="font-medium truncate" title={item.title}>{item.title}</p>
                 <p className="text-xs text-gray-500">{item.year} &middot; &#9733; {item.voteAverage.toFixed(1)}</p>
               </div>
               <span className="text-green-400 text-lg">✓</span>
@@ -63,7 +63,7 @@ export default function RankingBoard({ titles, onSubmit, submitted }: RankingBoa
                   <img src={item.posterPath} alt={item.title} className="w-10 h-14 rounded object-cover" />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{item.title}</p>
+                  <p className="font-medium truncate" title={item.title}>{item.title}</p>
                   <p className="text-xs text-gray-500">{item.year} &middot; &#9733; {item.voteAverage.toFixed(1)}</p>
                 </div>
                 <div className="text-gray-600 text-xl cursor-grab">&#9776;</div>

@@ -139,6 +139,7 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
               className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
                 settings.providers.includes(p.id) ? 'bg-primary/20 ring-1 ring-primary' : 'bg-dark-surface'
               }`}
+              title={p.name}
             >
               <img src={p.logoPath} alt={p.name} className="w-8 h-8 rounded-md" />
               <span className="text-[10px] text-gray-400 truncate w-full text-center">{p.name}</span>

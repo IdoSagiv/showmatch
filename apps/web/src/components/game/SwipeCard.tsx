@@ -126,7 +126,7 @@ export default function SwipeCard({
 
             {/* Info strip */}
             <div className="p-4 space-y-2">
-              <h2 className="text-lg font-bold truncate">
+              <h2 className="text-lg font-bold truncate" title={card.title}>
                 {card.title} <span className="text-gray-500 font-normal text-base">({card.year})</span>
               </h2>
 

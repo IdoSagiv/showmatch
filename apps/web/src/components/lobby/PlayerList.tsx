@@ -25,7 +25,7 @@ export default function PlayerList({ players }: PlayerListProps) {
             layout
           >
             <PlayerAvatar name={player.displayName} connected={player.connected} />
-            <span className="font-medium flex-1 truncate">{player.displayName}</span>
+            <span className="font-medium flex-1 truncate" title={player.displayName}>{player.displayName}</span>
             {player.isCreator && <span className="text-accent-gold text-sm" title="Room creator">👑</span>}
             <span className={`w-2 h-2 rounded-full ${player.connected ? 'bg-accent-green' : 'bg-gray-600'}`} />
           </motion.div>
