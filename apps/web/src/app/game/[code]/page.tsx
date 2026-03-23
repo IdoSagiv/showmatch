@@ -52,6 +52,7 @@ export default function GamePage() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [pendingDecision, setPendingDecision] = useState<'like' | 'pass' | 'superlike' | null>(null);
+  const [dragDirection, setDragDirection] = useState<'like' | 'pass' | 'superlike' | null>(null);
 
   useEffect(() => {
     if (!room || !titlePool.length) {
@@ -167,6 +168,7 @@ export default function GamePage() {
             totalCards={titlePool.length}
             onUndo={handleUndo}
             canUndo={canUndo}
+            onDragProgress={setDragDirection}
           />
         </div>
 
@@ -178,6 +180,7 @@ export default function GamePage() {
             onSuperLike={() => setPendingDecision('superlike')}
             superLikeUsed={me?.superLikeUsed ?? false}
             disabled={isFinished || !!pendingDecision}
+            dragDirection={dragDirection}
           />
         )}
       </div>
