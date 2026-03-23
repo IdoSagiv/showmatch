@@ -34,8 +34,9 @@ export default function SwipeCard({
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-250, 0, 250], [-18, 0, 18]);
-  const likeOpacity  = useTransform(x, [20, 120], [0, 1]);
-  const nopeOpacity  = useTransform(x, [-120, -20], [1, 0]);
+  const likeOpacity       = useTransform(x, [20, 120], [0, 1]);
+  const nopeOpacity       = useTransform(x, [-120, -20], [1, 0]);
+  const superLikeOpacity  = useTransform(y, [-120, -20], [1, 0]);
   const decisionRef = useRef<'like' | 'pass' | 'superlike'>('pass');
 
   const scale = 1 - stackIndex * 0.05;
@@ -108,7 +109,13 @@ export default function SwipeCard({
         onClick={handleTap}
       >
         {/* Overlay stamps */}
-        {isTop && <CardOverlay likeOpacity={likeOpacity} nopeOpacity={nopeOpacity} />}
+        {isTop && (
+          <CardOverlay
+            likeOpacity={likeOpacity}
+            nopeOpacity={nopeOpacity}
+            superLikeOpacity={superLikeUsed ? undefined : superLikeOpacity}
+          />
+        )}
 
         {/* Card faces wrapper (3D perspective) */}
         <div className="h-full" style={{ perspective: 1200 }}>
