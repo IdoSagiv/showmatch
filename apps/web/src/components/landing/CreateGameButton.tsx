@@ -18,16 +18,17 @@ export default function CreateGameButton() {
       whileHover={{ scale: 1.01 }}
       transition={{ type: 'spring', stiffness: 400, damping: 22 }}
     >
-      {/* Shimmer sweep */}
+      {/* Shimmer sweep — translateX for seamless loop (no flicker) */}
       <motion.div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)',
-          backgroundSize: '200% 100%',
-        }}
-        animate={{ backgroundPosition: ['200% 0', '-100% 0'] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 1.5 }}
-      />
+        className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl"
+      >
+        <motion.div
+          className="absolute inset-y-0 w-1/2"
+          style={{ background: 'linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%)' }}
+          animate={{ x: ['-100%', '300%'] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut', repeatDelay: 2 }}
+        />
+      </motion.div>
       Create Game
     </motion.button>
   );

@@ -48,7 +48,7 @@ export default function LobbyPage() {
   };
 
   return (
-    <main className="min-h-screen bg-dark">
+    <main className="min-h-screen">
       {/* Frosted glass header */}
       <header className="flex items-center justify-between px-4 py-3 border-b border-dark-border bg-dark/90 backdrop-blur-md sticky top-0 z-20">
         <Logo size="sm" />
