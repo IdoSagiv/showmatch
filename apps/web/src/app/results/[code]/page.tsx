@@ -12,6 +12,7 @@ import GameStats from '@/components/results/GameStats';
 import ShareResultButton from '@/components/results/ShareResultButton';
 import Button from '@/components/ui/Button';
 import Logo from '@/components/ui/Logo';
+import { saveGameToHistory } from '@/lib/history';
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -23,6 +24,21 @@ export default function ResultsPage() {
     isFirstMatch, playerId, swipeReveal, gameStats,
   } = useGameStore();
   const [rankingSubmitted, setRankingSubmitted] = useState(false);
+  const [historySaved, setHistorySaved] = useState(false);
+
+  // Save to history when winner is determined
+  useEffect(() => {
+    if (winner && room && !historySaved) {
+      setHistorySaved(true);
+      saveGameToHistory({
+        id: `${code}-${Date.now()}`,
+        date: new Date().toISOString(),
+        players: room.players.map(p => p.displayName),
+        winner: { title: winner.title, posterPath: winner.posterPath },
+        stats: gameStats,
+      });
+    }
+  }, [winner, room, historySaved, code, gameStats]);
 
   useEffect(() => {
     if (!room) {
