@@ -65,11 +65,11 @@ export default function ResultsPage() {
   }, [socket]);
 
   const handlePlayAgain = useCallback(() => {
-    socket.emit('playAgain', { playerId });
+    (socket as any).emit('playAgain', { playerId });
   }, [socket, playerId]);
 
   const handleEndGame = useCallback(() => {
-    socket.emit('endGame', { playerId });
+    (socket as any).emit('endGame', { playerId });
   }, [socket, playerId]);
 
   const handleShare = useCallback(async () => {

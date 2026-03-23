@@ -27,6 +27,13 @@ export default function GamePage() {
     recordSwipe, undoLastSwipe, playerId,
   } = useGameStore();
   const { playLike, playPass, playSuperLike } = useSound();
+
+  // Sound is driven from handleSwipe so it fires for both gestures AND button taps
+  const soundForDecision = useCallback((decision: 'like' | 'pass' | 'superlike') => {
+    if (decision === 'like') playLike();
+    else if (decision === 'pass') playPass();
+    else playSuperLike();
+  }, [playLike, playPass, playSuperLike]);
   const [flipped, setFlipped] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
@@ -56,6 +63,7 @@ export default function GamePage() {
     if (!titlePool[currentCardIndex]) return;
     const tmdbId = titlePool[currentCardIndex].tmdbId;
 
+    soundForDecision(decision);
     socket.emit('submitSwipe', tmdbId, decision);
     recordSwipe({ tmdbId, decision, timestamp: Date.now() });
     setFlipped(false);
@@ -69,7 +77,7 @@ export default function GamePage() {
         navigator.vibrate?.(50);
       }
     } catch {}
-  }, [socket, titlePool, currentCardIndex, recordSwipe]);
+  }, [socket, titlePool, currentCardIndex, recordSwipe, soundForDecision]);
 
   const handleUndo = useCallback(() => {
     const undone = undoLastSwipe();
@@ -145,9 +153,9 @@ export default function GamePage() {
           <div className="flex items-center justify-center gap-4">
             <UndoButton onClick={handleUndo} disabled={!canUndo} />
             <SwipeButtons
-              onPass={() => { playPass(); setPendingDecision('pass'); }}
-              onLike={() => { playLike(); setPendingDecision('like'); }}
-              onSuperLike={() => { playSuperLike(); setPendingDecision('superlike'); }}
+              onPass={() => setPendingDecision('pass')}
+              onLike={() => setPendingDecision('like')}
+              onSuperLike={() => setPendingDecision('superlike')}
               superLikeUsed={me?.superLikeUsed ?? false}
               disabled={isFinished || !!pendingDecision}
             />
