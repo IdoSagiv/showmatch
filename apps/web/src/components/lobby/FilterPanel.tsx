@@ -32,6 +32,26 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
     setProviderTooltip(null);
   }, []);
 
+  // Auto-detect region from browser locale on first mount
+  const regionDetected = useRef(false);
+  useEffect(() => {
+    if (!isCreator || regionDetected.current) return;
+    regionDetected.current = true;
+
+    const langs = [navigator.language, ...(navigator.languages ?? [])];
+    for (const lang of langs) {
+      const parts = lang.split('-');
+      if (parts.length >= 2) {
+        const detected = parts[parts.length - 1].toUpperCase();
+        if (detected !== settings.region) {
+          onSettingsChange({ ...settings, region: detected });
+        }
+        break;
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCreator]);
+
   useEffect(() => {
     fetch(`/api/tmdb/providers?region=${settings.region}`)
       .then(res => res.json())
@@ -97,7 +117,12 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
       {/* Streaming Providers */}
       <div>
         <div className="flex justify-between items-center mb-2">
-          <label className="text-sm text-gray-400">Streaming Services</label>
+          <label className="text-sm text-gray-400">
+            Streaming Services
+            <span className="ml-2 px-1.5 py-0.5 bg-dark-surface border border-dark-border rounded text-[10px] text-gray-500 font-mono">
+              {settings.region}
+            </span>
+          </label>
           <div className="flex gap-2">
             <button onClick={() => update({ providers: providers.map(p => p.id) })} className="text-xs text-primary">All</button>
             <button onClick={() => update({ providers: [] })} className="text-xs text-gray-500">Clear</button>
