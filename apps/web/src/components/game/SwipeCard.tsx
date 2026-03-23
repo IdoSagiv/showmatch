@@ -104,35 +104,39 @@ export default function SwipeCard({
         <div style={{ perspective: 1200 }}>
           {/* Front face */}
           <motion.div
-            className="bg-dark-card rounded-2xl overflow-hidden border border-dark-border shadow-2xl flex flex-col"
+            className="bg-dark-card rounded-2xl overflow-hidden border border-dark-border shadow-2xl"
             animate={{ rotateY: flipped ? 180 : 0 }}
             transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-            style={{
-              backfaceVisibility: 'hidden',
-              transformStyle: 'preserve-3d',
-              // Cap the card so the info strip is always on-screen.
-              // poster gets flex-1 so it fills whatever space remains.
-              maxHeight: 'calc(100svh - 185px)',
-            }}
+            style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
           >
-            {/* Poster — flex-1 so it fills the space above the info strip.
-                object-contain shows the full poster; TMDB posters are 2:3 so
-                bars (if any) will be tiny on a portrait phone. */}
-            <div className="relative bg-dark-surface w-full overflow-hidden flex-1 min-h-0">
+            {/* Poster — explicit height on the <img> so object-contain has
+                definite bounds and can never clip.
+                calc(100svh - 355px) = viewport minus chrome (header ~53px +
+                progress ~24px + card-stack margin ~16px + buttons ~80px +
+                padding ~32px + info-strip ~150px = 355px).
+                Capped at 50vh so it stays proportional on tablets. */}
+            <div className="relative bg-dark-surface w-full">
               {card.posterPath ? (
                 <img
                   src={card.posterPath}
                   alt={card.title}
-                  className="w-full h-full object-contain object-center"
+                  className="w-full block object-contain object-center"
+                  style={{
+                    height: 'calc(100svh - 355px)',
+                    maxHeight: '50vh',
+                  }}
                   draggable={false}
                 />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-gray-600 text-sm">No Poster</div>
+                <div className="flex items-center justify-center text-gray-600 text-sm"
+                  style={{ height: 'calc(100svh - 355px)', maxHeight: '50vh' }}>
+                  No Poster
+                </div>
               )}
             </div>
 
-            {/* Info strip — always visible, never shrinks */}
-            <div className="p-4 space-y-2 shrink-0">
+            {/* Info strip */}
+            <div className="p-4 space-y-2">
               <h2 className="text-lg font-bold truncate" title={card.title}>
                 {card.title} <span className="text-gray-500 font-normal text-base">({card.year})</span>
               </h2>
