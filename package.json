@@ -1,0 +1,13 @@
+{
+  "name": "showmatch",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=apps/web\" \"npm run dev --workspace=apps/socket-server\"",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:socket": "npm run dev --workspace=apps/socket-server"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  }
+}
