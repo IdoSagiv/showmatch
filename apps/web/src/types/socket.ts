@@ -25,7 +25,7 @@ export interface ClientToServerEvents {
   submitSwipe: (tmdbId: number, decision: 'like' | 'pass' | 'superlike') => void;
   undoSwipe: () => void;
   submitRanking: (rankings: Array<{ tmdbId: number; rank: number }>) => void;
-  playAgain: () => void;
-  endGame: () => void;
-  leaveRoom: () => void;
+  playAgain: (payload?: { playerId?: string }) => void;
+  endGame: (payload?: { playerId?: string }) => void;
+  leaveRoom: (payload?: { playerId?: string }) => void;
 }
