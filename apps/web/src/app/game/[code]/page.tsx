@@ -90,7 +90,7 @@ export default function GamePage() {
   const otherPlayers = room.players.filter(p => p.id !== playerId);
 
   return (
-    <main className="min-h-screen bg-dark flex flex-col" style={{ touchAction: 'pan-y' }}>
+    <main className="min-h-screen bg-dark flex flex-col overflow-hidden" style={{ touchAction: 'pan-y' }}>
       <TutorialOverlay onDismiss={() => setShowTutorial(false)} />
       {/* Header */}
       <header className="flex items-center justify-between p-3 border-b border-dark-border">
@@ -130,7 +130,7 @@ export default function GamePage() {
         )}
 
         {/* Card Stack */}
-        <div className="flex-1 flex items-center justify-center mt-4">
+        <div className="flex-1 flex items-center justify-center mt-4 overflow-hidden">
           <CardStack
             cards={titlePool}
             currentIndex={currentCardIndex}

@@ -94,6 +94,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     gameStats: [],
     wildcardCandidates: [],
     isFirstMatch: false,
+    gameOver: false,
+    loadingProgress: null,
     room: state.room ? { ...state.room, status: 'swiping', titlePool } : null,
   })),
 

@@ -21,10 +21,17 @@ export default function ResultsPage() {
   const socket = useSocket();
   const {
     room, matchedTitles, winner, fullRankings, wildcardCandidates,
-    isFirstMatch, playerId, swipeReveal, gameStats,
+    isFirstMatch, playerId, swipeReveal, gameStats, gameOver, setWinner,
   } = useGameStore();
   const [rankingSubmitted, setRankingSubmitted] = useState(false);
   const [historySaved, setHistorySaved] = useState(false);
+
+  // Auto-set winner when there's exactly 1 match (server skips ranking round)
+  useEffect(() => {
+    if (gameOver && matchedTitles.length === 1 && !winner) {
+      setWinner(matchedTitles[0]);
+    }
+  }, [gameOver, matchedTitles, winner, setWinner]);
 
   // Save to history when winner is determined
   useEffect(() => {
@@ -80,8 +87,10 @@ export default function ResultsPage() {
   if (!room) return null;
 
   const isCreator = room.players.find(p => p.id === playerId)?.isCreator ?? false;
-  const isRanking = room.status === 'ranking' && !winner;
-  const noMatches = matchedTitles.length === 0 && room.status === 'finished' && !winner;
+  // Use gameOver (set by allPlayersFinished event) since client room.status isn't updated server-side
+  const isRanking = gameOver && matchedTitles.length > 1 && !winner;
+  const noMatches = gameOver && matchedTitles.length === 0 && !winner;
+  const waitingForResults = gameOver && !winner && !isRanking && !noMatches;
 
   return (
     <main className="min-h-screen bg-dark">
@@ -90,6 +99,14 @@ export default function ResultsPage() {
       </header>
 
       <div className="max-w-lg mx-auto p-4 space-y-6">
+        {/* Still waiting */}
+        {!gameOver && !winner && (
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-gray-400">Waiting for everyone to finish…</p>
+          </div>
+        )}
+
         {/* No matches */}
         {noMatches && (
           <WildcardPicker candidates={wildcardCandidates} />
