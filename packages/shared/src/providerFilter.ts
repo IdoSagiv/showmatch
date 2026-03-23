@@ -63,7 +63,7 @@ export function normalizeProviderName(name: string): string {
     .toLowerCase()
     .replace(/\s+(apple tv|amazon|prime video|roku).*$/i, '') // strip platform suffix
     .replace(/[^a-z0-9]/g, '')
-    .replace(/(basic|standard|premium|kids|plus|hd|4k|withadvertisements|withads|ads)$/g, '')
+    .replace(/(basic|standard|premium|essential|kids|plus|hd|4k|withadvertisements|withads|adsupported|ads)$/g, '')
     .trim();
 }
 
