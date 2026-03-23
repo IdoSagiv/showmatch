@@ -28,13 +28,13 @@ export default function RankingBoard({ titles, onSubmit, submitted }: RankingBoa
         You agreed on {titles.length} titles! Rank them.
       </h2>
 
-      <Reorder.Group axis="y" values={items} onReorder={setItems}>
-        {items.map((item, index) => (
-          <Reorder.Item key={item.tmdbId} value={item}>
-            <motion.div
-              className="flex items-center gap-3 bg-dark-card rounded-xl p-3 mb-2 border border-dark-border cursor-grab active:cursor-grabbing"
-              whileDrag={{ scale: 1.02, boxShadow: '0 0 20px rgba(229,9,20,0.3)' }}
-              layout
+      {submitted ? (
+        // Locked static list after submission
+        <div className="space-y-2">
+          {items.map((item, index) => (
+            <div
+              key={item.tmdbId}
+              className="flex items-center gap-3 bg-dark-card rounded-xl p-3 mb-2 border border-dark-border opacity-60"
             >
               <span className="text-lg font-bold text-primary w-8 text-center">{index + 1}</span>
               {item.posterPath && (
@@ -44,11 +44,34 @@ export default function RankingBoard({ titles, onSubmit, submitted }: RankingBoa
                 <p className="font-medium truncate">{item.title}</p>
                 <p className="text-xs text-gray-500">{item.year} &middot; &#9733; {item.voteAverage.toFixed(1)}</p>
               </div>
-              <div className="text-gray-600 text-xl cursor-grab">&#9776;</div>
-            </motion.div>
-          </Reorder.Item>
-        ))}
-      </Reorder.Group>
+              <span className="text-green-400 text-lg">✓</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        // Draggable list before submission
+        <Reorder.Group axis="y" values={items} onReorder={setItems}>
+          {items.map((item, index) => (
+            <Reorder.Item key={item.tmdbId} value={item}>
+              <motion.div
+                className="flex items-center gap-3 bg-dark-card rounded-xl p-3 mb-2 border border-dark-border cursor-grab active:cursor-grabbing"
+                whileDrag={{ scale: 1.02, boxShadow: '0 0 20px rgba(229,9,20,0.3)' }}
+                layout
+              >
+                <span className="text-lg font-bold text-primary w-8 text-center">{index + 1}</span>
+                {item.posterPath && (
+                  <img src={item.posterPath} alt={item.title} className="w-10 h-14 rounded object-cover" />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{item.title}</p>
+                  <p className="text-xs text-gray-500">{item.year} &middot; &#9733; {item.voteAverage.toFixed(1)}</p>
+                </div>
+                <div className="text-gray-600 text-xl cursor-grab">&#9776;</div>
+              </motion.div>
+            </Reorder.Item>
+          ))}
+        </Reorder.Group>
+      )}
 
       <Button
         size="lg"
@@ -56,7 +79,7 @@ export default function RankingBoard({ titles, onSubmit, submitted }: RankingBoa
         disabled={submitted}
         className="w-full"
       >
-        {submitted ? 'Rankings Submitted!' : 'Submit Rankings'}
+        {submitted ? '✓ Rankings Submitted' : 'Submit Rankings'}
       </Button>
     </div>
   );

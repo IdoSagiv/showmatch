@@ -9,8 +9,6 @@ import RankingBoard from '@/components/results/RankingBoard';
 import WildcardPicker from '@/components/results/WildcardPicker';
 import SwipeReveal from '@/components/results/SwipeReveal';
 import GameStats from '@/components/results/GameStats';
-import ShareResultButton from '@/components/results/ShareResultButton';
-import Button from '@/components/ui/Button';
 import Logo from '@/components/ui/Logo';
 import { saveGameToHistory } from '@/lib/history';
 
@@ -25,6 +23,7 @@ export default function ResultsPage() {
   } = useGameStore();
   const [rankingSubmitted, setRankingSubmitted] = useState(false);
   const [historySaved, setHistorySaved] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   // Auto-set winner when there's exactly 1 match (server skips ranking round)
   useEffect(() => {
@@ -74,7 +73,7 @@ export default function ResultsPage() {
 
   const handleShare = useCallback(async () => {
     if (!winner) return;
-    const text = `We're watching ${winner.title}! Decided on ShowMatch`;
+    const text = `We're watching "${winner.title}" (${winner.year})! Decided on ShowMatch 🎬`;
     if (navigator.share) {
       try {
         await navigator.share({ title: 'ShowMatch Result', text });
@@ -82,6 +81,8 @@ export default function ResultsPage() {
       } catch {}
     }
     await navigator.clipboard.writeText(text);
+    setShareCopied(true);
+    setTimeout(() => setShareCopied(false), 2000);
   }, [winner]);
 
   if (!room) return null;
@@ -154,30 +155,60 @@ export default function ResultsPage() {
             </div>
 
             {/* Action buttons */}
-            <div className="flex gap-3 mt-6">
+            <div className="mt-8 rounded-2xl bg-dark-card border border-dark-border p-4 space-y-3">
+              {/* Share — always visible */}
+              <button
+                onClick={handleShare}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-dark-border bg-dark-surface hover:bg-dark-border transition-colors text-white font-semibold text-base active:scale-95"
+              >
+                <span className="text-lg">{shareCopied ? '✓' : '📤'}</span>
+                {shareCopied ? 'Copied to clipboard!' : 'Share Result'}
+              </button>
+
+              {/* Creator-only controls */}
               {isCreator && (
                 <>
-                  <Button onClick={handlePlayAgain} variant="secondary" className="flex-1">
+                  <button
+                    onClick={handlePlayAgain}
+                    className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary-dark transition-colors text-white font-semibold text-base active:scale-95"
+                  >
+                    <span className="text-lg">🔄</span>
                     Play Again
-                  </Button>
-                  <Button onClick={handleEndGame} variant="ghost" className="flex-1">
+                  </button>
+
+                  <button
+                    onClick={handleEndGame}
+                    className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-red-900/40 bg-red-950/30 hover:bg-red-950/60 transition-colors text-red-400 font-semibold text-base active:scale-95"
+                  >
+                    <span className="text-lg">🚪</span>
                     End Game
-                  </Button>
+                  </button>
                 </>
               )}
-              <ShareResultButton winner={winner} />
             </div>
           </>
         )}
 
         {/* Broadening suggestion for no matches */}
         {noMatches && (
-          <div className="text-center mt-6 space-y-3">
-            <p className="text-sm text-gray-500">Try selecting more genres or lowering the rating threshold</p>
+          <div className="mt-6 space-y-3">
+            <p className="text-sm text-gray-500 text-center">Try selecting more genres or lowering the rating threshold</p>
             {isCreator && (
-              <div className="flex gap-3 justify-center">
-                <Button onClick={handlePlayAgain} variant="secondary">Play Again</Button>
-                <Button onClick={handleEndGame} variant="ghost">End Game</Button>
+              <div className="rounded-2xl bg-dark-card border border-dark-border p-4 space-y-3">
+                <button
+                  onClick={handlePlayAgain}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary-dark transition-colors text-white font-semibold text-base active:scale-95"
+                >
+                  <span className="text-lg">🔄</span>
+                  Play Again
+                </button>
+                <button
+                  onClick={handleEndGame}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-red-900/40 bg-red-950/30 hover:bg-red-950/60 transition-colors text-red-400 font-semibold text-base active:scale-95"
+                >
+                  <span className="text-lg">🚪</span>
+                  End Game
+                </button>
               </div>
             )}
           </div>
