@@ -117,7 +117,7 @@ export default function GamePage() {
 
   return (
     <main className="bg-dark flex flex-col overflow-hidden" style={{ height: 'var(--game-h, 100vh)', touchAction: 'pan-y' }}>
-      <TutorialOverlay onDismiss={() => setShowTutorial(false)} />
+      <TutorialOverlay onDismiss={() => setShowTutorial(false)} forceShow={showTutorial} />
       {/* Header */}
       <header className="flex items-center justify-between p-3 border-b border-dark-border">
         <Logo size="sm" />

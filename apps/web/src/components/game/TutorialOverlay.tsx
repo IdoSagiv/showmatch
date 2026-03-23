@@ -33,18 +33,29 @@ const STEPS = [
 
 interface TutorialOverlayProps {
   onDismiss: () => void;
+  /** Set to true to force-show the tutorial (e.g. replay button). */
+  forceShow?: boolean;
 }
 
-export default function TutorialOverlay({ onDismiss }: TutorialOverlayProps) {
+export default function TutorialOverlay({ onDismiss, forceShow }: TutorialOverlayProps) {
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
 
+  // Show on first visit
   useEffect(() => {
     const seen = localStorage.getItem('showmatch-tutorial-seen');
     if (!seen) {
       setVisible(true);
     }
   }, []);
+
+  // Re-show when parent requests replay
+  useEffect(() => {
+    if (forceShow) {
+      setStep(0);
+      setVisible(true);
+    }
+  }, [forceShow]);
 
   const handleNext = () => {
     if (step >= STEPS.length - 1) {
