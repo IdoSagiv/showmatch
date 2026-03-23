@@ -143,6 +143,7 @@ export default function GamePage() {
             cards={titlePool}
             currentIndex={currentCardIndex}
             onSwipe={handleSwipe}
+            superLikeUsed={me?.superLikeUsed ?? false}
             pendingDecision={pendingDecision}
             onPendingConsumed={() => setPendingDecision(null)}
           />

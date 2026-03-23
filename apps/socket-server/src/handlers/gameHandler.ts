@@ -65,6 +65,12 @@ export function registerGameHandlers(io: Server, socket: Socket) {
     const room = roomManager.getRoomBySocket(socket.id);
     if (!room || room.status !== 'swiping') return;
 
+    // Enforce once-per-game superlike
+    if (decision === 'superlike') {
+      const player = room.players.find(p => p.id === socket.id);
+      if (player?.superLikeUsed) return;
+    }
+
     GameSession.recordSwipe(room, socket.id, tmdbId, decision);
 
     const player = room.players.find(p => p.id === socket.id);

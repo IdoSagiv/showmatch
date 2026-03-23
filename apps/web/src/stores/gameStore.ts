@@ -99,10 +99,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     room: state.room ? { ...state.room, status: 'swiping', titlePool } : null,
   })),
 
-  recordSwipe: (decision) => set((state) => ({
-    mySwipes: [...state.mySwipes, decision],
-    currentCardIndex: state.currentCardIndex + 1,
-  })),
+  recordSwipe: (decision) => set((state) => {
+    const isSuperLike = decision.decision === 'superlike';
+    return {
+      mySwipes: [...state.mySwipes, decision],
+      currentCardIndex: state.currentCardIndex + 1,
+      // Mark superLikeUsed on the local player so the button/gesture
+      // disables immediately without waiting for a server round-trip.
+      room: (isSuperLike && state.room && state.playerId)
+        ? {
+            ...state.room,
+            players: state.room.players.map(p =>
+              p.id === state.playerId ? { ...p, superLikeUsed: true } : p
+            ),
+          }
+        : state.room,
+    };
+  }),
 
   undoLastSwipe: () => {
     const state = get();
