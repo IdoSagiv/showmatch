@@ -118,13 +118,8 @@ export default function SwipeCard({
     >
       <motion.div
         className="relative cursor-grab active:cursor-grabbing select-none h-full"
-        style={{
-          x, y, rotate,
-          touchAction: flipped ? 'pan-y' : 'none',
-          WebkitUserSelect: 'none',
-          WebkitTouchCallout: 'none',
-          willChange: 'transform',
-        } as React.CSSProperties}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        style={{ x, y, rotate, touchAction: flipped ? 'pan-y' : 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', willChange: 'transform' } as any}
         drag={!preview && isTop && !exiting ? (flipped ? 'x' : true) : false}
         dragElastic={0.8}
         onDragEnd={isTop ? handleDragEnd : undefined}
@@ -136,6 +131,8 @@ export default function SwipeCard({
             likeOpacity={likeOpacity}
             nopeOpacity={nopeOpacity}
             superLikeOpacity={superLikeUsed ? undefined : superLikeOpacity}
+            x={x}
+            y={y}
           />
         )}
 

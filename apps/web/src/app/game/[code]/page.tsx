@@ -130,7 +130,7 @@ export default function GamePage() {
     <main className="bg-dark flex flex-col overflow-hidden" style={{ height: gameHeight, touchAction: 'pan-y' }}>
       <TutorialOverlay onDismiss={() => setShowTutorial(false)} forceShow={showTutorial} />
       {/* Header */}
-      <header className="flex items-center justify-between p-3 border-b border-dark-border">
+      <header className="flex items-center justify-between px-4 py-2.5 border-b border-dark-border bg-dark/90 backdrop-blur-md">
         <Logo size="sm" />
         <TutorialReplayButton onClick={() => {
           localStorage.removeItem('showmatch-tutorial-seen');
