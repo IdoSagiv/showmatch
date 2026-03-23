@@ -34,19 +34,23 @@ export function registerRoomHandlers(io: Server, socket: Socket) {
     console.log(`${playerName} joined room ${code}`);
   });
 
-  socket.on('leaveRoom', () => {
-    const room = roomManager.getRoomBySocket(socket.id);
+  socket.on('leaveRoom', (payload?: { playerId?: string }) => {
+    // Support playerId fallback so this works even after a socket reconnect
+    const room = roomManager.getRoomBySocket(socket.id)
+      ?? (payload?.playerId ? roomManager.getRoomByPlayerId(payload.playerId) : null);
     if (!room) return;
 
-    const player = room.players.find(p => p.id === socket.id);
+    const player = room.players.find(
+      p => p.id === socket.id || p.id === payload?.playerId
+    );
     if (!player) return;
 
     if (player.isCreator) {
       io.to(room.code).emit('roomClosed', 'Host left the game');
       roomManager.destroyRoom(room.code);
     } else {
-      roomManager.removePlayer(room.code, socket.id);
-      socket.to(room.code).emit('playerLeft', socket.id);
+      roomManager.removePlayer(room.code, player.id);
+      socket.to(room.code).emit('playerLeft', player.id);
     }
     socket.leave(room.code);
   });
@@ -93,17 +97,13 @@ export function registerRoomHandlers(io: Server, socket: Socket) {
 }
 
 export function handleDisconnect(io: Server, socket: Socket) {
-  const result = roomManager.handleDisconnect(socket.id, (room, player) => {
+  roomManager.handleDisconnect(socket.id, (room, player) => {
     if (player.isCreator) {
-      io.to(room.code).emit('roomClosed', 'Host left the game');
+      io.to(room.code).emit('roomClosed', 'Host disconnected');
       roomManager.destroyRoom(room.code);
     } else {
       roomManager.removePlayer(room.code, player.id);
       io.to(room.code).emit('playerLeft', player.id);
     }
   });
-
-  if (result) {
-    socket.to(result.room.code).emit('playerLeft', result.player.id);
-  }
 }

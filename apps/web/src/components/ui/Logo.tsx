@@ -15,10 +15,12 @@ interface LogoProps {
 export default function Logo({ size = 'sm' }: LogoProps) {
   const textSize = size === 'lg' ? 'text-5xl md:text-6xl' : 'text-2xl';
   const router = useRouter();
-  const { room, reset } = useGameStore();
+  const { room, reset, playerId } = useGameStore();
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const isInGame = room?.status === 'swiping' || room?.status === 'ranking';
+  // Show leave-confirmation and emit leaveRoom whenever the player is inside a running game
+  // (any status except lobby — lobby is fine to exit freely)
+  const isInGame = !!room && room.status !== 'lobby';
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -32,7 +34,7 @@ export default function Logo({ size = 'sm' }: LogoProps) {
   const handleLeave = () => {
     try {
       const socket = getSocket();
-      socket.emit('leaveRoom');
+      socket.emit('leaveRoom', { playerId: playerId ?? undefined });
     } catch {}
     reset();
     setShowConfirm(false);
