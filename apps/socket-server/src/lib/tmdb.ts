@@ -94,10 +94,12 @@ export async function fetchDiscoverResults(
     onProgress?.(done, total);
   }
 
-  // Drop titles with no streamable providers in the user's region.
-  // These are theatrical/pre-streaming releases that slip through the
-  // TMDB discover filter.  Trim to the original target pool size.
-  return enriched.filter(t => t.providers.length > 0).slice(0, poolSize);
+  // Only drop provider-less titles when the user actually filtered by provider.
+  // Without a provider filter, theatrical/un-streamed titles are fair game.
+  const filtered = settings.providers.length > 0
+    ? enriched.filter(t => t.providers.length > 0)
+    : enriched;
+  return filtered.slice(0, poolSize);
 }
 
 async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard> {
