@@ -137,8 +137,24 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
         /itunes/i,
         /google play/i,
       ];
+      // Normalize name for dedup: strip tier suffixes and platform distribution
+      // so "Netflix" and "Netflix Standard with Ads" collapse to the same key
+      const normalizeProviderName = (s: string) =>
+        s.toLowerCase()
+          .replace(/\s+(apple tv|amazon|prime video|roku).*$/i, '')
+          .replace(/[^a-z0-9]/g, '')
+          .replace(/(basic|standard|premium|kids|plus|hd|4k|withadvertisements|withads|ads)$/g, '')
+          .trim();
+
+      const seenProviders = new Set<string>();
       title.providers = flatrate
         .filter((p: any) => !CHANNEL_PATTERNS.some((re: RegExp) => re.test(p.provider_name)))
+        .filter((p: any) => {
+          const key = normalizeProviderName(p.provider_name);
+          if (seenProviders.has(key)) return false;
+          seenProviders.add(key);
+          return true;
+        })
         .map((p: any) => ({
           id: p.provider_id,
           name: p.provider_name,
