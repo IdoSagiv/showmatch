@@ -9,6 +9,7 @@ export default function CreateGameButton() {
 
   return (
     <motion.div
+      className="w-full"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
@@ -16,7 +17,7 @@ export default function CreateGameButton() {
       <Button
         size="lg"
         onClick={() => router.push('/create')}
-        className="w-full text-xl"
+        className="w-full text-lg py-4"
       >
         Create Game
       </Button>

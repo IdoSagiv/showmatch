@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import HeroSection from '@/components/landing/HeroSection';
 import CreateGameButton from '@/components/landing/CreateGameButton';
 import JoinGameForm from '@/components/landing/JoinGameForm';
@@ -20,39 +20,53 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background decoration */}
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl"
+          className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-primary/5 blur-3xl"
           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 8, repeat: Infinity }}
         />
         <motion.div
-          className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl"
+          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-primary/5 blur-3xl"
           animate={{ scale: [1.2, 1, 1.2], opacity: [0.5, 0.3, 0.5] }}
           transition={{ duration: 8, repeat: Infinity }}
         />
       </div>
 
-      <div className="relative z-10 w-full max-w-sm flex flex-col items-center">
+      {/* Card */}
+      <div className="relative z-10 w-full max-w-md flex flex-col items-center gap-3">
         <HeroSection />
-        <CreateGameButton />
-        <JoinGameForm />
+
+        <div className="w-full mt-2 flex flex-col gap-3">
+          <CreateGameButton />
+
+          <div className="flex items-center gap-3 text-gray-600 text-sm">
+            <div className="flex-1 h-px bg-dark-border" />
+            <span>or join with a code</span>
+            <div className="flex-1 h-px bg-dark-border" />
+          </div>
+
+          <JoinGameForm />
+        </div>
+
         <GameHistoryButton />
       </div>
 
       {/* Toast */}
-      {toast && (
-        <motion.div
-          className="fixed top-4 left-1/2 -translate-x-1/2 bg-dark-card border border-dark-border px-6 py-3 rounded-xl text-sm z-50"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-        >
-          {toast}
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            className="fixed top-4 left-1/2 -translate-x-1/2 bg-dark-card border border-dark-border px-6 py-3 rounded-xl text-sm z-50 whitespace-nowrap"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
