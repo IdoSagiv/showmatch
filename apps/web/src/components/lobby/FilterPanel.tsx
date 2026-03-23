@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import type { GameSettings, StreamingProvider } from '@/types/game';
 import { GENRES, CONTENT_RATINGS, TIMER_OPTIONS, SORT_OPTIONS } from '@/lib/constants';
 import { detectRegion } from '@/lib/detectRegion';
-import RangeSlider from '@/components/ui/RangeSlider';
+import YearRangeSlider from '@/components/ui/YearRangeSlider';
 
 interface FilterPanelProps {
   settings: GameSettings;
@@ -212,21 +212,13 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
 
       {/* Year Range */}
       <div>
-        <div className="flex justify-between items-center mb-2">
-          <label className="text-sm text-gray-400">Year Range</label>
-          <span className="text-sm font-mono text-white">{settings.yearRange[0]} – {settings.yearRange[1]}</span>
-        </div>
-        <RangeSlider
+        <label className="text-sm text-gray-400 mb-3 block">Year Range</label>
+        <YearRangeSlider
           min={1950}
           max={new Date().getFullYear()}
           value={settings.yearRange}
           onChange={(val) => update({ yearRange: val })}
-          step={1}
         />
-        <div className="flex justify-between mt-1 text-xs text-gray-600">
-          <span>1950</span>
-          <span>{new Date().getFullYear()}</span>
-        </div>
       </div>
 
       {/* Content Rating */}
