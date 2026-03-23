@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { TitleCard } from '@/types/game';
 import Confetti from './Confetti';
 import StreamingLogos from '@/components/game/StreamingLogos';
+import { playSound } from '@/lib/sounds';
 
 interface ResultRevealProps {
   winner: TitleCard;
@@ -25,6 +26,15 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
       setRevealed(true);
     }
   }, [countdown, skipCountdown]);
+
+  // Play victory sound when the winner card animates in.
+  // Guard with !skipCountdown: firstMatch path already plays it via useSocket.
+  useEffect(() => {
+    if (revealed && !skipCountdown) {
+      playSound('victory');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [revealed]);
 
   return (
     <div className="text-center">
