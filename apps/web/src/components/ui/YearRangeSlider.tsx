@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface YearRangeSliderProps {
   min: number;
@@ -64,39 +64,25 @@ export default function YearRangeSlider({ min, max, value, onChange }: YearRange
 
       {/* Slider track + thumbs */}
       <div className="relative pt-8 pb-1">
-        {/* Lo thumb bubble */}
+        {/* Lo thumb bubble — positioned using exact thumb-offset formula */}
         <div
           className="absolute top-0 flex flex-col items-center pointer-events-none"
-          style={{
-            left: `clamp(18px, ${loPercent}%, calc(100% - 18px))`,
-            transform: 'translateX(-50%)',
-          }}
+          style={{ left: `calc(${loPercent}% + ${10 - loPercent * 0.2}px)`, transform: 'translateX(-50%)' }}
         >
-          <motion.div
-            layout
-            className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg shadow-lg tabular-nums"
-            style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}
-          >
+          <div className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg tabular-nums" style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}>
             {lo}
-          </motion.div>
+          </div>
           <div className="w-0.5 h-1.5 bg-primary/60" />
         </div>
 
         {/* Hi thumb bubble */}
         <div
           className="absolute top-0 flex flex-col items-center pointer-events-none"
-          style={{
-            left: `clamp(18px, ${hiPercent}%, calc(100% - 18px))`,
-            transform: 'translateX(-50%)',
-          }}
+          style={{ left: `calc(${hiPercent}% + ${10 - hiPercent * 0.2}px)`, transform: 'translateX(-50%)' }}
         >
-          <motion.div
-            layout
-            className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg shadow-lg tabular-nums"
-            style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}
-          >
+          <div className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg tabular-nums" style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}>
             {hi}
-          </motion.div>
+          </div>
           <div className="w-0.5 h-1.5 bg-primary/60" />
         </div>
 
