@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
-import { DEFAULT_SETTINGS } from '@/lib/constants';
 import { NAME_ADJECTIVES, NAME_NOUNS } from '@/lib/constants';
 import FilterPanel from '@/components/lobby/FilterPanel';
 import FilterPreview from '@/components/lobby/FilterPreview';
@@ -25,27 +24,40 @@ export default function CreatePage() {
   const router = useRouter();
   const socket = useSocket();
   const { room, setRoom, setPlayerId, updateSettings } = useGameStore();
-  const [loading, setLoading] = useState(true);
+
+  // Step 1: pick a name. Step 2: room is live.
+  const [name, setName] = useState(() => randomName());
+  const [step, setStep] = useState<'name' | 'room'>('name');
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // If room already in store (e.g. back-navigation), skip to room step
+  useEffect(() => {
+    if (room) setStep('room');
+  }, []);
 
   useEffect(() => {
-    if (room) {
-      setLoading(false);
-      return;
-    }
+    if (step === 'name') setTimeout(() => inputRef.current?.select(), 50);
+  }, [step]);
 
-    const name = randomName();
-    socket.emit('createRoom', name, (response: any) => {
+  const handleCreate = useCallback(() => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setCreating(true);
+    setError(null);
+    socket.emit('createRoom', trimmed, (response: any) => {
       if ('error' in response) {
         setError(response.error);
-        setLoading(false);
+        setCreating(false);
         return;
       }
       setRoom(response.room);
       setPlayerId(socket.id || '');
-      setLoading(false);
+      setStep('room');
+      setCreating(false);
     });
-  }, []);
+  }, [name, socket, setRoom, setPlayerId]);
 
   const handleSettingsChange = useCallback((settings: GameSettings) => {
     updateSettings(settings);
@@ -63,27 +75,72 @@ export default function CreatePage() {
     }
   }, [room?.status, room?.code, router]);
 
-  if (loading) {
+  /* ── Step 1: Name picker ── */
+  if (step === 'name') {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      <main className="flex min-h-screen flex-col items-center justify-center p-6">
+        <motion.div
+          className="w-full max-w-sm flex flex-col items-center gap-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Logo size="md" />
+
+          <div className="w-full text-center">
+            <h2 className="text-xl font-bold mb-1">What's your name?</h2>
+            <p className="text-sm text-gray-500">Others will see this in the lobby</p>
+          </div>
+
+          <div className="w-full flex flex-col gap-3">
+            <div className="relative">
+              <input
+                ref={inputRef}
+                value={name}
+                onChange={e => setName(e.target.value.slice(0, 50))}
+                onKeyDown={e => e.key === 'Enter' && handleCreate()}
+                placeholder="Your name"
+                maxLength={50}
+                className="
+                  w-full bg-dark-surface border border-dark-border rounded-xl
+                  px-4 py-3 text-center text-lg font-medium text-white
+                  focus:outline-none focus:border-primary transition-colors
+                "
+              />
+              <button
+                type="button"
+                onClick={() => setName(randomName())}
+                title="Random name"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors text-lg"
+              >
+                🎲
+              </button>
+            </div>
+
+            {error && <p className="text-sm text-accent-red text-center">{error}</p>}
+
+            <Button
+              size="lg"
+              onClick={handleCreate}
+              disabled={!name.trim() || creating}
+              className="w-full"
+            >
+              {creating ? 'Creating…' : 'Create Room'}
+            </Button>
+
+            <button
+              onClick={() => router.push('/')}
+              className="text-sm text-gray-500 hover:text-gray-300 transition-colors text-center"
+            >
+              ← Back
+            </button>
+          </div>
         </motion.div>
-      </div>
+      </main>
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center p-4">
-        <p className="text-accent-red mb-4">{error}</p>
-        <Button onClick={() => router.push('/')}>Go Back</Button>
-      </div>
-    );
-  }
-
+  /* ── Step 2: Room live ── */
   if (!room) return null;
-
   const connectedCount = room.players.filter(p => p.connected).length;
 
   return (
@@ -120,7 +177,7 @@ export default function CreatePage() {
         <PlayerList players={room.players} />
 
         {/* Start Button */}
-        <div className="sticky bottom-4">
+        <div className="sticky bottom-4 pb-safe">
           <Button
             size="lg"
             onClick={handleStartGame}
@@ -128,7 +185,7 @@ export default function CreatePage() {
             className="w-full"
           >
             {connectedCount < 2
-              ? `Waiting for players... (${connectedCount}/2)`
+              ? `Waiting for players… (${connectedCount}/2)`
               : `Start Game (${connectedCount} players)`
             }
           </Button>
