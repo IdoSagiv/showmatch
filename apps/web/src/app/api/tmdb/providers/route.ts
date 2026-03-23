@@ -42,51 +42,64 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Known rental/purchase store provider IDs (not streaming subscriptions)
-  const STORE_IDS = new Set([
+  // IDs to exclude: rental/purchase stores and known non-subscription services
+  const EXCLUDED_IDS = new Set([
     2,   // Apple iTunes
     3,   // Google Play Movies
     7,   // Fandango at Home (was Vudu)
-    10,  // Amazon Video (rental — distinct from Prime Video id=9)
+    10,  // Amazon Video (rental)
     35,  // Rakuten TV
     68,  // Microsoft Store
-    130, // Pluto TV (ad-supported, not subscription — keep if desired)
     192, // YouTube (rental/purchase)
     188, // YouTube Premium
     207, // Redbox
-    258, // Hoopla (library — not a consumer streaming service)
+    258, // Hoopla
   ]);
 
-  // Name-based safety net for store keywords
-  const STORE_NAME_PATTERNS = [
+  // Name patterns to exclude:
+  // - Stores / rental services
+  // - Sub-channel add-ons sold through a platform (e.g. "BET+ Apple TV Channel",
+  //   "AMC+ Amazon Channel") — these are distribution wrappers, not standalone services
+  const EXCLUDED_NAME_PATTERNS = [
     /itunes/i,
     /google play/i,
     /microsoft store/i,
     /fandango/i,
     /redbox/i,
-    /\bstore\b/i,      // "Apple TV Store", "Play Store", etc.
-    /\brent\b/i,       // any "rent" branded service
+    /\bstore\b/i,
+    /\brent\b/i,
+    // Platform add-on channels — "X Apple TV Channel", "X Amazon Channel", etc.
+    /apple tv channel/i,
+    /amazon channel/i,
+    /prime video channel/i,
+    /roku channel/i,
+    /\bchannel$/i,   // anything ending in bare "Channel" (e.g. "Starz Channel")
   ];
 
-  const isStore = (p: { id: number; name: string }) =>
-    STORE_IDS.has(p.id) || STORE_NAME_PATTERNS.some(re => re.test(p.name));
+  const shouldExclude = (p: { id: number; name: string }) =>
+    EXCLUDED_IDS.has(p.id) || EXCLUDED_NAME_PATTERNS.some(re => re.test(p.name));
 
-  // Sort by regional priority (lower = more prominent), then deduplicate
-  // by normalized name to collapse e.g. "Amazon Video" + "Amazon Prime Video"
-  // or multiple tiers of the same service that TMDB tracks as separate IDs.
+  // Normalize name for dedup: strip punctuation + tier/plan suffixes,
+  // and strip platform distribution suffixes so "Netflix" and "Netflix Basic"
+  // collapse to the same key.
   const normalize = (s: string) =>
-    s.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/(basic|standard|premium|kids|plus|hd|4k)$/g, '').trim();
+    s.toLowerCase()
+      .replace(/\s+(apple tv|amazon|prime video|roku).*$/i, '') // strip " Apple TV..." suffix
+      .replace(/[^a-z0-9]/g, '')
+      .replace(/(basic|standard|premium|kids|plus|hd|4k)$/g, '')
+      .trim();
 
   const seenNames = new Set<string>();
   const sorted = [...providers.values()]
     .sort((a, b) => a.priority - b.priority)
-    .filter(p => !isStore(p))
+    .filter(p => !shouldExclude(p))
     .filter(p => {
       const key = normalize(p.name);
       if (seenNames.has(key)) return false;
       seenNames.add(key);
       return true;
     })
+    .slice(0, 30)  // cap at top 30 by regional priority
     .map(({ id, name, logoPath }) => ({ id, name, logoPath }));
 
   return NextResponse.json(sorted);
