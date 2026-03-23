@@ -42,8 +42,21 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // Sort by regional priority (lower = more prominent), then deduplicate
+  // by normalized name to collapse e.g. "Amazon Video" + "Amazon Prime Video"
+  // or multiple tiers of the same service that TMDB tracks as separate IDs.
+  const normalize = (s: string) =>
+    s.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/(basic|standard|premium|kids|plus|hd|4k)$/g, '').trim();
+
+  const seenNames = new Set<string>();
   const sorted = [...providers.values()]
     .sort((a, b) => a.priority - b.priority)
+    .filter(p => {
+      const key = normalize(p.name);
+      if (seenNames.has(key)) return false;
+      seenNames.add(key);
+      return true;
+    })
     .map(({ id, name, logoPath }) => ({ id, name, logoPath }));
 
   return NextResponse.json(sorted);
