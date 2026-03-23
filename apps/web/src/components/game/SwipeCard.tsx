@@ -267,7 +267,7 @@ export default function SwipeCard({
               />
             )}
 
-            <div ref={backScrollRef} className="relative p-5 h-full overflow-y-auto space-y-4">
+            <div ref={backScrollRef} className="relative p-5 h-full overflow-y-auto space-y-4" style={{ touchAction: 'pan-y', overscrollBehavior: 'none' }}>
               <h2 className="text-xl font-black leading-tight tracking-tight">
                 {card.title}{' '}
                 <span className="text-gray-500 font-normal text-base">({card.year})</span>
