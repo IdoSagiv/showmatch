@@ -54,7 +54,7 @@ export default function JoinPage() {
   return (
     <main className="min-h-screen bg-dark">
       <header className="flex items-center p-4 border-b border-dark-border">
-        <a href="/"><Logo size="sm" /></a>
+        <Logo size="sm" />
       </header>
 
       <div className="max-w-sm mx-auto p-4 mt-12">

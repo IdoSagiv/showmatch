@@ -94,7 +94,7 @@ export default function GamePage() {
       <TutorialOverlay onDismiss={() => setShowTutorial(false)} />
       {/* Header */}
       <header className="flex items-center justify-between p-3 border-b border-dark-border">
-        <a href="/"><Logo size="sm" /></a>
+        <Logo size="sm" />
         <div className="flex items-center gap-2">
           <TutorialReplayButton onClick={() => {
             localStorage.removeItem('showmatch-tutorial-seen');

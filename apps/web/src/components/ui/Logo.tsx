@@ -41,9 +41,11 @@ export default function Logo({ size = 'sm' }: LogoProps) {
 
   return (
     <>
-      <motion.a
-        href="/"
+      <motion.div
+        role="button"
+        tabIndex={0}
         onClick={handleClick}
+        onKeyDown={e => e.key === 'Enter' && handleClick(e as any)}
         className="flex items-center gap-2 cursor-pointer"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -53,7 +55,7 @@ export default function Logo({ size = 'sm' }: LogoProps) {
           <span className="text-white">Show</span>
           <span className="text-primary">Match</span>
         </span>
-      </motion.a>
+      </motion.div>
 
       <Modal isOpen={showConfirm} onClose={() => setShowConfirm(false)} title="Leave Game?">
         <p className="text-gray-400 mb-6">

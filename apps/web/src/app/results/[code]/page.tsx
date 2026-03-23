@@ -86,7 +86,7 @@ export default function ResultsPage() {
   return (
     <main className="min-h-screen bg-dark">
       <header className="flex items-center p-4 border-b border-dark-border">
-        <a href="/"><Logo size="sm" /></a>
+        <Logo size="sm" />
       </header>
 
       <div className="max-w-lg mx-auto p-4 space-y-6">
