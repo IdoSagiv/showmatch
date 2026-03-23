@@ -22,6 +22,7 @@ export interface TitleCard {
   overview: string;
   voteAverage: number;
   rottenTomatoesScore: number | null;
+  metacriticScore: number | null;
   runtime: number | null;
   genres: string[];
   contentRating: string;

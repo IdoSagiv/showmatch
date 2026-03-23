@@ -199,12 +199,17 @@ export default function SwipeCard({
                     <span>{card.voteAverage.toFixed(1)}</span>
                   </span>
                 )}
-                {card.rottenTomatoesScore !== null && (
+                {card.rottenTomatoesScore !== null ? (
                   <span className="flex items-center gap-1">
                     <span>🍅</span>
                     <span>{card.rottenTomatoesScore}%</span>
                   </span>
-                )}
+                ) : card.metacriticScore !== null ? (
+                  <span className="flex items-center gap-1.5">
+                    <span className="bg-[#FFCC34] text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded leading-none">MC</span>
+                    <span>{card.metacriticScore}</span>
+                  </span>
+                ) : null}
               </div>
 
               <div className="flex flex-wrap gap-1">
@@ -236,6 +241,12 @@ export default function SwipeCard({
                   <div className="bg-dark-surface rounded-lg px-3 py-2 text-center min-w-[56px]">
                     <div className="text-red-400 text-lg font-bold">{card.rottenTomatoesScore}%</div>
                     <div className="text-xs text-gray-500">RT</div>
+                  </div>
+                )}
+                {card.rottenTomatoesScore === null && card.metacriticScore !== null && (
+                  <div className="bg-dark-surface rounded-lg px-3 py-2 text-center min-w-[56px]">
+                    <div className="text-yellow-400 text-lg font-bold">{card.metacriticScore}</div>
+                    <div className="text-xs text-gray-500">MC</div>
                   </div>
                 )}
                 {card.runtime && (
