@@ -4,6 +4,8 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { registerRoomHandlers, handleDisconnect } from './handlers/roomHandler';
+import { registerGameHandlers } from './handlers/gameHandler';
+import { registerRankingHandlers } from './handlers/rankingHandler';
 
 dotenv.config();
 
@@ -22,6 +24,8 @@ io.on('connection', (socket) => {
   console.log(`Client connected: ${socket.id}`);
 
   registerRoomHandlers(io, socket);
+  registerGameHandlers(io, socket);
+  registerRankingHandlers(io, socket);
 
   socket.on('disconnect', () => {
     console.log(`Client disconnected: ${socket.id}`);
