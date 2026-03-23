@@ -17,6 +17,8 @@ interface SwipeCardProps {
   onSwipe: (decision: 'like' | 'pass' | 'superlike') => void;
   isTop: boolean;
   stackIndex: number;
+  /** Whether this player has already used their one superlike this game */
+  superLikeUsed?: boolean;
   /** Programmatic trigger from buttons: set to fire an exit animation */
   pendingDecision?: 'like' | 'pass' | 'superlike' | null;
   onPendingConsumed?: () => void;
@@ -24,6 +26,7 @@ interface SwipeCardProps {
 
 export default function SwipeCard({
   card, onSwipe, isTop, stackIndex,
+  superLikeUsed = false,
   pendingDecision, onPendingConsumed,
 }: SwipeCardProps) {
   const [flipped, setFlipped] = useState(false);
@@ -68,12 +71,19 @@ export default function SwipeCard({
   }
 
   const handleDragEnd = (_: any, info: PanInfo) => {
-    const swipedEnough = Math.abs(info.offset.x) > 100 || Math.abs(info.velocity.x) > 600;
-    if (swipedEnough) {
+    const swipedUp = (info.offset.y < -80 || info.velocity.y < -500) &&
+                     Math.abs(info.offset.x) < Math.abs(info.offset.y);
+    if (swipedUp && !superLikeUsed) {
+      flyOut('superlike');
+      return;
+    }
+    const swipedH = Math.abs(info.offset.x) > 100 || Math.abs(info.velocity.x) > 600;
+    if (swipedH) {
       flyOut(info.offset.x > 0 ? 'like' : 'pass');
     } else {
       // Snap back smoothly
       animate(x, 0, { type: 'spring', stiffness: 400, damping: 30 });
+      animate(y, 0, { type: 'spring', stiffness: 400, damping: 30 });
     }
   };
 
@@ -92,7 +102,7 @@ export default function SwipeCard({
       <motion.div
         className="relative cursor-grab active:cursor-grabbing select-none"
         style={{ x, y, rotate, touchAction: 'none' }}
-        drag={isTop && !exiting ? 'x' : false}
+        drag={isTop && !exiting ? true : false}
         dragElastic={0.8}
         onDragEnd={isTop ? handleDragEnd : undefined}
         onClick={handleTap}

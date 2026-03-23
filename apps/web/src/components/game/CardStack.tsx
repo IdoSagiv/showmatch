@@ -8,12 +8,14 @@ interface CardStackProps {
   cards: TitleCard[];
   currentIndex: number;
   onSwipe: (decision: 'like' | 'pass' | 'superlike') => void;
+  superLikeUsed?: boolean;
   pendingDecision?: 'like' | 'pass' | 'superlike' | null;
   onPendingConsumed?: () => void;
 }
 
 export default function CardStack({
   cards, currentIndex, onSwipe,
+  superLikeUsed = false,
   pendingDecision, onPendingConsumed,
 }: CardStackProps) {
   if (currentIndex >= cards.length) {
@@ -45,6 +47,7 @@ export default function CardStack({
             onSwipe={onSwipe}
             isTop={isTop}
             stackIndex={stackIndex}
+            superLikeUsed={isTop ? superLikeUsed : false}
             pendingDecision={isTop ? pendingDecision : null}
             onPendingConsumed={isTop ? onPendingConsumed : undefined}
           />
