@@ -91,7 +91,7 @@ export default function CreatePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Logo size="md" />
+          <Logo size="sm" />
 
           <div className="w-full text-center">
             <h2 className="text-xl font-bold mb-1">What's your name?</h2>

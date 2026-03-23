@@ -102,7 +102,7 @@ export default function ResultsPage() {
   const waitingForResults = gameOver && !winner && !isRanking && !noMatches;
 
   return (
-    <main className="min-h-screen bg-dark">
+    <main className="min-h-screen bg-dark pb-36">
       <header className="flex items-center p-4 border-b border-dark-border">
         <Logo size="sm" />
       </header>
@@ -154,45 +154,33 @@ export default function ResultsPage() {
               skipCountdown={isFirstMatch || matchedTitles.length === 1}
             />
 
-            <div className="mt-8">
+            {/* Watch Now — streaming links */}
+            {winner.providers && winner.providers.length > 0 && (
+              <div className="text-center space-y-2">
+                <p className="text-xs text-gray-500 uppercase tracking-widest">Available on</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {winner.providers.map(p => (
+                    <a
+                      key={p.id}
+                      href={`https://www.justwatch.com/search?q=${encodeURIComponent(winner.title)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 bg-dark-surface border border-dark-border rounded-full px-3 py-1.5 text-sm hover:border-primary transition-colors"
+                    >
+                      <img src={p.logoPath} alt={p.name} className="w-5 h-5 rounded" />
+                      {p.name}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-4">
               <SwipeReveal reveals={swipeReveal} />
             </div>
 
             <div className="mt-6">
               <GameStats stats={gameStats} />
-            </div>
-
-            {/* Action buttons */}
-            <div className="mt-8 rounded-2xl bg-dark-card border border-dark-border p-4 space-y-3">
-              {/* Share — always visible */}
-              <button
-                onClick={handleShare}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-dark-border bg-dark-surface hover:bg-dark-border transition-colors text-white font-semibold text-base active:scale-95"
-              >
-                <span className="text-lg">{shareCopied ? '✓' : '📤'}</span>
-                {shareCopied ? 'Copied to clipboard!' : 'Share Result'}
-              </button>
-
-              {/* Creator-only controls */}
-              {isCreator && (
-                <>
-                  <button
-                    onClick={handlePlayAgain}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary-dark transition-colors text-white font-semibold text-base active:scale-95"
-                  >
-                    <span className="text-lg">🔄</span>
-                    Play Again
-                  </button>
-
-                  <button
-                    onClick={handleEndGame}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-red-900/40 bg-red-950/30 hover:bg-red-950/60 transition-colors text-red-400 font-semibold text-base active:scale-95"
-                  >
-                    <span className="text-lg">🚪</span>
-                    End Game
-                  </button>
-                </>
-              )}
             </div>
           </>
         )}
@@ -201,27 +189,43 @@ export default function ResultsPage() {
         {noMatches && (
           <div className="mt-6 space-y-3">
             <p className="text-sm text-gray-500 text-center">Try selecting more genres or lowering the rating threshold</p>
-            {isCreator && (
-              <div className="rounded-2xl bg-dark-card border border-dark-border p-4 space-y-3">
-                <button
-                  onClick={handlePlayAgain}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary-dark transition-colors text-white font-semibold text-base active:scale-95"
-                >
-                  <span className="text-lg">🔄</span>
-                  Play Again
-                </button>
-                <button
-                  onClick={handleEndGame}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-red-900/40 bg-red-950/30 hover:bg-red-950/60 transition-colors text-red-400 font-semibold text-base active:scale-95"
-                >
-                  <span className="text-lg">🚪</span>
-                  End Game
-                </button>
-              </div>
-            )}
+{/* action buttons in sticky footer */}
           </div>
         )}
       </div>
+
+      {/* Sticky footer — always visible once game is over */}
+      {(winner || noMatches) && (
+        <div className="fixed bottom-0 left-0 right-0 z-10 bg-dark/90 backdrop-blur-sm border-t border-dark-border">
+          <div className="max-w-lg mx-auto p-3 flex gap-2">
+            <button
+              onClick={handleShare}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-dark-border bg-dark-surface hover:bg-dark-border transition-colors text-white font-semibold text-sm active:scale-95"
+            >
+              <span>{shareCopied ? '✓' : '📤'}</span>
+              {shareCopied ? 'Copied!' : 'Share'}
+            </button>
+
+            {isCreator && (
+              <>
+                <button
+                  onClick={handlePlayAgain}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary hover:bg-primary/90 transition-colors text-white font-semibold text-sm active:scale-95"
+                >
+                  <span>🔄</span> Play Again
+                </button>
+                <button
+                  onClick={handleEndGame}
+                  className="flex items-center justify-center px-4 py-3 rounded-xl border border-red-900/40 bg-red-950/30 hover:bg-red-950/60 transition-colors text-red-400 text-sm active:scale-95"
+                  title="End Game"
+                >
+                  🚪
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -65,6 +65,9 @@ export default function LobbyPage() {
           <div className="mt-2 flex justify-center">
             <ShareButton code={room.code} />
           </div>
+          {connectedCount < 2 && (
+            <p className="mt-2 text-xs text-gray-600">Share this code with friends to invite them</p>
+          )}
         </motion.div>
 
         {/* Players */}

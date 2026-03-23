@@ -9,13 +9,10 @@ interface ProgressBarProps {
 
 export default function ProgressBar({ current, total }: ProgressBarProps) {
   const pct = total > 0 ? Math.min(100, (current / total) * 100) : 0;
+  const remaining = Math.max(0, total - current);
 
   return (
     <div className="w-full">
-      <div className="flex justify-between text-xs text-gray-500 mb-1">
-        <span>{current} / {total}</span>
-        <span>{Math.round(pct)}%</span>
-      </div>
       <div className="h-1.5 bg-dark-border rounded-full overflow-hidden">
         <motion.div
           className="h-full bg-primary rounded-full"
@@ -23,6 +20,9 @@ export default function ProgressBar({ current, total }: ProgressBarProps) {
           transition={{ type: 'spring', stiffness: 100 }}
         />
       </div>
+      {remaining > 0 && (
+        <p className="text-right text-xs text-gray-600 mt-0.5">{remaining} left</p>
+      )}
     </div>
   );
 }

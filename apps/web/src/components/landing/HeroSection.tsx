@@ -15,6 +15,14 @@ export default function HeroSection() {
       >
         Swipe. Match. Watch.
       </motion.p>
+      <motion.p
+        className="mt-2 text-sm text-gray-600 max-w-xs mx-auto"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+      >
+        Pick movies everyone agrees on — swipe with friends, match wins.
+      </motion.p>
     </div>
   );
 }
