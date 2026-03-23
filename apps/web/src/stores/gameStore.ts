@@ -16,6 +16,7 @@ interface GameStore {
   gameStats: GameStatAward[];
   mySwipes: SwipeDecision[];
   isFirstMatch: boolean;
+  loadingProgress: { stage: string; progress: number; total?: number } | null;
 
   setRoom: (room: Room | null) => void;
   setPlayerId: (id: string) => void;
@@ -34,6 +35,7 @@ interface GameStore {
   setSwipeReveal: (reveal: Array<{ title: TitleCard; playerDecisions: Array<{ playerName: string; decision: string }> }>) => void;
   setGameStats: (stats: GameStatAward[]) => void;
   setIsFirstMatch: (val: boolean) => void;
+  setLoadingProgress: (data: { stage: string; progress: number; total?: number } | null) => void;
   reset: () => void;
 }
 
@@ -50,6 +52,7 @@ const initialState = {
   gameStats: [] as GameStatAward[],
   mySwipes: [] as SwipeDecision[],
   isFirstMatch: false,
+  loadingProgress: null as { stage: string; progress: number; total?: number } | null,
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -123,6 +126,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setSwipeReveal: (reveal) => set({ swipeReveal: reveal }),
   setGameStats: (stats) => set({ gameStats: stats }),
   setIsFirstMatch: (val) => set({ isFirstMatch: val }),
+  setLoadingProgress: (data) => set({ loadingProgress: data }),
 
   reset: () => set(initialState),
 }));

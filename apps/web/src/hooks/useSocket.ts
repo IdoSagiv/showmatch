@@ -29,6 +29,10 @@ export function useSocket() {
       store.startGame(titlePool);
     });
 
+    (socket as any).on('loadingProgress', (data: { stage: string; progress: number; total?: number }) => {
+      store.setLoadingProgress(data);
+    });
+
     socket.on('playerProgress', (playerId, progress) => {
       store.updatePlayerProgress(playerId, progress);
     });
@@ -86,6 +90,7 @@ export function useSocket() {
       socket.off('roomClosed');
       (socket as any).off('wildcardCandidates');
       (socket as any).off('roomReset');
+      (socket as any).off('loadingProgress');
     };
   }, []);
 

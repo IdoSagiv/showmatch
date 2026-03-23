@@ -38,7 +38,10 @@ export async function fetchTitleCount(settings: GameSettings): Promise<number> {
   return total;
 }
 
-export async function fetchDiscoverResults(settings: GameSettings): Promise<TitleCard[]> {
+export async function fetchDiscoverResults(
+  settings: GameSettings,
+  onProgress?: (done: number, total: number) => void
+): Promise<TitleCard[]> {
   const allResults: TitleCard[] = [];
   const poolSize = settings.poolSize === 'all' ? 500 : settings.poolSize;
 
@@ -68,19 +71,21 @@ export async function fetchDiscoverResults(settings: GameSettings): Promise<Titl
   }
 
   const trimmed = allResults.slice(0, poolSize);
+  const total = trimmed.length;
+  let done = 0;
 
-  // Enrich in batches of 5
+  // Enrich in batches of 10
   const enriched: TitleCard[] = [];
-  for (let i = 0; i < trimmed.length; i += 5) {
-    const batch = trimmed.slice(i, i + 5);
+  for (let i = 0; i < trimmed.length; i += 10) {
+    const batch = trimmed.slice(i, i + 10);
     const results = await Promise.allSettled(
       batch.map(title => enrichTitle(title, settings.region))
     );
     for (const result of results) {
-      if (result.status === 'fulfilled') {
-        enriched.push(result.value);
-      }
+      if (result.status === 'fulfilled') enriched.push(result.value);
+      done++;
     }
+    onProgress?.(done, total);
   }
 
   return enriched;
@@ -161,15 +166,6 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
         }
       }
     } catch { /* Content rating failure is non-critical */ }
-
-    // Runtime
-    try {
-      const detailRes = await tmdbFetch(`/${type}/${id}`);
-      if (detailRes.ok) {
-        const detail = await detailRes.json();
-        title.runtime = type === 'movie' ? detail.runtime || null : detail.episode_run_time?.[0] || null;
-      }
-    } catch { /* Runtime failure is non-critical */ }
 
   } catch (err) {
     console.error(`Error enriching title ${id}:`, err);

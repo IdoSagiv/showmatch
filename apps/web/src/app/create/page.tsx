@@ -23,12 +23,13 @@ function randomName(): string {
 export default function CreatePage() {
   const router = useRouter();
   const socket = useSocket();
-  const { room, setRoom, setPlayerId, updateSettings } = useGameStore();
+  const { room, setRoom, setPlayerId, updateSettings, loadingProgress } = useGameStore();
 
   // Step 1: pick a name. Step 2: room is live.
   const [name, setName] = useState(() => randomName());
   const [step, setStep] = useState<'name' | 'room'>('name');
   const [creating, setCreating] = useState(false);
+  const [gameStarting, setGameStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -66,7 +67,13 @@ export default function CreatePage() {
 
   const handleStartGame = useCallback(() => {
     if (!room) return;
+    setGameStarting(true);
+    setError(null);
     socket.emit('startGame');
+    socket.once('error' as any, (msg: string) => {
+      setGameStarting(false);
+      setError(msg);
+    });
   }, [socket, room]);
 
   useEffect(() => {
@@ -139,6 +146,32 @@ export default function CreatePage() {
     );
   }
 
+  /* ── Loading: game is starting ── */
+  if (gameStarting) {
+    const stage = loadingProgress?.stage || 'fetching';
+    const progress = loadingProgress?.progress || 0;
+    const total = loadingProgress?.total;
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-6">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+          className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full"
+        />
+        <div className="text-center">
+          <p className="text-lg font-semibold text-white mb-1">
+            {stage === 'fetching' ? 'Finding titles…' : 'Loading titles…'}
+          </p>
+          {total ? (
+            <p className="text-sm text-gray-400">{progress} / {total}</p>
+          ) : (
+            <p className="text-sm text-gray-400">This takes a few seconds ☕</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   /* ── Step 2: Room live ── */
   if (!room) return null;
   const connectedCount = room.players.filter(p => p.connected).length;
@@ -177,7 +210,12 @@ export default function CreatePage() {
         <PlayerList players={room.players} />
 
         {/* Start Button */}
-        <div className="sticky bottom-4 pb-safe">
+        <div className="sticky bottom-4 pb-safe flex flex-col gap-2">
+          {error && (
+            <p className="text-sm text-accent-red text-center bg-dark-card rounded-xl px-4 py-2 border border-red-900">
+              {error}
+            </p>
+          )}
           <Button
             size="lg"
             onClick={handleStartGame}

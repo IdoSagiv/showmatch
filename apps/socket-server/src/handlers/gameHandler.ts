@@ -24,9 +24,16 @@ export function registerGameHandlers(io: Server, socket: Socket) {
   });
 
   socket.on('startGame', async () => {
-    if (!roomManager.isCreator(socket.id)) return;
+    console.log(`[startGame] socket=${socket.id} isCreator=${roomManager.isCreator(socket.id)}`);
+    if (!roomManager.isCreator(socket.id)) {
+      socket.emit('error', 'Only the room creator can start the game');
+      return;
+    }
     const room = roomManager.getRoomBySocket(socket.id);
-    if (!room || room.status !== 'lobby') return;
+    if (!room || room.status !== 'lobby') {
+      socket.emit('error', `Cannot start: room status is ${room?.status ?? 'not found'}`);
+      return;
+    }
 
     const connectedPlayers = room.players.filter(p => p.connected);
     if (connectedPlayers.length < 2) {
@@ -37,7 +44,9 @@ export function registerGameHandlers(io: Server, socket: Socket) {
     try {
       io.to(room.code).emit('loadingProgress', { stage: 'fetching', progress: 0 });
 
-      const titlePool = await fetchDiscoverResults(room.settings);
+      const titlePool = await fetchDiscoverResults(room.settings, (done, total) => {
+        io.to(room.code).emit('loadingProgress', { stage: 'enriching', progress: done, total });
+      });
       if (titlePool.length === 0) {
         socket.emit('error', 'No titles found matching your filters. Try broadening your search.');
         return;
