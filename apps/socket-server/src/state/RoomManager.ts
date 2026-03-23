@@ -85,6 +85,51 @@ class RoomManager {
     return { room };
   }
 
+  /**
+   * Re-attach a socket to an existing in-game player.
+   * Works regardless of current connected state — handles both brief
+   * disconnects and server-restart re-joins.
+   */
+  rejoinPlayer(code: string, displayName: string, newSocketId: string): { room: Room; player: Player } | null {
+    const room = this.rooms.get(code);
+    if (!room) return null;
+
+    const player = room.players.find(p => p.displayName === displayName);
+    if (!player) return null;
+
+    const oldSocketId = player.id;
+
+    // Cancel any pending disconnect timer
+    const timerKey = `${code}:${oldSocketId}`;
+    const timer = this.disconnectTimers.get(timerKey);
+    if (timer) {
+      clearTimeout(timer);
+      this.disconnectTimers.delete(timerKey);
+    }
+
+    // Migrate swipes / rankings keyed by old socket ID
+    const oldSwipes = room.swipes.get(oldSocketId);
+    if (oldSwipes) {
+      room.swipes.set(newSocketId, oldSwipes);
+      room.swipes.delete(oldSocketId);
+    }
+    const oldRankings = room.rankings.get(oldSocketId);
+    if (oldRankings) {
+      room.rankings.set(newSocketId, oldRankings);
+      room.rankings.delete(oldSocketId);
+    }
+
+    // Remap socket lookups
+    this.socketToRoom.delete(oldSocketId);
+    this.socketToPlayer.delete(oldSocketId);
+    player.id = newSocketId;
+    player.connected = true;
+    this.socketToRoom.set(newSocketId, code);
+    this.socketToPlayer.set(newSocketId, newSocketId);
+
+    return { room, player };
+  }
+
   reconnectPlayer(code: string, playerName: string, newSocketId: string): { room: Room; player: Player } | null {
     const room = this.rooms.get(code);
     if (!room) return null;

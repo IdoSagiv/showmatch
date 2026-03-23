@@ -9,10 +9,28 @@ import type { Socket } from 'socket.io-client';
 export function useSocket() {
   const socketRef = useRef<Socket | null>(null);
   const store = useGameStore();
+  // Track whether this socket has connected at least once so we can
+  // distinguish a reconnect (true) from the initial connection (false).
+  const everConnectedRef = useRef(false);
 
   useEffect(() => {
     const socket = connectSocket();
     socketRef.current = socket;
+
+    // On every (re)connect: if we were already connected before, try to
+    // re-attach to the room.  Handles both brief disconnects and full
+    // server restarts (server responds with roomClosed if room is gone).
+    socket.on('connect', () => {
+      if (!everConnectedRef.current) {
+        everConnectedRef.current = true;
+        return; // initial connect — nothing to rejoin
+      }
+      const { room, playerId } = useGameStore.getState();
+      if (!room) return;
+      const me = room.players.find(p => p.id === playerId);
+      if (!me) return;
+      socket.emit('rejoinGame', { code: room.code, displayName: me.displayName });
+    });
 
     socket.on('playerJoined', (player) => {
       store.addPlayer(player);
@@ -76,6 +94,12 @@ export function useSocket() {
       store.setRoom(room);
     });
 
+    (socket as any).on('gameRejoined', (room: any) => {
+      // Successfully re-attached to existing room after reconnect.
+      // Update room state; keep client-side progress (currentCardIndex) intact.
+      store.setRoom(room);
+    });
+
     socket.on('roomClosed', (reason) => {
       store.reset();
       if (typeof window !== 'undefined') {
@@ -85,6 +109,7 @@ export function useSocket() {
     });
 
     return () => {
+      socket.off('connect');
       socket.off('playerJoined');
       socket.off('playerLeft');
       socket.off('settingsUpdated');
@@ -99,6 +124,7 @@ export function useSocket() {
       (socket as any).off('wildcardCandidates');
       (socket as any).off('roomReset');
       (socket as any).off('loadingProgress');
+      (socket as any).off('gameRejoined');
     };
   }, []);
 
