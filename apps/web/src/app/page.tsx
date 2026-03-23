@@ -15,21 +15,9 @@ const POSTER_CARDS = [
 ];
 
 const STEPS = [
-  {
-    emoji: '🎬',
-    label: 'Pick a vibe',
-    desc: 'Set the genre, era, and whether you\'re feeling movies or shows.',
-  },
-  {
-    emoji: '👆',
-    label: 'Swipe together',
-    desc: 'Everyone in the room votes on the same titles in real time.',
-  },
-  {
-    emoji: '🎉',
-    label: 'Watch the match',
-    desc: 'Mutual likes win — the crowd\'s pick is revealed live.',
-  },
+  { emoji: '🎬', label: 'Pick a vibe',      desc: "Set the genre, era, and whether you're feeling movies or shows." },
+  { emoji: '👆', label: 'Swipe together',   desc: 'Everyone in the room votes on the same titles in real time.' },
+  { emoji: '🎉', label: 'Watch the match',  desc: "Mutual likes win — the crowd's pick is revealed live." },
 ];
 
 export default function Home() {
@@ -69,14 +57,15 @@ export default function Home() {
         />
       </div>
 
-      {/* ── Main content ── */}
-      <div className="relative z-10 flex-1 flex items-center">
-        <div className="w-full max-w-7xl mx-auto px-5 lg:px-16 py-12
-                        grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+      {/* ── Two-pane layout ── */}
+      {/*  mobile: flex-col (only left pane shows)            */}
+      {/*  desktop (lg+): flex-row, left + right side by side */}
+      <div className="relative z-10 flex-1 flex flex-col lg:flex-row items-stretch">
 
-          {/* ═══ LEFT: Brand + CTAs ═══ */}
+        {/* ═══ LEFT PANE: Brand + CTAs ═══ */}
+        <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 lg:pl-20 lg:pr-10">
           <motion.div
-            className="flex flex-col items-center lg:items-start w-full max-w-sm lg:max-w-none mx-auto lg:mx-0"
+            className="w-full max-w-sm lg:max-w-md"
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 24 }}
@@ -85,7 +74,7 @@ export default function Home() {
             <div className="text-center lg:text-left mb-8 lg:mb-10">
               <h1
                 className="font-black tracking-tight leading-none"
-                style={{ fontSize: 'clamp(3.2rem, 10vw, 6rem)' }}
+                style={{ fontSize: 'clamp(3rem, 10vw, 6rem)' }}
               >
                 <span className="text-white">Show</span>
                 <span className="gradient-text">Match</span>
@@ -96,7 +85,7 @@ export default function Home() {
             </div>
 
             {/* How it works — desktop only */}
-            <div className="hidden lg:flex flex-col gap-3 mb-10 w-full max-w-[440px]">
+            <div className="hidden lg:flex flex-col gap-3 mb-10">
               {STEPS.map((step, i) => (
                 <motion.div
                   key={step.label}
@@ -121,7 +110,7 @@ export default function Home() {
 
             {/* Action buttons */}
             <motion.div
-              className="w-full flex flex-col gap-3"
+              className="flex flex-col gap-3"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.18, type: 'spring', stiffness: 240, damping: 24 }}
@@ -138,7 +127,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="mt-5"
+              className="mt-5 flex justify-center lg:justify-start"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.42 }}
@@ -146,14 +135,12 @@ export default function Home() {
               <GameHistoryButton />
             </motion.div>
           </motion.div>
+        </div>
 
-          {/* ═══ RIGHT: Floating card fan — desktop only ═══ */}
-          <div
-            className="hidden lg:block relative"
-            style={{ height: '540px' }}
-          >
+        {/* ═══ RIGHT PANE: Floating card fan — desktop only ═══ */}
+        <div className="hidden lg:flex flex-1 items-center justify-center pr-16 relative">
+          <div className="relative" style={{ width: 420, height: 520 }}>
             {POSTER_CARDS.map((card, i) => (
-              /* Outer div: CSS position + rotation (no conflict with motion values) */
               <div
                 key={i}
                 style={{
@@ -166,31 +153,19 @@ export default function Home() {
                   height: 264,
                 }}
               >
-                {/* Entrance fade+scale */}
+                {/* Entrance */}
                 <motion.div
                   className="w-full h-full"
                   initial={{ opacity: 0, scale: 0.78 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{
-                    delay: 0.5 + card.delay,
-                    type: 'spring',
-                    stiffness: 160,
-                    damping: 20,
-                  }}
+                  transition={{ delay: 0.5 + card.delay, type: 'spring', stiffness: 160, damping: 20 }}
                 >
-                  {/* Continuous bob */}
+                  {/* Bob */}
                   <motion.div
                     className="w-full h-full rounded-3xl overflow-hidden"
-                    style={{
-                      boxShadow: '0 24px 64px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.07)',
-                    }}
+                    style={{ boxShadow: '0 24px 64px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.07)' }}
                     animate={{ y: [0, -12, 0] }}
-                    transition={{
-                      duration: 3.8 + i * 0.6,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                      delay: card.delay + 1.2,
-                    }}
+                    transition={{ duration: 3.8 + i * 0.6, repeat: Infinity, ease: 'easeInOut', delay: card.delay + 1.2 }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -205,18 +180,14 @@ export default function Home() {
               </div>
             ))}
 
-            {/* Glow pool beneath the stack */}
+            {/* Glow pool */}
             <div
               className="absolute bottom-12 left-1/2 -translate-x-1/2 w-72 h-6 pointer-events-none"
-              style={{
-                background: 'radial-gradient(ellipse, rgba(229,9,20,0.22) 0%, transparent 70%)',
-                filter: 'blur(14px)',
-              }}
+              style={{ background: 'radial-gradient(ellipse, rgba(229,9,20,0.22) 0%, transparent 70%)', filter: 'blur(14px)' }}
             />
 
-            {/* Subtle label */}
             <motion.p
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs text-gray-600 tracking-widest uppercase whitespace-nowrap"
+              className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs text-gray-600 tracking-widest uppercase whitespace-nowrap"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.8 }}
@@ -224,8 +195,8 @@ export default function Home() {
               What will you pick tonight?
             </motion.p>
           </div>
-
         </div>
+
       </div>
 
       {/* Toast */}
