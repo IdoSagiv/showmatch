@@ -93,14 +93,14 @@ export default function SwipeCard({
 
   return (
     <motion.div
-      className="absolute w-full"
+      className="absolute w-full h-full"
       style={{ zIndex: 10 - stackIndex }}
       initial={{ scale: scale * 0.95, opacity: 0, y: yOffset + 10 }}
       animate={{ scale, opacity: 1 - stackIndex * 0.1, y: yOffset }}
       transition={{ type: 'spring', stiffness: 300, damping: 28 }}
     >
       <motion.div
-        className="relative cursor-grab active:cursor-grabbing select-none"
+        className="relative cursor-grab active:cursor-grabbing select-none h-full"
         style={{ x, y, rotate, touchAction: 'none' }}
         drag={isTop && !exiting ? true : false}
         dragElastic={0.8}
@@ -111,42 +111,33 @@ export default function SwipeCard({
         {isTop && <CardOverlay likeOpacity={likeOpacity} nopeOpacity={nopeOpacity} />}
 
         {/* Card faces wrapper (3D perspective) */}
-        <div style={{ perspective: 1200 }}>
-          {/* Front face */}
+        <div className="h-full" style={{ perspective: 1200 }}>
+          {/* Front face — fills the card container via h-full, flex-col splits
+              the poster from the info strip */}
           <motion.div
-            className="bg-dark-card rounded-2xl overflow-hidden border border-dark-border shadow-2xl"
+            className="bg-dark-card rounded-2xl overflow-hidden border border-dark-border shadow-2xl h-full flex flex-col"
             animate={{ rotateY: flipped ? 180 : 0 }}
             transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
             style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
           >
-            {/* Poster — explicit height on the <img> so object-contain has
-                definite bounds and can never clip.
-                calc(100svh - 355px) = viewport minus chrome (header ~53px +
-                progress ~24px + card-stack margin ~16px + buttons ~80px +
-                padding ~32px + info-strip ~150px = 355px).
-                Capped at 50vh so it stays proportional on tablets. */}
-            <div className="relative bg-dark-surface w-full">
+            {/* Poster — flex-1 fills whatever height remains after the info
+                strip.  Parent now has a *definite* height (h-full from the
+                chain above) so flex-1 + min-h-0 works correctly. */}
+            <div className="relative bg-dark-surface w-full flex-1 min-h-0 overflow-hidden">
               {card.posterPath ? (
                 <img
                   src={card.posterPath}
                   alt={card.title}
-                  className="w-full block object-contain object-center"
-                  style={{
-                    height: 'calc(100svh - 355px)',
-                    maxHeight: '50vh',
-                  }}
+                  className="w-full h-full object-contain object-center"
                   draggable={false}
                 />
               ) : (
-                <div className="flex items-center justify-center text-gray-600 text-sm"
-                  style={{ height: 'calc(100svh - 355px)', maxHeight: '50vh' }}>
-                  No Poster
-                </div>
+                <div className="w-full h-full flex items-center justify-center text-gray-600 text-sm">No Poster</div>
               )}
             </div>
 
-            {/* Info strip */}
-            <div className="p-4 space-y-2">
+            {/* Info strip — fixed height, never shrinks or grows */}
+            <div className="p-4 space-y-2 shrink-0">
               <h2 className="text-lg font-bold truncate" title={card.title}>
                 {card.title} <span className="text-gray-500 font-normal text-base">({card.year})</span>
               </h2>

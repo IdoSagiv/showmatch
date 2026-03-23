@@ -35,7 +35,7 @@ export default function CardStack({
   const visibleCards = cards.slice(currentIndex, currentIndex + 3);
 
   return (
-    <div className="relative w-full max-w-[min(90vw,400px)] mx-auto" style={{ height: 'min(75vh, 600px)' }}>
+    <div className="relative w-full h-full max-w-[min(90vw,400px)] mx-auto">
       {/* Render back-to-front so top card is on top */}
       {[...visibleCards].reverse().map((card, reversedI) => {
         const stackIndex = visibleCards.length - 1 - reversedI;
