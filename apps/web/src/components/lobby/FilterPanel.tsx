@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { GameSettings, StreamingProvider } from '@/types/game';
 import { GENRES, CONTENT_RATINGS, TIMER_OPTIONS, SORT_OPTIONS } from '@/lib/constants';
@@ -14,6 +14,23 @@ interface FilterPanelProps {
 
 export default function FilterPanel({ settings, onSettingsChange, isCreator }: FilterPanelProps) {
   const [providers, setProviders] = useState<StreamingProvider[]>([]);
+  const [providerTooltip, setProviderTooltip] = useState<string | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleProviderPointerDown = useCallback((name: string) => {
+    longPressTimer.current = setTimeout(() => setProviderTooltip(name), 500);
+  }, []);
+
+  const handleProviderPointerUp = useCallback(() => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+    longPressTimer.current = null;
+  }, []);
+
+  const handleProviderPointerLeave = useCallback(() => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+    longPressTimer.current = null;
+    setProviderTooltip(null);
+  }, []);
 
   useEffect(() => {
     fetch(`/api/tmdb/providers?region=${settings.region}`)
@@ -86,15 +103,24 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
             <button onClick={() => update({ providers: [] })} className="text-xs text-gray-500">Clear</button>
           </div>
         </div>
+        {/* Long-press tooltip */}
+        {providerTooltip && (
+          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-xl shadow-lg border border-dark-border pointer-events-none">
+            {providerTooltip}
+          </div>
+        )}
+
         <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto">
           {providers.slice(0, 20).map(p => (
             <button
               key={p.id}
               onClick={() => update({ providers: toggleInArray(settings.providers, p.id) })}
+              onPointerDown={() => handleProviderPointerDown(p.name)}
+              onPointerUp={handleProviderPointerUp}
+              onPointerLeave={handleProviderPointerLeave}
               className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
                 settings.providers.includes(p.id) ? 'bg-primary/20 ring-1 ring-primary' : 'bg-dark-surface'
               }`}
-              title={p.name}
             >
               <img src={p.logoPath} alt={p.name} className="w-8 h-8 rounded-md" />
               <span className="text-[10px] text-gray-400 truncate w-full text-center">{p.name}</span>
