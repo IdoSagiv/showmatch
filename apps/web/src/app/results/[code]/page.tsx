@@ -154,27 +154,6 @@ export default function ResultsPage() {
               skipCountdown={isFirstMatch || matchedTitles.length === 1}
             />
 
-            {/* Watch Now — streaming links */}
-            {winner.providers && winner.providers.length > 0 && (
-              <div className="text-center space-y-2">
-                <p className="text-xs text-gray-500 uppercase tracking-widest">Available on</p>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {winner.providers.map(p => (
-                    <a
-                      key={p.id}
-                      href={`https://www.justwatch.com/search?q=${encodeURIComponent(winner.title)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 bg-dark-surface border border-dark-border rounded-full px-3 py-1.5 text-sm hover:border-primary transition-colors"
-                    >
-                      <img src={p.logoPath} alt={p.name} className="w-5 h-5 rounded" />
-                      {p.name}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div className="mt-4">
               <SwipeReveal reveals={swipeReveal} />
             </div>

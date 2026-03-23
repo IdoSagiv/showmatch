@@ -119,10 +119,15 @@ export function TutorialReplayButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="w-8 h-8 rounded-full bg-dark-surface border border-dark-border flex items-center justify-center text-gray-500 hover:text-white text-sm"
-      title="Replay tutorial"
+      className="flex items-center justify-center w-8 h-8 rounded-full bg-dark-surface border border-dark-border text-primary hover:bg-dark-border transition-colors"
+      title="How to play"
+      aria-label="How to play"
     >
-      ?
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="7" cy="7" r="6.25" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M7 10V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <circle cx="7" cy="4.5" r="0.75" fill="currentColor"/>
+      </svg>
     </button>
   );
 }
