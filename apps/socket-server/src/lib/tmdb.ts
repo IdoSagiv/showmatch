@@ -47,10 +47,13 @@ export async function fetchDiscoverResults(
 ): Promise<TitleCard[]> {
   const allResults: TitleCard[] = [];
   const poolSize = settings.poolSize === 'all' ? 500 : settings.poolSize;
+  // Fetch 1.5× more raw results to compensate for titles filtered out after
+  // enrichment (theatrical/pre-streaming releases with no flatrate providers).
+  const fetchSize = Math.min(Math.ceil(poolSize * 1.5), 500);
 
   for (const mediaType of settings.mediaTypes) {
     const params = buildDiscoverParams(settings, mediaType);
-    const perType = Math.ceil(poolSize / settings.mediaTypes.length);
+    const perType = Math.ceil(fetchSize / settings.mediaTypes.length);
     const pagesNeeded = Math.min(Math.ceil(perType / 20), 25);
 
     for (let page = 1; page <= pagesNeeded; page++) {
@@ -64,7 +67,7 @@ export async function fetchDiscoverResults(
           allResults.push(mapBasicResult(item, mediaType));
         }
 
-        if (allResults.length >= poolSize) break;
+        if (allResults.length >= fetchSize) break;
         if (page >= data.total_pages) break;
       } catch (err) {
         console.error(`Error fetching page ${page}:`, err);
@@ -73,7 +76,7 @@ export async function fetchDiscoverResults(
     }
   }
 
-  const trimmed = allResults.slice(0, poolSize);
+  const trimmed = allResults.slice(0, fetchSize);
   const total = trimmed.length;
   let done = 0;
 
@@ -91,7 +94,10 @@ export async function fetchDiscoverResults(
     onProgress?.(done, total);
   }
 
-  return enriched;
+  // Drop titles with no streamable providers in the user's region.
+  // These are theatrical/pre-streaming releases that slip through the
+  // TMDB discover filter.  Trim to the original target pool size.
+  return enriched.filter(t => t.providers.length > 0).slice(0, poolSize);
 }
 
 async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard> {
