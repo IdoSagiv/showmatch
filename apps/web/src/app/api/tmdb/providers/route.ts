@@ -23,13 +23,17 @@ export async function GET(request: NextRequest) {
       if (res.ok) {
         const data = await res.json();
         for (const p of data.results || []) {
-          if (!providers.has(p.provider_id)) {
+          const existing = providers.get(p.provider_id);
+          if (!existing) {
             providers.set(p.provider_id, {
               id: p.provider_id,
               name: p.provider_name,
               logoPath: `${TMDB_IMG}${p.logo_path}`,
               priority: p.display_priority,
             });
+          } else if (p.display_priority < existing.priority) {
+            // Keep the best (lowest) priority across movie + tv
+            existing.priority = p.display_priority;
           }
         }
       }
