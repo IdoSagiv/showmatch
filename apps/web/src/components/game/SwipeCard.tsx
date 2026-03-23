@@ -52,7 +52,7 @@ export default function SwipeCard({ card, onSwipe, isTop, stackIndex }: SwipeCar
     >
       <motion.div
         className="relative cursor-grab active:cursor-grabbing"
-        style={{ x: isTop ? x : 0, rotate: isTop ? rotate : 0, perspective: 1000 }}
+        style={{ x: isTop ? x : 0, rotate: isTop ? rotate : 0, perspective: 1000, touchAction: 'none' }}
         drag={isTop ? 'x' : false}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.7}
