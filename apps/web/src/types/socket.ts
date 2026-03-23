@@ -19,6 +19,8 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   createRoom: (playerName: string, callback: (response: { room: import('./game').Room } | { error: string }) => void) => void;
   joinRoom: (code: string, playerName: string, callback: (response: { room: import('./game').Room } | { error: string }) => void) => void;
+  checkRoom: (code: string, callback: (response: { exists: boolean; error?: string }) => void) => void;
+  rejoinGame: (payload: { code: string; displayName: string }) => void;
   updateSettings: (settings: GameSettings) => void;
   requestTitleCount: (settings: GameSettings) => void;
   startGame: () => void;

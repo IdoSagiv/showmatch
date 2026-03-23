@@ -145,8 +145,8 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
       }));
     }
 
-    // External IDs + OMDB (movies only)
-    if (type === 'movie' && externalRes.status === 'fulfilled' && externalRes.value.ok) {
+    // External IDs + OMDB (movies and TV — OMDB supports both)
+    if (externalRes.status === 'fulfilled' && externalRes.value.ok) {
       const external = await externalRes.value.json();
       if (external.imdb_id && getOmdbKey()) {
         try {

@@ -6,7 +6,6 @@ import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
 import CardStack from '@/components/game/CardStack';
 import SwipeButtons from '@/components/game/SwipeButtons';
-import UndoButton from '@/components/game/UndoButton';
 import ProgressBar from '@/components/game/ProgressBar';
 import TimerBar from '@/components/game/TimerBar';
 import PlayerAvatar from '@/components/lobby/PlayerAvatar';
@@ -107,6 +106,21 @@ export default function GamePage() {
     handleSwipe('pass');
   }, [handleSwipe]);
 
+  // Keyboard shortcuts: ← pass, → like, ↑ superlike
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!room || !titlePool.length) return;
+      const finished = currentCardIndex >= titlePool.length;
+      const player = room.players.find(p => p.id === playerId);
+      if (finished || pendingDecision) return;
+      if (e.key === 'ArrowLeft')  setPendingDecision('pass');
+      if (e.key === 'ArrowRight') setPendingDecision('like');
+      if (e.key === 'ArrowUp' && !player?.superLikeUsed) setPendingDecision('superlike');
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [room, titlePool, currentCardIndex, pendingDecision, playerId]);
+
   if (!room || !titlePool.length) return null;
 
   const isFinished = currentCardIndex >= titlePool.length;
@@ -162,21 +176,22 @@ export default function GamePage() {
             superLikeUsed={me?.superLikeUsed ?? false}
             pendingDecision={pendingDecision}
             onPendingConsumed={() => setPendingDecision(null)}
+            otherPlayers={otherPlayers}
+            totalCards={titlePool.length}
           />
         </div>
 
         {/* Buttons */}
         {!isFinished && (
-          <div className="flex items-center justify-center gap-4">
-            <UndoButton onClick={handleUndo} disabled={!canUndo} />
-            <SwipeButtons
-              onPass={() => setPendingDecision('pass')}
-              onLike={() => setPendingDecision('like')}
-              onSuperLike={() => setPendingDecision('superlike')}
-              superLikeUsed={me?.superLikeUsed ?? false}
-              disabled={isFinished || !!pendingDecision}
-            />
-          </div>
+          <SwipeButtons
+            onPass={() => setPendingDecision('pass')}
+            onLike={() => setPendingDecision('like')}
+            onSuperLike={() => setPendingDecision('superlike')}
+            onUndo={handleUndo}
+            canUndo={canUndo}
+            superLikeUsed={me?.superLikeUsed ?? false}
+            disabled={isFinished || !!pendingDecision}
+          />
         )}
       </div>
     </main>

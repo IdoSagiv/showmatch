@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import {
   motion,
   useMotionValue,
@@ -31,6 +31,15 @@ export default function SwipeCard({
 }: SwipeCardProps) {
   const [flipped, setFlipped] = useState(false);
   const [exiting, setExiting] = useState(false);
+  const backScrollRef = useRef<HTMLDivElement>(null);
+
+  // Reset scroll position when card is un-flipped
+  useEffect(() => {
+    if (!flipped && backScrollRef.current) {
+      backScrollRef.current.scrollTop = 0;
+    }
+  }, [flipped]);
+
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-250, 0, 250], [-18, 0, 18]);
@@ -102,8 +111,8 @@ export default function SwipeCard({
     >
       <motion.div
         className="relative cursor-grab active:cursor-grabbing select-none h-full"
-        style={{ x, y, rotate, touchAction: 'none' }}
-        drag={isTop && !exiting ? true : false}
+        style={{ x, y, rotate, touchAction: flipped ? 'pan-y' : 'none' }}
+        drag={isTop && !exiting ? (flipped ? 'x' : true) : false}
         dragElastic={0.8}
         onDragEnd={isTop ? handleDragEnd : undefined}
         onClick={handleTap}
@@ -127,20 +136,38 @@ export default function SwipeCard({
             transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
             style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
           >
-            {/* Poster — flex-1 fills whatever height remains after the info
-                strip.  Parent now has a *definite* height (h-full from the
-                chain above) so flex-1 + min-h-0 works correctly. */}
+            {/* Poster — flex-1 fills remaining height. object-cover + blurred
+                background fill so any non-standard aspect ratio looks immersive
+                rather than leaving black bars. */}
             <div className="relative bg-dark-surface w-full flex-1 min-h-0 overflow-hidden">
               {card.posterPath ? (
-                <img
-                  src={card.posterPath}
-                  alt={card.title}
-                  className="w-full h-full object-contain object-center"
-                  draggable={false}
-                />
+                <>
+                  {/* Blurred background fill */}
+                  <img
+                    src={card.posterPath}
+                    aria-hidden="true"
+                    className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-25"
+                    draggable={false}
+                  />
+                  {/* Crisp poster */}
+                  <img
+                    src={card.posterPath}
+                    alt={card.title}
+                    className="relative w-full h-full object-contain object-center"
+                    draggable={false}
+                  />
+                </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-600 text-sm">No Poster</div>
               )}
+              {/* Media type badge */}
+              <span className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">
+                {card.mediaType === 'movie' ? '🎬 Film' : '📺 Series'}
+              </span>
+              {/* Info icon — tap-for-details hint */}
+              <span className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/70 text-sm select-none pointer-events-none">
+                ⓘ
+              </span>
             </div>
 
             {/* Info strip — fixed height, never shrinks or grows */}
@@ -150,11 +177,13 @@ export default function SwipeCard({
               </h2>
 
               <div className="flex gap-3 text-sm items-center">
-                <span className="flex items-center gap-1">
-                  <span className="text-yellow-400">★</span>
-                  <span>{card.voteAverage.toFixed(1)}</span>
-                  <span className="text-gray-600 text-xs">IMDB</span>
-                </span>
+                {card.voteAverage > 0 && (
+                  <span className="flex items-center gap-1">
+                    <span className="text-yellow-400">★</span>
+                    <span>{card.voteAverage.toFixed(1)}</span>
+                    <span className="text-gray-600 text-xs">IMDB</span>
+                  </span>
+                )}
                 {card.rottenTomatoesScore !== null && (
                   <span className="flex items-center gap-1">
                     <span>🍅</span>
@@ -173,7 +202,6 @@ export default function SwipeCard({
               </div>
 
               {card.providers.length > 0 && <StreamingLogos providers={card.providers} />}
-              <p className="text-xs text-gray-600 text-center">Tap for details ↕</p>
             </div>
           </motion.div>
 
@@ -184,7 +212,7 @@ export default function SwipeCard({
             transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
             style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
           >
-            <div className="p-5 h-full overflow-y-auto space-y-4">
+            <div ref={backScrollRef} className="p-5 h-full overflow-y-auto space-y-4">
               <h2 className="text-xl font-bold leading-tight">{card.title} <span className="text-gray-500 font-normal text-base">({card.year})</span></h2>
 
               <div className="flex gap-3 flex-wrap">

@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TitleCard } from '@/types/game';
 import Confetti from './Confetti';
+import { useSound } from '@/hooks/useSound';
 
 interface WildcardPickerProps {
   candidates: TitleCard[];
@@ -14,6 +15,7 @@ export default function WildcardPicker({ candidates }: WildcardPickerProps) {
   const [winner, setWinner] = useState<TitleCard | null>(null);
   const [displayIndex, setDisplayIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout>();
+  const { playTick, playWildcard } = useSound();
 
   const handleSpin = useCallback(() => {
     if (spinning || candidates.length === 0) return;
@@ -26,12 +28,15 @@ export default function WildcardPicker({ candidates }: WildcardPickerProps) {
     const tick = () => {
       idx = (idx + 1) % candidates.length;
       setDisplayIndex(idx);
+      playTick();
       speed += 15;
 
       if (speed > 400) {
         setSpinning(false);
         const selected = candidates[Math.floor(Math.random() * candidates.length)];
         setWinner(selected);
+        // Small delay so last tick sound clears, then play win sound
+        setTimeout(() => playWildcard(), 150);
         return;
       }
 
@@ -39,7 +44,7 @@ export default function WildcardPicker({ candidates }: WildcardPickerProps) {
     };
 
     tick();
-  }, [candidates, spinning]);
+  }, [candidates, spinning, playTick, playWildcard]);
 
   if (candidates.length === 0) {
     return <p className="text-gray-400 text-center">No close matches found.</p>;

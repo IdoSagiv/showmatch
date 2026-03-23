@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
   // Sort by priority, then run through the shared filter (excludes stores,
   // sub-channels, deduplicates tier variants) with a hard cap of 30.
-  const sorted = [...byId.values()].sort((a, b) => a.display_priority - b.display_priority);
+  const sorted = Array.from(byId.values()).sort((a, b) => a.display_priority - b.display_priority);
   const filtered = filterProviders(sorted, 30);
 
   return NextResponse.json(

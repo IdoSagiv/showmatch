@@ -202,7 +202,7 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
         <input
           type="range"
           min={0}
-          max={10}
+          max={9}
           step={0.5}
           value={settings.minRating}
           onChange={e => update({ minRating: parseFloat(e.target.value) })}

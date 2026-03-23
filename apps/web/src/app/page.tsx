@@ -58,7 +58,8 @@ export default function Home() {
       <AnimatePresence>
         {toast && (
           <motion.div
-            className="fixed top-4 left-1/2 -translate-x-1/2 bg-dark-card border border-dark-border px-6 py-3 rounded-xl text-sm z-50 whitespace-nowrap"
+            className="fixed left-1/2 -translate-x-1/2 bg-dark-card border border-dark-border px-6 py-3 rounded-xl text-sm z-50 whitespace-nowrap"
+            style={{ top: 'max(1rem, env(safe-area-inset-top))' }}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
