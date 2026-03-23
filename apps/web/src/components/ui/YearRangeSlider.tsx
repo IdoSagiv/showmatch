@@ -64,27 +64,46 @@ export default function YearRangeSlider({ min, max, value, onChange }: YearRange
 
       {/* Slider track + thumbs */}
       <div className="relative pt-8 pb-1">
-        {/* Lo thumb bubble — positioned using exact thumb-offset formula */}
-        <div
-          className="absolute top-0 flex flex-col items-center pointer-events-none"
-          style={{ left: `calc(${loPercent}% + ${10 - loPercent * 0.2}px)`, transform: 'translateX(-50%)' }}
-        >
-          <div className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg tabular-nums" style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}>
-            {lo}
+        {/* Bubbles — merge into one when thumbs are close */}
+        {hiPercent - loPercent < 14 ? (
+          /* Merged bubble centered between the two thumbs */
+          <div
+            className="absolute top-0 flex flex-col items-center pointer-events-none"
+            style={{
+              left: `calc(${(loPercent + hiPercent) / 2}% + ${10 - ((loPercent + hiPercent) / 2) * 0.2}px)`,
+              transform: 'translateX(-50%)',
+            }}
+          >
+            <div className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg tabular-nums whitespace-nowrap" style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}>
+              {lo === hi ? lo : `${lo} – ${hi}`}
+            </div>
+            <div className="w-0.5 h-1.5 bg-primary/60" />
           </div>
-          <div className="w-0.5 h-1.5 bg-primary/60" />
-        </div>
+        ) : (
+          <>
+            {/* Lo thumb bubble */}
+            <div
+              className="absolute top-0 flex flex-col items-center pointer-events-none"
+              style={{ left: `calc(${loPercent}% + ${10 - loPercent * 0.2}px)`, transform: 'translateX(-50%)' }}
+            >
+              <div className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg tabular-nums" style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}>
+                {lo}
+              </div>
+              <div className="w-0.5 h-1.5 bg-primary/60" />
+            </div>
 
-        {/* Hi thumb bubble */}
-        <div
-          className="absolute top-0 flex flex-col items-center pointer-events-none"
-          style={{ left: `calc(${hiPercent}% + ${10 - hiPercent * 0.2}px)`, transform: 'translateX(-50%)' }}
-        >
-          <div className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg tabular-nums" style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}>
-            {hi}
-          </div>
-          <div className="w-0.5 h-1.5 bg-primary/60" />
-        </div>
+            {/* Hi thumb bubble */}
+            <div
+              className="absolute top-0 flex flex-col items-center pointer-events-none"
+              style={{ left: `calc(${hiPercent}% + ${10 - hiPercent * 0.2}px)`, transform: 'translateX(-50%)' }}
+            >
+              <div className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg tabular-nums" style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}>
+                {hi}
+              </div>
+              <div className="w-0.5 h-1.5 bg-primary/60" />
+            </div>
+          </>
+        )}
 
         {/* Track */}
         <div className="relative h-2 w-full rounded-full bg-dark-border">
