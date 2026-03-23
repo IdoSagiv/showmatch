@@ -12,8 +12,10 @@ import TimerBar from '@/components/game/TimerBar';
 import PlayerAvatar from '@/components/lobby/PlayerAvatar';
 import Logo from '@/components/ui/Logo';
 import TutorialOverlay, { TutorialReplayButton } from '@/components/game/TutorialOverlay';
+import { useBeforeUnload } from '@/hooks/useBeforeUnload';
 
 export default function GamePage() {
+  useBeforeUnload();
   const router = useRouter();
   const params = useParams();
   const code = (params.code as string).toUpperCase();
