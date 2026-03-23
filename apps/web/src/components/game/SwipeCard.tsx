@@ -118,7 +118,13 @@ export default function SwipeCard({
     >
       <motion.div
         className="relative cursor-grab active:cursor-grabbing select-none h-full"
-        style={{ x, y, rotate, touchAction: flipped ? 'pan-y' : 'none' }}
+        style={{
+          x, y, rotate,
+          touchAction: flipped ? 'pan-y' : 'none',
+          WebkitUserSelect: 'none',
+          WebkitTouchCallout: 'none',
+          willChange: 'transform',
+        } as React.CSSProperties}
         drag={!preview && isTop && !exiting ? (flipped ? 'x' : true) : false}
         dragElastic={0.8}
         onDragEnd={isTop ? handleDragEnd : undefined}
@@ -151,15 +157,17 @@ export default function SwipeCard({
                   <img
                     src={card.posterPath}
                     aria-hidden="true"
-                    className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-25"
+                    className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-25 pointer-events-none"
                     draggable={false}
+                    onDragStart={e => e.preventDefault()}
                   />
                   {/* Crisp poster */}
                   <img
                     src={card.posterPath}
                     alt={card.title}
-                    className="relative w-full h-full object-contain object-center"
+                    className="relative w-full h-full object-contain object-center pointer-events-none"
                     draggable={false}
+                    onDragStart={e => e.preventDefault()}
                   />
                 </>
               ) : (
