@@ -7,6 +7,9 @@ import { useGameStore } from '@/stores/gameStore';
 import ResultReveal from '@/components/results/ResultReveal';
 import RankingBoard from '@/components/results/RankingBoard';
 import WildcardPicker from '@/components/results/WildcardPicker';
+import SwipeReveal from '@/components/results/SwipeReveal';
+import GameStats from '@/components/results/GameStats';
+import ShareResultButton from '@/components/results/ShareResultButton';
 import Button from '@/components/ui/Button';
 import Logo from '@/components/ui/Logo';
 
@@ -109,51 +112,13 @@ export default function ResultsPage() {
               skipCountdown={isFirstMatch || matchedTitles.length === 1}
             />
 
-            {/* Swipe Reveal */}
-            {swipeReveal.length > 0 && (
-              <div className="mt-8">
-                <h3 className="text-lg font-bold mb-3">Who Liked What</h3>
-                <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                  {swipeReveal.slice(0, 20).map(({ title, playerDecisions }) => (
-                    <div key={title.tmdbId} className="flex items-center gap-3 bg-dark-surface rounded-lg p-2">
-                      {title.posterPath && (
-                        <img src={title.posterPath} alt={title.title} className="w-8 h-12 rounded object-cover" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm truncate">{title.title}</p>
-                        <div className="flex gap-2 mt-1">
-                          {playerDecisions.map(pd => (
-                            <span key={pd.playerName} className="text-xs" title={pd.playerName}>
-                              {pd.decision === 'like' ? '❤️' : pd.decision === 'superlike' ? '⭐' : '❌'}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div className="mt-8">
+              <SwipeReveal reveals={swipeReveal} />
+            </div>
 
-            {/* Fun Stats */}
-            {gameStats.length > 0 && (
-              <div className="mt-6">
-                <h3 className="text-lg font-bold mb-3">Awards</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {gameStats.map((stat, i) => (
-                    <div
-                      key={stat.title}
-                      className="bg-dark-card rounded-xl p-3 border border-dark-border text-center"
-                    >
-                      <div className="text-2xl mb-1">{stat.emoji}</div>
-                      <div className="text-sm font-bold">{stat.title}</div>
-                      <div className="text-xs text-primary">{stat.playerName}</div>
-                      <div className="text-xs text-gray-500">{stat.value}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div className="mt-6">
+              <GameStats stats={gameStats} />
+            </div>
 
             {/* Action buttons */}
             <div className="flex gap-3 mt-6">
@@ -167,9 +132,7 @@ export default function ResultsPage() {
                   </Button>
                 </>
               )}
-              <Button onClick={handleShare} variant="secondary" className={isCreator ? '' : 'flex-1'}>
-                Share Result
-              </Button>
+              <ShareResultButton winner={winner} />
             </div>
           </>
         )}
