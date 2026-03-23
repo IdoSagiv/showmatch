@@ -220,6 +220,21 @@ export default function SwipeCard({
                 ) : null}
               </div>
 
+              {/* Genre chips — max 3, compact */}
+              {card.genres.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1.5">
+                  {card.genres.slice(0, 3).map(g => (
+                    <span
+                      key={g}
+                      className="px-2 py-0.5 rounded-full text-[11px] font-medium text-white/70"
+                      style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(4px)' }}
+                    >
+                      {g}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               {/* Providers */}
               {card.providers.length > 0 && (
                 <div className="mt-2 pointer-events-auto">
