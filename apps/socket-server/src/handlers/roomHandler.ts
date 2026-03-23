@@ -34,6 +34,19 @@ export function registerRoomHandlers(io: Server, socket: Socket) {
     console.log(`${playerName} joined room ${code}`);
   });
 
+  socket.on('rejoinGame', ({ code, displayName }: { code: string; displayName: string }) => {
+    const result = roomManager.rejoinPlayer(code?.toUpperCase(), displayName, socket.id);
+    if (!result) {
+      // Room gone (server restart) or player not found — send them home
+      socket.emit('roomClosed', 'Connection lost. The room no longer exists.');
+      return;
+    }
+    const { room } = result;
+    socket.join(room.code);
+    console.log(`[rejoinGame] ${displayName} re-attached to room ${room.code}`);
+    socket.emit('gameRejoined', roomManager.serializeRoom(room), room.titlePool);
+  });
+
   socket.on('checkRoom', (code: string, callback: Function) => {
     const room = roomManager.getRoom(code?.toUpperCase());
     if (!room) {
