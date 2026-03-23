@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { filterProviders } from '@showmatch/shared';
 
 const TMDB_TOKEN = process.env.TMDB_READ_ACCESS_TOKEN || '';
 const TMDB_BASE = 'https://api.themoviedb.org/3';
@@ -8,7 +9,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const region = searchParams.get('region') || 'US';
 
-  const providers: Map<number, { id: number; name: string; logoPath: string; priority: number }> = new Map();
+  // Aggregate providers across movie + tv, keeping the best regional priority
+  const byId = new Map<number, { provider_id: number; provider_name: string; logo_path: string; display_priority: number }>();
 
   for (const type of ['movie', 'tv']) {
     try {
@@ -23,17 +25,9 @@ export async function GET(request: NextRequest) {
       if (res.ok) {
         const data = await res.json();
         for (const p of data.results || []) {
-          const existing = providers.get(p.provider_id);
-          if (!existing) {
-            providers.set(p.provider_id, {
-              id: p.provider_id,
-              name: p.provider_name,
-              logoPath: `${TMDB_IMG}${p.logo_path}`,
-              priority: p.display_priority,
-            });
-          } else if (p.display_priority < existing.priority) {
-            // Keep the best (lowest) priority across movie + tv
-            existing.priority = p.display_priority;
+          const existing = byId.get(p.provider_id);
+          if (!existing || p.display_priority < existing.display_priority) {
+            byId.set(p.provider_id, p);
           }
         }
       }
@@ -42,65 +36,12 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // IDs to exclude: rental/purchase stores and known non-subscription services
-  const EXCLUDED_IDS = new Set([
-    2,   // Apple iTunes
-    3,   // Google Play Movies
-    7,   // Fandango at Home (was Vudu)
-    10,  // Amazon Video (rental)
-    35,  // Rakuten TV
-    68,  // Microsoft Store
-    192, // YouTube (rental/purchase)
-    188, // YouTube Premium
-    207, // Redbox
-    258, // Hoopla
-  ]);
+  // Sort by priority, then run through the shared filter (excludes stores,
+  // sub-channels, deduplicates tier variants) with a hard cap of 30.
+  const sorted = [...byId.values()].sort((a, b) => a.display_priority - b.display_priority);
+  const filtered = filterProviders(sorted, 30);
 
-  // Name patterns to exclude:
-  // - Stores / rental services
-  // - Sub-channel add-ons sold through a platform (e.g. "BET+ Apple TV Channel",
-  //   "AMC+ Amazon Channel") — these are distribution wrappers, not standalone services
-  const EXCLUDED_NAME_PATTERNS = [
-    /itunes/i,
-    /google play/i,
-    /microsoft store/i,
-    /fandango/i,
-    /redbox/i,
-    /\bstore\b/i,
-    /\brent\b/i,
-    // Platform add-on channels — "X Apple TV Channel", "X Amazon Channel", etc.
-    /apple tv channel/i,
-    /amazon channel/i,
-    /prime video channel/i,
-    /roku channel/i,
-    /\bchannel$/i,   // anything ending in bare "Channel" (e.g. "Starz Channel")
-  ];
-
-  const shouldExclude = (p: { id: number; name: string }) =>
-    EXCLUDED_IDS.has(p.id) || EXCLUDED_NAME_PATTERNS.some(re => re.test(p.name));
-
-  // Normalize name for dedup: strip punctuation + tier/plan suffixes,
-  // and strip platform distribution suffixes so "Netflix" and "Netflix Basic"
-  // collapse to the same key.
-  const normalize = (s: string) =>
-    s.toLowerCase()
-      .replace(/\s+(apple tv|amazon|prime video|roku).*$/i, '') // strip " Apple TV..." suffix
-      .replace(/[^a-z0-9]/g, '')
-      .replace(/(basic|standard|premium|kids|plus|hd|4k)$/g, '')
-      .trim();
-
-  const seenNames = new Set<string>();
-  const sorted = [...providers.values()]
-    .sort((a, b) => a.priority - b.priority)
-    .filter(p => !shouldExclude(p))
-    .filter(p => {
-      const key = normalize(p.name);
-      if (seenNames.has(key)) return false;
-      seenNames.add(key);
-      return true;
-    })
-    .slice(0, 30)  // cap at top 30 by regional priority
-    .map(({ id, name, logoPath }) => ({ id, name, logoPath }));
-
-  return NextResponse.json(sorted);
+  return NextResponse.json(
+    filtered.map(p => ({ id: p.provider_id, name: p.provider_name, logoPath: `${TMDB_IMG}${p.logo_path}` }))
+  );
 }
