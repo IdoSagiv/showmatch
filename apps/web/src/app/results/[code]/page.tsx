@@ -11,6 +11,7 @@ import SwipeReveal from '@/components/results/SwipeReveal';
 import GameStats from '@/components/results/GameStats';
 import Logo from '@/components/ui/Logo';
 import { saveGameToHistory } from '@/lib/history';
+import { safeCopy } from '@/lib/clipboard';
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -83,21 +84,7 @@ export default function ResultsPage() {
       } catch {}
     }
 
-    // navigator.clipboard requires HTTPS/localhost — falls back to execCommand
-    // which works on any origin (including LAN HTTP)
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const el = document.createElement('textarea');
-      el.value = text;
-      el.style.position = 'fixed';
-      el.style.opacity = '0';
-      document.body.appendChild(el);
-      el.focus();
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-    }
+    await safeCopy(text);
     setShareCopied(true);
     setTimeout(() => setShareCopied(false), 2000);
   }, [winner]);
