@@ -68,7 +68,7 @@ export default function JoinGameForm() {
             flex-1 min-w-0
             bg-dark-surface border border-dark-border
             rounded-xl px-4 py-3
-            text-center font-mono text-xl tracking-[0.25em] text-white placeholder:text-gray-600
+            text-center font-mono text-xl tracking-[0.25em] text-white placeholder:text-gray-600 placeholder:tracking-normal placeholder:text-base
             focus:outline-none focus:border-primary transition-colors
           "
         />
