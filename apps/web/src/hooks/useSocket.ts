@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { connectSocket, getSocket } from '@/lib/socket';
 import { useGameStore } from '@/stores/gameStore';
+import { playSound } from '@/lib/sounds';
 import type { Socket } from 'socket.io-client';
 
 export function useSocket() {
@@ -40,6 +41,7 @@ export function useSocket() {
     socket.on('allPlayersFinished', (matchedTitles) => {
       store.setMatchedTitles(matchedTitles);
       store.setGameOver(true);
+      if (matchedTitles.length > 0) playSound('match');
     });
 
     socket.on('firstMatch', (title) => {
@@ -47,6 +49,7 @@ export function useSocket() {
       store.setWinner(title);
       store.setMatchedTitles([title]);
       store.setGameOver(true);
+      playSound('victory');
     });
 
     socket.on('rankingsReady', (winner, rankings) => {
