@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useSocket } from '@/hooks/useSocket';
@@ -24,6 +24,29 @@ export default function JoinPage() {
   const [name, setName] = useState(randomName());
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  // Verify the room exists before showing the name picker.
+  useEffect(() => {
+    const doCheck = () => {
+      socket.emit('checkRoom', code, (response: any) => {
+        if ('error' in response) {
+          sessionStorage.setItem('showmatch-toast', response.error);
+          router.replace('/');
+        } else {
+          setChecking(false);
+        }
+      });
+    };
+
+    if (socket.connected) {
+      doCheck();
+    } else {
+      socket.once('connect', doCheck);
+      socket.connect();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleJoin = () => {
     if (!name.trim() || joining) return;
@@ -50,6 +73,19 @@ export default function JoinPage() {
       socket.connect();
     }
   };
+
+  if (checking) {
+    return (
+      <main className="min-h-screen bg-dark flex flex-col">
+        <header className="flex items-center p-4 border-b border-dark-border">
+          <Logo size="sm" />
+        </header>
+        <div className="flex-1 flex items-center justify-center text-gray-500">
+          Checking room…
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-dark">

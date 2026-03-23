@@ -34,6 +34,19 @@ export function registerRoomHandlers(io: Server, socket: Socket) {
     console.log(`${playerName} joined room ${code}`);
   });
 
+  socket.on('checkRoom', (code: string, callback: Function) => {
+    const room = roomManager.getRoom(code?.toUpperCase());
+    if (!room) {
+      callback({ error: 'Room not found' });
+      return;
+    }
+    if (room.status !== 'lobby') {
+      callback({ error: 'Game already in progress' });
+      return;
+    }
+    callback({ status: room.status, playerCount: room.players.length });
+  });
+
   socket.on('leaveRoom', (payload?: { playerId?: string }) => {
     // Support playerId fallback so this works even after a socket reconnect
     const room = roomManager.getRoomBySocket(socket.id)
