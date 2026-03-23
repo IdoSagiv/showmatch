@@ -24,22 +24,23 @@ export default function Home() {
       {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-primary/5 blur-3xl"
+          className="absolute -top-40 -right-40 w-[480px] h-[480px] rounded-full bg-primary/10 blur-3xl"
           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 8, repeat: Infinity }}
         />
         <motion.div
-          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-primary/5 blur-3xl"
+          className="absolute -bottom-40 -left-40 w-[480px] h-[480px] rounded-full bg-primary/10 blur-3xl"
           animate={{ scale: [1.2, 1, 1.2], opacity: [0.5, 0.3, 0.5] }}
           transition={{ duration: 8, repeat: Infinity }}
         />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-violet-900/5 blur-3xl" />
       </div>
 
       {/* Card */}
       <div className="relative z-10 w-full max-w-md flex flex-col items-center gap-3">
         <HeroSection />
 
-        <div className="w-full mt-2 flex flex-col gap-3">
+        <div className="gradient-border w-full mt-2 rounded-2xl p-4 flex flex-col gap-3">
           <CreateGameButton />
 
           <div className="flex items-center gap-3 text-gray-600 text-sm">

@@ -24,7 +24,7 @@ export default function Button({
   const baseStyles = 'font-semibold rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark';
 
   const variants = {
-    primary: 'bg-primary hover:bg-primary-dark text-white focus:ring-primary',
+    primary: 'bg-gradient-to-r from-primary to-[#ff6b35] hover:from-primary-dark hover:to-[#e85a20] text-white shadow-lg shadow-primary/20 focus:ring-primary',
     secondary: 'bg-dark-surface hover:bg-dark-border text-white border border-dark-border focus:ring-dark-border',
     ghost: 'bg-transparent hover:bg-white/10 text-gray-300 focus:ring-white/20',
   };

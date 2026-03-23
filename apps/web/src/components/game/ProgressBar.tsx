@@ -15,7 +15,7 @@ export default function ProgressBar({ current, total }: ProgressBarProps) {
     <div className="w-full">
       <div className="h-1.5 bg-dark-border rounded-full overflow-hidden">
         <motion.div
-          className="h-full bg-primary rounded-full"
+          className="h-full bg-gradient-to-r from-primary to-[#ff6b35] rounded-full"
           animate={{ width: `${pct}%` }}
           transition={{ type: 'spring', stiffness: 100 }}
         />

@@ -74,7 +74,7 @@ export default function WildcardPicker({ candidates }: WildcardPickerProps) {
         <motion.button
           onClick={handleSpin}
           disabled={spinning}
-          className="px-6 py-3 bg-accent-gold text-black rounded-xl font-bold text-lg disabled:opacity-50"
+          className="px-6 py-3 bg-gradient-to-r from-accent-gold to-[#ff9500] text-black rounded-xl font-bold text-lg disabled:opacity-50 shadow-lg shadow-accent-gold/30"
           whileTap={{ scale: 0.95 }}
         >
           {spinning ? 'Spinning...' : 'Wildcard Pick!'}

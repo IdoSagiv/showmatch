@@ -102,7 +102,7 @@ export default function ResultsPage() {
   const waitingForResults = gameOver && !winner && !isRanking && !noMatches;
 
   return (
-    <main className="min-h-screen bg-dark pb-36">
+    <main className="min-h-screen bg-dark pb-36" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #0d0b1e 100%)' }}>
       <header className="flex items-center p-4 border-b border-dark-border">
         <Logo size="sm" />
       </header>

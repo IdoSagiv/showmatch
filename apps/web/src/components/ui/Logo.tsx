@@ -55,7 +55,7 @@ export default function Logo({ size = 'sm' }: LogoProps) {
       >
         <span className={`font-bold ${textSize} tracking-tight`}>
           <span className="text-white">Show</span>
-          <span className="text-primary">Match</span>
+          <span className="gradient-text">Match</span>
         </span>
       </motion.div>
 

@@ -6,6 +6,7 @@ interface PlayerAvatarProps {
   size?: 'sm' | 'md';
   progress?: number;
   total?: number;
+  avatarClassName?: string;
 }
 
 const COLORS = [
@@ -23,12 +24,13 @@ function getInitials(name: string): string {
   return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 }
 
-export default function PlayerAvatar({ name, connected = true, size = 'md', progress, total }: PlayerAvatarProps) {
+export default function PlayerAvatar({ name, connected = true, size = 'md', progress, total, avatarClassName }: PlayerAvatarProps) {
   const sizeClass = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm';
+  const colorClass = avatarClassName ?? getColor(name);
 
   return (
     <div className="relative">
-      <div className={`${sizeClass} ${getColor(name)} rounded-full flex items-center justify-center font-bold ${!connected ? 'opacity-50' : ''}`}>
+      <div className={`${sizeClass} ${colorClass} rounded-full flex items-center justify-center font-bold ${!connected ? 'opacity-50' : ''}`}>
         {getInitials(name)}
       </div>
       {progress !== undefined && total !== undefined && total > 0 && (
