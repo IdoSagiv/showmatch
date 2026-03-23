@@ -183,18 +183,6 @@ export default function SwipeCard({
                 background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.78) 25%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.08) 68%, transparent 80%)',
               }}
             >
-              {/* Type + rating badge row */}
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-[10px] font-bold text-white/60 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full tracking-wide uppercase">
-                  {card.mediaType === 'movie' ? '🎬 Film' : '📺 Series'}
-                </span>
-                {card.contentRating && (
-                  <span className="text-[10px] font-bold text-white/40 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full">
-                    {card.contentRating}
-                  </span>
-                )}
-              </div>
-
               {/* Title */}
               <h2
                 className="text-white font-black leading-tight tracking-tight"
@@ -236,6 +224,18 @@ export default function SwipeCard({
                 <div className="mt-2 pointer-events-auto">
                   <StreamingLogos providers={card.providers} searchTitle={card.title} />
                 </div>
+              )}
+            </div>
+
+            {/* Type + age badges — bottom right */}
+            <div className="absolute bottom-4 right-4 flex flex-col items-end gap-1.5 pointer-events-none z-10">
+              <span className="text-[10px] font-bold text-white/65 bg-black/45 backdrop-blur-md px-2.5 py-1 rounded-full tracking-wide uppercase">
+                {card.mediaType === 'movie' ? '🎬 Film' : '📺 Series'}
+              </span>
+              {card.contentRating && (
+                <span className="text-[10px] font-bold text-white/50 bg-black/45 backdrop-blur-md px-2.5 py-1 rounded-full">
+                  {card.contentRating}
+                </span>
               )}
             </div>
 
