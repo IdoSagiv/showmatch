@@ -127,7 +127,7 @@ export default function GamePage() {
   const otherPlayers = room.players.filter(p => p.id !== playerId);
 
   return (
-    <main className="bg-dark flex flex-col overflow-hidden" style={{ height: gameHeight, touchAction: 'pan-y' }}>
+    <main className="flex flex-col overflow-hidden" style={{ height: gameHeight, touchAction: 'pan-y', background: '#08080f' }}>
       <TutorialOverlay onDismiss={() => setShowTutorial(false)} forceShow={showTutorial} />
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-2.5 border-b border-dark-border bg-dark/90 backdrop-blur-md">

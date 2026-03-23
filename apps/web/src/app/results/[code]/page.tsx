@@ -102,8 +102,8 @@ export default function ResultsPage() {
   const waitingForResults = gameOver && !winner && !isRanking && !noMatches;
 
   return (
-    <main className="min-h-screen bg-dark pb-36" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #0d0b1e 100%)' }}>
-      <header className="flex items-center p-4 border-b border-dark-border">
+    <main className="min-h-screen bg-dark pb-36">
+      <header className="flex items-center px-4 py-3 border-b border-dark-border bg-dark/90 backdrop-blur-md sticky top-0 z-20">
         <Logo size="sm" />
       </header>
 
@@ -175,7 +175,7 @@ export default function ResultsPage() {
 
       {/* Sticky footer — always visible once game is over */}
       {(winner || noMatches) && (
-        <div className="fixed bottom-0 left-0 right-0 z-10 bg-dark/90 backdrop-blur-sm border-t border-dark-border">
+        <div className="fixed bottom-0 left-0 right-0 z-10 bg-dark/90 backdrop-blur-md border-t border-dark-border shadow-[0_-4px_32px_rgba(0,0,0,0.5)]">
           <div className="max-w-lg mx-auto p-3 flex gap-2">
             <button
               onClick={handleShare}

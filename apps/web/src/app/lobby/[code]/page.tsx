@@ -49,25 +49,36 @@ export default function LobbyPage() {
 
   return (
     <main className="min-h-screen bg-dark">
-      <header className="flex items-center justify-between p-4 border-b border-dark-border">
+      {/* Frosted glass header */}
+      <header className="flex items-center justify-between px-4 py-3 border-b border-dark-border bg-dark/90 backdrop-blur-md sticky top-0 z-20">
         <Logo size="sm" />
       </header>
 
-      <div className="max-w-lg mx-auto p-4 pb-28 space-y-4">
-        {/* Room Code */}
+      <div className="max-w-lg mx-auto p-4 pb-32 space-y-4">
+        {/* Room Code — hero section */}
         <motion.div
-          className="text-center bg-gradient-to-b from-dark-card to-dark-surface rounded-2xl p-5 border border-dark-border relative overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          className="text-center rounded-2xl p-6 relative overflow-hidden glass-card"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 24 }}
         >
-          <div className="absolute inset-0 bg-primary/5 pointer-events-none rounded-2xl" />
-          <p className="text-sm text-gray-400 mb-1">Room Code</p>
-          <p className="relative text-4xl font-mono font-black tracking-[0.35em]" style={{ textShadow: '0 0 40px rgba(229,9,20,0.5)' }}>{room.code}</p>
-          <div className="mt-2 flex justify-center">
+          {/* Subtle red bloom behind code */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(229,9,20,0.08) 0%, transparent 70%)' }}
+          />
+
+          <p className="text-xs text-gray-500 uppercase tracking-[0.2em] mb-2">Room Code</p>
+          <p
+            className="relative text-5xl font-mono font-black tracking-[0.4em] code-glow text-white"
+          >
+            {room.code}
+          </p>
+          <div className="mt-3 flex justify-center">
             <ShareButton code={room.code} />
           </div>
           {connectedCount < 2 && (
-            <p className="mt-2 text-xs text-gray-600">Share this code with friends to invite them</p>
+            <p className="mt-3 text-xs text-gray-600 tracking-wide">Share this code with friends to join</p>
           )}
         </motion.div>
 
@@ -94,8 +105,8 @@ export default function LobbyPage() {
               className="w-full"
             >
               {connectedCount < 2
-                ? `Waiting for players... (${connectedCount}/2)`
-                : `Start Game (${connectedCount} players)`
+                ? `Waiting for players… (${connectedCount}/2)`
+                : `Start Game — ${connectedCount} players`
               }
             </Button>
           </div>

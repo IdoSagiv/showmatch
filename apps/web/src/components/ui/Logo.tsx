@@ -13,7 +13,7 @@ interface LogoProps {
 }
 
 export default function Logo({ size = 'sm' }: LogoProps) {
-  const textSize = size === 'lg' ? 'text-5xl md:text-6xl' : 'text-2xl';
+  const textSize = size === 'lg' ? 'text-[3.5rem] md:text-[4rem]' : 'text-2xl';
   const router = useRouter();
   const { room, reset, playerId } = useGameStore();
   const [showConfirm, setShowConfirm] = useState(false);
