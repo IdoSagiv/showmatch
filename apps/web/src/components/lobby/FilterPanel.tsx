@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { GameSettings, StreamingProvider } from '@/types/game';
 import { GENRES, CONTENT_RATINGS, TIMER_OPTIONS, SORT_OPTIONS } from '@/lib/constants';
+import { detectRegion } from '@/lib/detectRegion';
 import RangeSlider from '@/components/ui/RangeSlider';
 
 interface FilterPanelProps {
@@ -32,22 +33,14 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
     setProviderTooltip(null);
   }, []);
 
-  // Auto-detect region from browser locale on first mount
+  // Auto-detect region from browser locale / timezone on first mount
   const regionDetected = useRef(false);
   useEffect(() => {
     if (!isCreator || regionDetected.current) return;
     regionDetected.current = true;
-
-    const langs = [navigator.language, ...(navigator.languages ?? [])];
-    for (const lang of langs) {
-      const parts = lang.split('-');
-      if (parts.length >= 2) {
-        const detected = parts[parts.length - 1].toUpperCase();
-        if (detected !== settings.region) {
-          onSettingsChange({ ...settings, region: detected });
-        }
-        break;
-      }
+    const detected = detectRegion();
+    if (detected !== settings.region) {
+      onSettingsChange({ ...settings, region: detected });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCreator]);
