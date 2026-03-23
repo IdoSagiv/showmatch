@@ -122,16 +122,28 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
       title.trailerKey = trailer?.key || null;
     }
 
-    // Providers
+    // Providers — flatrate (subscription) only, strip platform sub-channels
     if (providersRes.status === 'fulfilled' && providersRes.value.ok) {
       const providersData = await providersRes.value.json();
       const regionData = providersData.results?.[region];
       const flatrate = regionData?.flatrate || [];
-      title.providers = flatrate.map((p: any) => ({
-        id: p.provider_id,
-        name: p.provider_name,
-        logoPath: `${TMDB_IMG}${p.logo_path}`,
-      }));
+      const CHANNEL_PATTERNS = [
+        /apple tv channel/i,
+        /amazon channel/i,
+        /prime video channel/i,
+        /roku channel/i,
+        /\bchannel$/i,
+        /\bstore\b/i,
+        /itunes/i,
+        /google play/i,
+      ];
+      title.providers = flatrate
+        .filter((p: any) => !CHANNEL_PATTERNS.some((re: RegExp) => re.test(p.provider_name)))
+        .map((p: any) => ({
+          id: p.provider_id,
+          name: p.provider_name,
+          logoPath: `${TMDB_IMG}${p.logo_path}`,
+        }));
     }
 
     // External IDs + OMDB (movies only)

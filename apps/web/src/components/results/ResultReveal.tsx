@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TitleCard } from '@/types/game';
 import Confetti from './Confetti';
+import StreamingLogos from '@/components/game/StreamingLogos';
 
 interface ResultRevealProps {
   winner: TitleCard;
@@ -85,6 +86,11 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
                       </span>
                     )}
                   </div>
+                  {winner.providers && winner.providers.length > 0 && (
+                    <div className="flex justify-center pt-1">
+                      <StreamingLogos providers={winner.providers} />
+                    </div>
+                  )}
                   <p className="text-xs text-gray-600 pt-1">Tap for details ↕</p>
                 </div>
               </motion.div>
@@ -144,6 +150,10 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
                     <p className="text-sm">
                       <span className="text-gray-500">Directed by: </span>{winner.director}
                     </p>
+                  )}
+
+                  {winner.providers && winner.providers.length > 0 && (
+                    <StreamingLogos providers={winner.providers} />
                   )}
 
                   {winner.trailerKey && (
