@@ -6,18 +6,18 @@ export default function Confetti() {
   useEffect(() => {
     import('canvas-confetti').then(mod => {
       const confetti = mod.default;
-      const duration = 3500;
+      const duration = 1500;
       const end = Date.now() + duration;
 
-      // Burst from both sides — more particles, useWorker:false for mobile compat
+      // Burst from both sides — useWorker:false for mobile compat
       // (cast to any to bypass outdated type definitions)
       const fire = (opts: object) =>
         (confetti as any)({
-          particleCount: 6,
-          spread: 60,
-          ticks: 200,
-          gravity: 1.2,
-          scalar: 1.1,
+          particleCount: 4,
+          spread: 55,
+          ticks: 150,
+          gravity: 1.4,
+          scalar: 1.0,
           colors: ['#e50914', '#ffd700', '#00c853', '#ffffff', '#ff69b4'],
           disableForReducedMotion: true,
           useWorker: false,
@@ -30,10 +30,10 @@ export default function Confetti() {
         if (Date.now() < end) requestAnimationFrame(frame);
       };
 
-      // Initial big burst
+      // Initial burst (lighter than before)
       (confetti as any)({
-        particleCount: 80,
-        spread: 100,
+        particleCount: 50,
+        spread: 90,
         origin: { y: 0.5 },
         colors: ['#e50914', '#ffd700', '#00c853'],
         disableForReducedMotion: true,
