@@ -155,6 +155,8 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
             const omdb = await omdbRes.json();
             const rt = (omdb.Ratings || []).find((r: any) => r.Source === 'Rotten Tomatoes');
             title.rottenTomatoesScore = rt ? parseInt(rt.Value) : null;
+            const mc = omdb.Metascore && omdb.Metascore !== 'N/A' ? parseInt(omdb.Metascore) : null;
+            title.metacriticScore = mc;
           }
         } catch { /* OMDB failure is non-critical */ }
       }
@@ -231,6 +233,7 @@ function mapBasicResult(item: any, mediaType: 'movie' | 'tv'): TitleCard {
     overview: item.overview || '',
     voteAverage: item.vote_average || 0,
     rottenTomatoesScore: null,
+    metacriticScore: null,
     runtime: null,
     genres: (item.genre_ids || []).map((id: number) => GENRE_MAP[id] || 'Unknown'),
     contentRating: '',

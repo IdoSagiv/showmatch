@@ -88,12 +88,17 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
                       <span className="bg-[#F5C518] text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded leading-none">IMDb</span>
                       <span>{winner.voteAverage.toFixed(1)}</span>
                     </span>
-                    {winner.rottenTomatoesScore !== null && (
+                    {winner.rottenTomatoesScore !== null ? (
                       <span className="flex items-center gap-1">
                         <span>🍅</span>
                         <span>{winner.rottenTomatoesScore}%</span>
                       </span>
-                    )}
+                    ) : winner.metacriticScore !== null ? (
+                      <span className="flex items-center gap-1.5">
+                        <span className="bg-[#FFCC34] text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded leading-none">MC</span>
+                        <span>{winner.metacriticScore}</span>
+                      </span>
+                    ) : null}
                   </div>
                   {winner.providers && winner.providers.length > 0 && (
                     <div className="flex justify-center pt-1">
@@ -126,6 +131,12 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
                       <div className="bg-dark-surface rounded-lg px-3 py-2 text-center min-w-[56px]">
                         <div className="text-red-400 text-lg font-bold">{winner.rottenTomatoesScore}%</div>
                         <div className="text-xs text-gray-500">RT</div>
+                      </div>
+                    )}
+                    {winner.rottenTomatoesScore === null && winner.metacriticScore !== null && (
+                      <div className="bg-dark-surface rounded-lg px-3 py-2 text-center min-w-[56px]">
+                        <div className="text-yellow-400 text-lg font-bold">{winner.metacriticScore}</div>
+                        <div className="text-xs text-gray-500">MC</div>
                       </div>
                     )}
                     {winner.runtime && (
