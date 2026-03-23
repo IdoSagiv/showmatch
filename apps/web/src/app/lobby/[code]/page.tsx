@@ -53,7 +53,7 @@ export default function LobbyPage() {
         <Logo size="sm" />
       </header>
 
-      <div className="max-w-lg mx-auto p-4 space-y-4">
+      <div className="max-w-lg mx-auto p-4 pb-28 space-y-4">
         {/* Room Code */}
         <motion.div
           className="text-center bg-gradient-to-b from-dark-card to-dark-surface rounded-2xl p-5 border border-dark-border relative overflow-hidden"
