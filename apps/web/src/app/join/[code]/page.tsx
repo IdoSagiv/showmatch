@@ -107,7 +107,7 @@ export default function JoinPage() {
 
           {/* Room code block */}
           <div className="text-center">
-            <p className="text-xs text-gray-600 tracking-[0.25em] uppercase font-semibold mb-3">
+            <p className="text-xs text-gray-400 tracking-[0.25em] uppercase font-semibold mb-3">
               Joining Room
             </p>
             <motion.div
@@ -134,7 +134,7 @@ export default function JoinPage() {
             transition={{ delay: 0.18, type: 'spring', stiffness: 220, damping: 24 }}
           >
             <div>
-              <p className="text-xs text-gray-500 tracking-widest uppercase font-semibold mb-3">
+              <p className="text-xs text-gray-400 tracking-widest uppercase font-semibold mb-3">
                 Your Name
               </p>
 
@@ -239,7 +239,7 @@ export default function JoinPage() {
           {/* Back link */}
           <motion.button
             onClick={() => router.back()}
-            className="text-xs text-gray-600 hover:text-gray-400 transition-colors tracking-wide"
+            className="text-xs text-gray-400 hover:text-white transition-colors tracking-wide"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
