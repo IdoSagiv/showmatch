@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import {
   motion,
   useMotionValue,
+  useMotionValueEvent,
   useTransform,
   animate,
   type PanInfo,
@@ -27,12 +28,15 @@ interface SwipeCardProps {
   canUndo?: boolean;
   /** Preview mode: static card, tap to flip, no swiping */
   preview?: boolean;
+  /** Called every frame during drag with the active direction (null = snapped back) */
+  onDragProgress?: (direction: 'like' | 'pass' | 'superlike' | null) => void;
 }
 
 export default function SwipeCard({
   card, onSwipe, isTop, stackIndex,
   superLikeUsed = false,
   pendingDecision, onPendingConsumed,
+  onDragProgress,
   onUndo, canUndo = false,
   preview = false,
 }: SwipeCardProps) {
@@ -54,6 +58,22 @@ export default function SwipeCard({
   const nopeOpacity       = useTransform(x, [-120, -20], [1, 0]);
   const superLikeOpacity  = useTransform(y, [-120, -20], [1, 0]);
   const decisionRef = useRef<'like' | 'pass' | 'superlike'>('pass');
+
+  // Emit drag direction to parent so SwipeButtons can highlight the active button
+  useMotionValueEvent(x, 'change', (latest) => {
+    if (!isTop || exiting || !onDragProgress) return;
+    if (latest > 30) onDragProgress('like');
+    else if (latest < -30) onDragProgress('pass');
+    else if (y.get() < -30) onDragProgress('superlike');
+    else onDragProgress(null);
+  });
+  useMotionValueEvent(y, 'change', (latest) => {
+    if (!isTop || exiting || !onDragProgress) return;
+    if (latest < -30 && Math.abs(x.get()) < 30) onDragProgress('superlike');
+    else if (x.get() > 30) onDragProgress('like');
+    else if (x.get() < -30) onDragProgress('pass');
+    else onDragProgress(null);
+  });
 
   const scale = 1 - stackIndex * 0.05;
   const yOffset = stackIndex * 10;
@@ -98,7 +118,8 @@ export default function SwipeCard({
     if (swipedH) {
       flyOut(info.offset.x > 0 ? 'like' : 'pass');
     } else {
-      // Snap back smoothly
+      // Snap back smoothly, clear the highlight
+      onDragProgress?.(null);
       animate(x, 0, { type: 'spring', stiffness: 400, damping: 30 });
       animate(y, 0, { type: 'spring', stiffness: 400, damping: 30 });
     }
