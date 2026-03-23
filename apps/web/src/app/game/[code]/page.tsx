@@ -17,6 +17,24 @@ import { useSound } from '@/hooks/useSound';
 
 export default function GamePage() {
   useBeforeUnload();
+
+  // Reliably set the game page height on mobile browsers where 100vh ≠ visible area.
+  // visualViewport.height is the true visible height, accounting for browser chrome.
+  useEffect(() => {
+    const set = () => {
+      const h = window.visualViewport?.height ?? window.innerHeight;
+      document.documentElement.style.setProperty('--game-h', `${h}px`);
+    };
+    set();
+    const vv = window.visualViewport;
+    vv?.addEventListener('resize', set);
+    window.addEventListener('resize', set);
+    return () => {
+      vv?.removeEventListener('resize', set);
+      window.removeEventListener('resize', set);
+    };
+  }, []);
+
   const router = useRouter();
   const params = useParams();
   const code = (params.code as string).toUpperCase();
@@ -98,7 +116,7 @@ export default function GamePage() {
   const otherPlayers = room.players.filter(p => p.id !== playerId);
 
   return (
-    <main className="h-screen bg-dark flex flex-col overflow-hidden" style={{ touchAction: 'pan-y' }}>
+    <main className="bg-dark flex flex-col overflow-hidden" style={{ height: 'var(--game-h, 100vh)', touchAction: 'pan-y' }}>
       <TutorialOverlay onDismiss={() => setShowTutorial(false)} />
       {/* Header */}
       <header className="flex items-center justify-between p-3 border-b border-dark-border">
