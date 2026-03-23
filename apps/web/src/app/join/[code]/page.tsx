@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
@@ -18,16 +18,20 @@ function randomName(): string {
 export default function JoinPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const code = (params.code as string).toUpperCase();
   const socket = useSocket();
   const { setRoom, setPlayerId } = useGameStore();
   const [name, setName] = useState(randomName());
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
-  const [checking, setChecking] = useState(true);
+  // Skip room check when navigating from the join form (?v=1 = pre-verified).
+  // Still check for direct URL access so we don't show a broken name picker.
+  const [checking, setChecking] = useState(!searchParams.get('v'));
 
-  // Verify the room exists before showing the name picker.
   useEffect(() => {
+    if (!checking) return; // pre-verified — no need to check
+
     const doCheck = () => {
       socket.emit('checkRoom', code, (response: any) => {
         if ('error' in response) {

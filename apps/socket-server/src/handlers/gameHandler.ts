@@ -63,7 +63,10 @@ export function registerGameHandlers(io: Server, socket: Socket) {
 
   socket.on('submitSwipe', (tmdbId: number, decision: 'like' | 'pass' | 'superlike') => {
     const room = roomManager.getRoomBySocket(socket.id);
-    if (!room || room.status !== 'swiping') return;
+    if (!room || room.status !== 'swiping') {
+      console.log(`[submitSwipe] DROPPED socket=${socket.id} room=${room?.code ?? 'null'} status=${room?.status ?? 'null'}`);
+      return;
+    }
 
     // Enforce once-per-game superlike
     if (decision === 'superlike') {
@@ -76,6 +79,12 @@ export function registerGameHandlers(io: Server, socket: Socket) {
     const player = room.players.find(p => p.id === socket.id);
     if (player) {
       io.to(room.code).emit('playerProgress', socket.id, player.progress);
+      if (player.finished) {
+        const connected = room.players.filter(p => p.connected);
+        console.log(`[submitSwipe] ${player.displayName} finished. connected=${connected.map(p => `${p.displayName}:${p.finished}`).join(',')}`);
+      }
+    } else {
+      console.log(`[submitSwipe] player NOT FOUND for socket=${socket.id} in room ${room.code}. players=${room.players.map(p => p.id).join(',')}`);
     }
 
     // First match mode
