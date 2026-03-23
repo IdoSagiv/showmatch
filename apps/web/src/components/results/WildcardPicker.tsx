@@ -60,7 +60,7 @@ export default function WildcardPicker({ candidates }: WildcardPickerProps) {
             }`}
           >
             {c.posterPath && <img src={c.posterPath} alt={c.title} className="w-full aspect-[2/3] object-cover" />}
-            <p className="text-xs p-1 truncate">{c.title}</p>
+            <p className="text-xs p-1 truncate" title={c.title}>{c.title}</p>
           </motion.div>
         ))}
       </div>

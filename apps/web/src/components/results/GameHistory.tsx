@@ -50,7 +50,7 @@ export default function GameHistory({ isOpen, onClose }: GameHistoryProps) {
                   />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">
+                  <p className="font-medium truncate" title={entry.winner?.title || 'No winner'}>
                     {entry.winner?.title || 'No winner'}
                   </p>
                   <p className="text-xs text-gray-500">
