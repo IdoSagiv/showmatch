@@ -9,9 +9,10 @@ export default function Confetti() {
       const duration = 3500;
       const end = Date.now() + duration;
 
-      // Burst from both sides — more particles + useWorker:false for mobile compat
+      // Burst from both sides — more particles, useWorker:false for mobile compat
+      // (cast to any to bypass outdated type definitions)
       const fire = (opts: object) =>
-        confetti({
+        (confetti as any)({
           particleCount: 6,
           spread: 60,
           ticks: 200,
@@ -30,7 +31,7 @@ export default function Confetti() {
       };
 
       // Initial big burst
-      confetti({
+      (confetti as any)({
         particleCount: 80,
         spread: 100,
         origin: { y: 0.5 },
