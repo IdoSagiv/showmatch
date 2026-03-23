@@ -109,9 +109,9 @@ export default function SwipeCard({
             transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
             style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
           >
-            {/* Poster */}
-            <div className="relative bg-dark-surface flex items-center justify-center overflow-hidden"
-              style={{ height: 'min(45vh, 340px)' }}>
+            {/* Poster — aspect-[2/3] matches TMDB poster ratio so no cropping needed */}
+            <div className="relative bg-dark-surface w-full overflow-hidden"
+              style={{ aspectRatio: '2/3', maxHeight: '58vh' }}>
               {card.posterPath ? (
                 <img
                   src={card.posterPath}
@@ -120,7 +120,7 @@ export default function SwipeCard({
                   draggable={false}
                 />
               ) : (
-                <div className="text-gray-600 text-sm">No Poster</div>
+                <div className="absolute inset-0 flex items-center justify-center text-gray-600 text-sm">No Poster</div>
               )}
             </div>
 
