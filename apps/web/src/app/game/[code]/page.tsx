@@ -11,6 +11,7 @@ import ProgressBar from '@/components/game/ProgressBar';
 import TimerBar from '@/components/game/TimerBar';
 import PlayerAvatar from '@/components/lobby/PlayerAvatar';
 import Logo from '@/components/ui/Logo';
+import TutorialOverlay, { TutorialReplayButton } from '@/components/game/TutorialOverlay';
 
 export default function GamePage() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function GamePage() {
     recordSwipe, undoLastSwipe, playerId,
   } = useGameStore();
   const [flipped, setFlipped] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
     if (!room || !titlePool.length) {
@@ -81,10 +83,15 @@ export default function GamePage() {
 
   return (
     <main className="min-h-screen bg-dark flex flex-col" style={{ touchAction: 'pan-y' }}>
+      <TutorialOverlay onDismiss={() => setShowTutorial(false)} />
       {/* Header */}
       <header className="flex items-center justify-between p-3 border-b border-dark-border">
         <a href="/"><Logo size="sm" /></a>
         <div className="flex items-center gap-2">
+          <TutorialReplayButton onClick={() => {
+            localStorage.removeItem('showmatch-tutorial-seen');
+            setShowTutorial(true);
+          }} />
           {otherPlayers.map(p => (
             <PlayerAvatar
               key={p.id}
