@@ -124,9 +124,10 @@ export default function SwipeCard({
       <motion.div
         className="relative cursor-grab active:cursor-grabbing select-none h-full"
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        style={{ x, y, rotate, touchAction: flipped ? 'auto' : 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', willChange: 'transform' } as any}
-        drag={!preview && isTop && !exiting && !flipped ? true : false}
-        dragElastic={0.8}
+        style={{ x, y, rotate, touchAction: flipped ? 'pan-y' : 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', willChange: 'transform' } as any}
+        drag={!preview && isTop && !exiting ? (flipped ? 'x' : true) : false}
+        dragElastic={flipped ? 0.4 : 0.8}
+        dragConstraints={flipped ? { top: 0, bottom: 0 } : undefined}
         onDragEnd={isTop ? handleDragEnd : undefined}
         onClick={handleTap}
       >
