@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { safeCopy } from '@/lib/clipboard';
 
 interface ShareButtonProps {
   code: string;
@@ -8,6 +9,11 @@ interface ShareButtonProps {
 
 export default function ShareButton({ code }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
+
+  const flash = () => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleShare = async () => {
     const text = `Join my ShowMatch game! Code: ${code}`;
@@ -20,15 +26,13 @@ export default function ShareButton({ code }: ShareButtonProps) {
       } catch { /* User cancelled or not supported */ }
     }
 
-    await navigator.clipboard.writeText(`${text}\n${url}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    await safeCopy(`${text}\n${url}`);
+    flash();
   };
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    await safeCopy(code);
+    flash();
   };
 
   return (

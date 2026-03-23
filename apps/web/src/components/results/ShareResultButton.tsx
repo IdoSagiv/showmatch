@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { TitleCard } from '@/types/game';
 import Button from '@/components/ui/Button';
+import { safeCopy } from '@/lib/clipboard';
 
 interface ShareResultButtonProps {
   winner: TitleCard;
@@ -21,7 +22,7 @@ export default function ShareResultButton({ winner }: ShareResultButtonProps) {
       } catch {}
     }
 
-    await navigator.clipboard.writeText(text);
+    await safeCopy(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
