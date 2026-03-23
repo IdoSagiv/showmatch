@@ -42,6 +42,35 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // Known rental/purchase store provider IDs (not streaming subscriptions)
+  const STORE_IDS = new Set([
+    2,   // Apple iTunes
+    3,   // Google Play Movies
+    7,   // Fandango at Home (was Vudu)
+    10,  // Amazon Video (rental — distinct from Prime Video id=9)
+    35,  // Rakuten TV
+    68,  // Microsoft Store
+    130, // Pluto TV (ad-supported, not subscription — keep if desired)
+    192, // YouTube (rental/purchase)
+    188, // YouTube Premium
+    207, // Redbox
+    258, // Hoopla (library — not a consumer streaming service)
+  ]);
+
+  // Name-based safety net for store keywords
+  const STORE_NAME_PATTERNS = [
+    /itunes/i,
+    /google play/i,
+    /microsoft store/i,
+    /fandango/i,
+    /redbox/i,
+    /\bstore\b/i,      // "Apple TV Store", "Play Store", etc.
+    /\brent\b/i,       // any "rent" branded service
+  ];
+
+  const isStore = (p: { id: number; name: string }) =>
+    STORE_IDS.has(p.id) || STORE_NAME_PATTERNS.some(re => re.test(p.name));
+
   // Sort by regional priority (lower = more prominent), then deduplicate
   // by normalized name to collapse e.g. "Amazon Video" + "Amazon Prime Video"
   // or multiple tiers of the same service that TMDB tracks as separate IDs.
@@ -51,6 +80,7 @@ export async function GET(request: NextRequest) {
   const seenNames = new Set<string>();
   const sorted = [...providers.values()]
     .sort((a, b) => a.priority - b.priority)
+    .filter(p => !isStore(p))
     .filter(p => {
       const key = normalize(p.name);
       if (seenNames.has(key)) return false;
