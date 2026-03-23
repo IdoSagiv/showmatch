@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import {
   motion,
   useMotionValue,
   useTransform,
+  animate,
   type PanInfo,
 } from 'framer-motion';
 import type { TitleCard } from '@/types/game';
@@ -16,145 +17,175 @@ interface SwipeCardProps {
   onSwipe: (decision: 'like' | 'pass' | 'superlike') => void;
   isTop: boolean;
   stackIndex: number;
+  /** Programmatic trigger from buttons: set to fire an exit animation */
+  pendingDecision?: 'like' | 'pass' | 'superlike' | null;
+  onPendingConsumed?: () => void;
 }
 
-export default function SwipeCard({ card, onSwipe, isTop, stackIndex }: SwipeCardProps) {
+export default function SwipeCard({
+  card, onSwipe, isTop, stackIndex,
+  pendingDecision, onPendingConsumed,
+}: SwipeCardProps) {
   const [flipped, setFlipped] = useState(false);
+  const [exiting, setExiting] = useState(false);
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 0, 200], [-15, 0, 15]);
-  const likeOpacity = useTransform(x, [0, 100], [0, 1]);
-  const nopeOpacity = useTransform(x, [-100, 0], [1, 0]);
+  const y = useMotionValue(0);
+  const rotate = useTransform(x, [-250, 0, 250], [-18, 0, 18]);
+  const likeOpacity  = useTransform(x, [20, 120], [0, 1]);
+  const nopeOpacity  = useTransform(x, [-120, -20], [1, 0]);
+  const decisionRef = useRef<'like' | 'pass' | 'superlike'>('pass');
 
   const scale = 1 - stackIndex * 0.05;
-  const yOffset = stackIndex * 8;
+  const yOffset = stackIndex * 10;
+
+  // Fly the card off screen, then notify parent
+  const flyOut = useCallback((decision: 'like' | 'pass' | 'superlike') => {
+    if (exiting) return;
+    setExiting(true);
+    decisionRef.current = decision;
+
+    const targetX = decision === 'pass' ? -700 : decision === 'like' ? 700 : 0;
+    const targetY = decision === 'superlike' ? -700 : 0;
+    const targetRotate = decision === 'pass' ? -25 : decision === 'like' ? 25 : 0;
+
+    Promise.all([
+      animate(x, targetX, { duration: 0.35, ease: [0.4, 0, 0.2, 1] }),
+      animate(y, targetY, { duration: 0.35, ease: [0.4, 0, 0.2, 1] }),
+      animate(rotate as any, targetRotate, { duration: 0.35 }),
+    ]).then(() => {
+      onSwipe(decision);
+    });
+  }, [exiting, x, y, rotate, onSwipe]);
+
+  // Button-triggered swipe (pendingDecision from parent)
+  const pendingRef = useRef<typeof pendingDecision>(null);
+  if (isTop && pendingDecision && pendingDecision !== pendingRef.current && !exiting) {
+    pendingRef.current = pendingDecision;
+    setTimeout(() => {
+      flyOut(pendingDecision);
+      onPendingConsumed?.();
+    }, 0);
+  }
 
   const handleDragEnd = (_: any, info: PanInfo) => {
-    if (Math.abs(info.offset.x) > 100 || Math.abs(info.velocity.x) > 500) {
-      onSwipe(info.offset.x > 0 ? 'like' : 'pass');
+    const swipedEnough = Math.abs(info.offset.x) > 100 || Math.abs(info.velocity.x) > 600;
+    if (swipedEnough) {
+      flyOut(info.offset.x > 0 ? 'like' : 'pass');
+    } else {
+      // Snap back smoothly
+      animate(x, 0, { type: 'spring', stiffness: 400, damping: 30 });
     }
   };
 
   const handleTap = () => {
-    if (isTop) setFlipped(!flipped);
+    if (isTop && !exiting) setFlipped(f => !f);
   };
 
   return (
     <motion.div
       className="absolute w-full"
-      style={{
-        zIndex: 10 - stackIndex,
-        scale,
-        y: yOffset,
-        opacity: stackIndex > 2 ? 0 : 1 - stackIndex * 0.15,
-      }}
-      initial={{ scale: 0.95, opacity: 0 }}
-      animate={{ scale, opacity: 1 - stackIndex * 0.15 }}
+      style={{ zIndex: 10 - stackIndex }}
+      initial={{ scale: scale * 0.95, opacity: 0, y: yOffset + 10 }}
+      animate={{ scale, opacity: 1 - stackIndex * 0.1, y: yOffset }}
+      transition={{ type: 'spring', stiffness: 300, damping: 28 }}
     >
       <motion.div
-        className="relative cursor-grab active:cursor-grabbing"
-        style={{ x: isTop ? x : 0, rotate: isTop ? rotate : 0, perspective: 1000, touchAction: 'none' }}
-        drag={isTop ? 'x' : false}
-        dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.7}
+        className="relative cursor-grab active:cursor-grabbing select-none"
+        style={{ x, y, rotate, touchAction: 'none' }}
+        drag={isTop && !exiting ? 'x' : false}
+        dragElastic={0.8}
         onDragEnd={isTop ? handleDragEnd : undefined}
         onClick={handleTap}
-        exit={isTop ? { x: x.get() > 0 ? 500 : -500, opacity: 0, rotate: x.get() > 0 ? 30 : -30 } : undefined}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
-        <div className="relative" style={{ transformStyle: 'preserve-3d' }}>
-          {/* Overlay stamps */}
-          {isTop && <CardOverlay likeOpacity={likeOpacity} nopeOpacity={nopeOpacity} />}
+        {/* Overlay stamps */}
+        {isTop && <CardOverlay likeOpacity={likeOpacity} nopeOpacity={nopeOpacity} />}
 
-          {/* Card content */}
+        {/* Card faces wrapper (3D perspective) */}
+        <div style={{ perspective: 1200 }}>
+          {/* Front face */}
           <motion.div
             className="bg-dark-card rounded-2xl overflow-hidden border border-dark-border shadow-2xl"
-            style={{ backfaceVisibility: 'hidden' }}
             animate={{ rotateY: flipped ? 180 : 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+            style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
           >
-            {/* Front face */}
-            <div style={{ backfaceVisibility: 'hidden' }}>
-              {/* Poster */}
-              <div className="relative aspect-[2/3] max-h-[45vh] overflow-hidden">
-                {card.posterPath ? (
-                  <img
-                    src={card.posterPath}
-                    alt={card.title}
-                    className="w-full h-full object-cover"
-                    draggable={false}
-                  />
-                ) : (
-                  <div className="w-full h-full bg-dark-surface flex items-center justify-center text-gray-600">
-                    No Poster
-                  </div>
+            {/* Poster */}
+            <div className="relative bg-dark-surface flex items-center justify-center overflow-hidden"
+              style={{ height: 'min(45vh, 340px)' }}>
+              {card.posterPath ? (
+                <img
+                  src={card.posterPath}
+                  alt={card.title}
+                  className="w-full h-full object-cover object-center"
+                  draggable={false}
+                />
+              ) : (
+                <div className="text-gray-600 text-sm">No Poster</div>
+              )}
+            </div>
+
+            {/* Info strip */}
+            <div className="p-4 space-y-2">
+              <h2 className="text-lg font-bold truncate">
+                {card.title} <span className="text-gray-500 font-normal text-base">({card.year})</span>
+              </h2>
+
+              <div className="flex gap-3 text-sm items-center">
+                <span className="flex items-center gap-1">
+                  <span className="text-yellow-400">★</span>
+                  <span>{card.voteAverage.toFixed(1)}</span>
+                  <span className="text-gray-600 text-xs">IMDB</span>
+                </span>
+                {card.rottenTomatoesScore !== null && (
+                  <span className="flex items-center gap-1">
+                    <span>🍅</span>
+                    <span>{card.rottenTomatoesScore}%</span>
+                  </span>
                 )}
               </div>
 
-              {/* Info */}
-              <div className="p-4 space-y-2">
-                <h2 className="text-lg font-bold truncate">
-                  {card.title} <span className="text-gray-500 font-normal">({card.year})</span>
-                </h2>
-
-                {/* Ratings */}
-                <div className="flex gap-3 text-sm">
-                  <span className="flex items-center gap-1">
-                    <span className="text-yellow-400">&#9733;</span>
-                    {card.voteAverage.toFixed(1)}
-                  </span>
-                  {card.rottenTomatoesScore !== null && (
-                    <span className="flex items-center gap-1">
-                      <span className="text-red-500">&#127813;</span>
-                      {card.rottenTomatoesScore}%
-                    </span>
-                  )}
-                </div>
-
-                {/* Genres */}
-                <div className="flex flex-wrap gap-1">
-                  {card.genres.slice(0, 3).map(g => (
-                    <span key={g} className="px-2 py-0.5 bg-dark-surface rounded-full text-xs text-gray-400">
-                      {g}
-                    </span>
-                  ))}
-                  {card.genres.length > 3 && (
-                    <span className="px-2 py-0.5 text-xs text-gray-500">+{card.genres.length - 3} more</span>
-                  )}
-                </div>
-
-                {/* Streaming */}
-                {card.providers.length > 0 && <StreamingLogos providers={card.providers} />}
-
-                <p className="text-xs text-gray-600 text-center mt-1">Tap for details</p>
+              <div className="flex flex-wrap gap-1">
+                {card.genres.slice(0, 3).map(g => (
+                  <span key={g} className="px-2 py-0.5 bg-dark-surface rounded-full text-xs text-gray-400">{g}</span>
+                ))}
+                {card.genres.length > 3 && (
+                  <span className="text-xs text-gray-500 px-1">+{card.genres.length - 3}</span>
+                )}
               </div>
+
+              {card.providers.length > 0 && <StreamingLogos providers={card.providers} />}
+              <p className="text-xs text-gray-600 text-center">Tap for details ↕</p>
             </div>
           </motion.div>
 
           {/* Back face */}
           <motion.div
             className="absolute inset-0 bg-dark-card rounded-2xl border border-dark-border shadow-2xl overflow-hidden"
-            style={{ backfaceVisibility: 'hidden', rotateY: 180 }}
             animate={{ rotateY: flipped ? 360 : 180 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+            style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
           >
             <div className="p-5 h-full overflow-y-auto space-y-4">
-              <h2 className="text-xl font-bold">{card.title} ({card.year})</h2>
+              <h2 className="text-xl font-bold leading-tight">{card.title} <span className="text-gray-500 font-normal text-base">({card.year})</span></h2>
 
-              {/* Ratings */}
-              <div className="flex gap-4">
-                <div className="bg-dark-surface rounded-lg px-3 py-2 text-center">
+              <div className="flex gap-3 flex-wrap">
+                <div className="bg-dark-surface rounded-lg px-3 py-2 text-center min-w-[56px]">
                   <div className="text-yellow-400 text-lg font-bold">{card.voteAverage.toFixed(1)}</div>
-                  <div className="text-xs text-gray-500">TMDB</div>
+                  <div className="text-xs text-gray-500">IMDB</div>
                 </div>
                 {card.rottenTomatoesScore !== null && (
-                  <div className="bg-dark-surface rounded-lg px-3 py-2 text-center">
+                  <div className="bg-dark-surface rounded-lg px-3 py-2 text-center min-w-[56px]">
                     <div className="text-red-400 text-lg font-bold">{card.rottenTomatoesScore}%</div>
                     <div className="text-xs text-gray-500">RT</div>
                   </div>
                 )}
                 {card.runtime && (
-                  <div className="bg-dark-surface rounded-lg px-3 py-2 text-center">
-                    <div className="text-lg font-bold">{Math.floor(card.runtime / 60)}h {card.runtime % 60}m</div>
+                  <div className="bg-dark-surface rounded-lg px-3 py-2 text-center min-w-[56px]">
+                    <div className="text-lg font-bold">
+                      {card.runtime >= 60
+                        ? `${Math.floor(card.runtime / 60)}h ${card.runtime % 60}m`
+                        : `${card.runtime}m`}
+                    </div>
                     <div className="text-xs text-gray-500">Runtime</div>
                   </div>
                 )}
@@ -169,17 +200,10 @@ export default function SwipeCard({ card, onSwipe, isTop, stackIndex }: SwipeCar
               <p className="text-sm text-gray-300 leading-relaxed">{card.overview}</p>
 
               {card.cast.length > 0 && (
-                <p className="text-sm">
-                  <span className="text-gray-500">Starring: </span>
-                  {card.cast.join(', ')}
-                </p>
+                <p className="text-sm"><span className="text-gray-500">Starring: </span>{card.cast.join(', ')}</p>
               )}
-
               {card.director && (
-                <p className="text-sm">
-                  <span className="text-gray-500">Directed by: </span>
-                  {card.director}
-                </p>
+                <p className="text-sm"><span className="text-gray-500">Directed by: </span>{card.director}</p>
               )}
 
               {card.trailerKey && (
@@ -190,11 +214,11 @@ export default function SwipeCard({ card, onSwipe, isTop, stackIndex }: SwipeCar
                   className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors"
                   onClick={e => e.stopPropagation()}
                 >
-                  &#9654; Watch Trailer
+                  ▶ Watch Trailer
                 </a>
               )}
 
-              <p className="text-xs text-gray-600 text-center">Tap to flip back</p>
+              <p className="text-xs text-gray-600 text-center pb-2">Tap to flip back ↕</p>
             </div>
           </motion.div>
         </div>

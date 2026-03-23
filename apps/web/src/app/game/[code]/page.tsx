@@ -13,6 +13,7 @@ import PlayerAvatar from '@/components/lobby/PlayerAvatar';
 import Logo from '@/components/ui/Logo';
 import TutorialOverlay, { TutorialReplayButton } from '@/components/game/TutorialOverlay';
 import { useBeforeUnload } from '@/hooks/useBeforeUnload';
+import { useSound } from '@/hooks/useSound';
 
 export default function GamePage() {
   useBeforeUnload();
@@ -22,11 +23,14 @@ export default function GamePage() {
   const socket = useSocket();
   const {
     room, titlePool, currentCardIndex, mySwipes,
-    matchedTitles, winner, isFirstMatch,
+    matchedTitles, winner, isFirstMatch, gameOver,
     recordSwipe, undoLastSwipe, playerId,
   } = useGameStore();
+  const { playLike, playPass, playSuperLike } = useSound();
   const [flipped, setFlipped] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [canUndo, setCanUndo] = useState(false);
+  const [pendingDecision, setPendingDecision] = useState<'like' | 'pass' | 'superlike' | null>(null);
 
   useEffect(() => {
     if (!room || !titlePool.length) {
@@ -36,10 +40,10 @@ export default function GamePage() {
 
   // Redirect to results
   useEffect(() => {
-    if (room?.status === 'ranking' || room?.status === 'finished' || matchedTitles.length > 0 || winner) {
+    if (gameOver || room?.status === 'ranking' || room?.status === 'finished' || winner) {
       router.push(`/results/${code}`);
     }
-  }, [room?.status, matchedTitles, winner, code, router]);
+  }, [gameOver, room?.status, winner, code, router]);
 
   // Redirect back to lobby on reset
   useEffect(() => {
@@ -55,6 +59,7 @@ export default function GamePage() {
     socket.emit('submitSwipe', tmdbId, decision);
     recordSwipe({ tmdbId, decision, timestamp: Date.now() });
     setFlipped(false);
+    setCanUndo(true);
 
     // Haptic feedback
     try {
@@ -70,6 +75,7 @@ export default function GamePage() {
     const undone = undoLastSwipe();
     if (undone) {
       socket.emit('undoSwipe');
+      setCanUndo(false);
     }
   }, [socket, undoLastSwipe]);
 
@@ -129,19 +135,21 @@ export default function GamePage() {
             cards={titlePool}
             currentIndex={currentCardIndex}
             onSwipe={handleSwipe}
+            pendingDecision={pendingDecision}
+            onPendingConsumed={() => setPendingDecision(null)}
           />
         </div>
 
         {/* Buttons */}
         {!isFinished && (
           <div className="flex items-center justify-center gap-4">
-            <UndoButton onClick={handleUndo} disabled={mySwipes.length === 0} />
+            <UndoButton onClick={handleUndo} disabled={!canUndo} />
             <SwipeButtons
-              onPass={() => handleSwipe('pass')}
-              onLike={() => handleSwipe('like')}
-              onSuperLike={() => handleSwipe('superlike')}
+              onPass={() => { playPass(); setPendingDecision('pass'); }}
+              onLike={() => { playLike(); setPendingDecision('like'); }}
+              onSuperLike={() => { playSuperLike(); setPendingDecision('superlike'); }}
               superLikeUsed={me?.superLikeUsed ?? false}
-              disabled={isFinished}
+              disabled={isFinished || !!pendingDecision}
             />
           </div>
         )}

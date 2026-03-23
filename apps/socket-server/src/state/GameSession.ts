@@ -46,9 +46,7 @@ export class GameSession {
     if (player) {
       player.progress = Math.max(0, player.progress - 1);
       player.finished = false;
-      if (undone.decision === 'superlike') {
-        player.superLikeUsed = false;
-      }
+      // superLikeUsed is NOT reset on undo — super like is once per game
     }
     return undone;
   }

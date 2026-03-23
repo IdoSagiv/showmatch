@@ -17,36 +17,40 @@ export default function SwipeButtons({ onPass, onLike, onSuperLike, superLikeUse
       <motion.button
         onClick={onPass}
         disabled={disabled}
-        className="w-14 h-14 rounded-full bg-dark-surface border-2 border-accent-red flex items-center justify-center text-accent-red text-2xl disabled:opacity-30"
-        whileTap={{ scale: 0.9 }}
+        className="w-14 h-14 rounded-full bg-dark-surface border-2 border-accent-red flex items-center justify-center text-accent-red text-2xl disabled:opacity-30 transition-opacity"
+        whileTap={{ scale: 0.85 }}
       >
-        &#10005;
+        ✕
       </motion.button>
 
       {/* Super Like */}
-      <motion.button
-        onClick={onSuperLike}
-        disabled={disabled || superLikeUsed}
-        className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl ${
-          superLikeUsed
-            ? 'bg-dark-surface border-gray-600 text-gray-600'
-            : 'bg-dark-surface border-accent-gold text-accent-gold'
-        } disabled:opacity-30`}
-        whileTap={{ scale: 0.9 }}
-        animate={superLikeUsed ? {} : { boxShadow: ['0 0 0px #ffd700', '0 0 15px #ffd700', '0 0 0px #ffd700'] }}
-        transition={superLikeUsed ? {} : { repeat: Infinity, duration: 2 }}
-      >
-        &#9733;
-      </motion.button>
+      <div className="relative">
+        {/* Pulsing ring — CSS animation, no Framer Motion to avoid flicker */}
+        {!superLikeUsed && !disabled && (
+          <span className="absolute inset-0 rounded-full border-2 border-accent-gold animate-ping opacity-60" />
+        )}
+        <motion.button
+          onClick={onSuperLike}
+          disabled={disabled || superLikeUsed}
+          className={`relative w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl transition-all ${
+            superLikeUsed
+              ? 'bg-dark-surface border-gray-600 text-gray-600 opacity-40'
+              : 'bg-dark-surface border-accent-gold text-accent-gold'
+          }`}
+          whileTap={{ scale: 0.85 }}
+        >
+          ★
+        </motion.button>
+      </div>
 
       {/* Like */}
       <motion.button
         onClick={onLike}
         disabled={disabled}
-        className="w-14 h-14 rounded-full bg-dark-surface border-2 border-accent-green flex items-center justify-center text-accent-green text-2xl disabled:opacity-30"
-        whileTap={{ scale: 0.9 }}
+        className="w-14 h-14 rounded-full bg-dark-surface border-2 border-accent-green flex items-center justify-center text-accent-green text-2xl disabled:opacity-30 transition-opacity"
+        whileTap={{ scale: 0.85 }}
       >
-        &#9829;
+        ♥
       </motion.button>
     </div>
   );

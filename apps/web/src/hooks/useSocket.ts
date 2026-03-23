@@ -39,12 +39,14 @@ export function useSocket() {
 
     socket.on('allPlayersFinished', (matchedTitles) => {
       store.setMatchedTitles(matchedTitles);
+      store.setGameOver(true);
     });
 
     socket.on('firstMatch', (title) => {
       store.setIsFirstMatch(true);
       store.setWinner(title);
       store.setMatchedTitles([title]);
+      store.setGameOver(true);
     });
 
     socket.on('rankingsReady', (winner, rankings) => {

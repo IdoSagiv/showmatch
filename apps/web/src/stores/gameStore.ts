@@ -17,6 +17,7 @@ interface GameStore {
   mySwipes: SwipeDecision[];
   isFirstMatch: boolean;
   loadingProgress: { stage: string; progress: number; total?: number } | null;
+  gameOver: boolean;
 
   setRoom: (room: Room | null) => void;
   setPlayerId: (id: string) => void;
@@ -36,6 +37,7 @@ interface GameStore {
   setGameStats: (stats: GameStatAward[]) => void;
   setIsFirstMatch: (val: boolean) => void;
   setLoadingProgress: (data: { stage: string; progress: number; total?: number } | null) => void;
+  setGameOver: (val: boolean) => void;
   reset: () => void;
 }
 
@@ -53,6 +55,7 @@ const initialState = {
   mySwipes: [] as SwipeDecision[],
   isFirstMatch: false,
   loadingProgress: null as { stage: string; progress: number; total?: number } | null,
+  gameOver: false,
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -127,6 +130,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setGameStats: (stats) => set({ gameStats: stats }),
   setIsFirstMatch: (val) => set({ isFirstMatch: val }),
   setLoadingProgress: (data) => set({ loadingProgress: data }),
+  setGameOver: (val) => set({ gameOver: val }),
 
   reset: () => set(initialState),
 }));
