@@ -101,7 +101,11 @@ export function useSocket() {
     });
 
     socket.on('roomClosed', (reason) => {
-      store.reset();
+      // Don't call store.reset() here — it nullifies `room` which triggers the
+      // game page's guard effect to do a SPA navigation that races with our
+      // window.location.href below and can eat the toast from sessionStorage.
+      // A full-page reload (window.location.href) already wipes all in-memory
+      // state, so the reset is redundant anyway.
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('showmatch-toast', reason);
         window.location.href = '/';
