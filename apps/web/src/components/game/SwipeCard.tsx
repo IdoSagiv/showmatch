@@ -22,12 +22,16 @@ interface SwipeCardProps {
   /** Programmatic trigger from buttons: set to fire an exit animation */
   pendingDecision?: 'like' | 'pass' | 'superlike' | null;
   onPendingConsumed?: () => void;
+  /** Undo last swipe — shown as a small button on the card */
+  onUndo?: () => void;
+  canUndo?: boolean;
 }
 
 export default function SwipeCard({
   card, onSwipe, isTop, stackIndex,
   superLikeUsed = false,
   pendingDecision, onPendingConsumed,
+  onUndo, canUndo = false,
 }: SwipeCardProps) {
   const [flipped, setFlipped] = useState(false);
   const [exiting, setExiting] = useState(false);
@@ -136,9 +140,7 @@ export default function SwipeCard({
             transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
             style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
           >
-            {/* Poster — flex-1 fills remaining height. object-cover + blurred
-                background fill so any non-standard aspect ratio looks immersive
-                rather than leaving black bars. */}
+            {/* Poster — flex-1 fills remaining height */}
             <div className="relative bg-dark-surface w-full flex-1 min-h-0 overflow-hidden">
               {card.posterPath ? (
                 <>
@@ -160,13 +162,27 @@ export default function SwipeCard({
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-600 text-sm">No Poster</div>
               )}
-              {/* Media type badge */}
-              <span className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">
-                {card.mediaType === 'movie' ? '🎬 Film' : '📺 Series'}
-              </span>
-              {/* Info icon — tap-for-details hint */}
+
+              {/* Undo button — top-left, only on top card when there's something to undo */}
+              {isTop && onUndo && (
+                <button
+                  onClick={e => { e.stopPropagation(); onUndo(); }}
+                  disabled={!canUndo}
+                  className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/70 disabled:opacity-20 transition-opacity"
+                  title="Undo last swipe"
+                >
+                  ↩
+                </button>
+              )}
+
+              {/* Info icon — top-right, tap-for-details hint */}
               <span className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/70 text-sm select-none pointer-events-none">
                 ⓘ
+              </span>
+
+              {/* Media type badge — bottom-right */}
+              <span className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">
+                {card.mediaType === 'movie' ? '🎬 Film' : '📺 Series'}
               </span>
             </div>
 
@@ -176,12 +192,11 @@ export default function SwipeCard({
                 {card.title} <span className="text-gray-500 font-normal text-base">({card.year})</span>
               </h2>
 
-              <div className="flex gap-3 text-sm items-center">
+              <div className="flex gap-3 text-sm items-center flex-wrap">
                 {card.voteAverage > 0 && (
-                  <span className="flex items-center gap-1">
-                    <span className="text-yellow-400">★</span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="bg-[#F5C518] text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded leading-none">IMDb</span>
                     <span>{card.voteAverage.toFixed(1)}</span>
-                    <span className="text-gray-600 text-xs">IMDB</span>
                   </span>
                 )}
                 {card.rottenTomatoesScore !== null && (
@@ -193,12 +208,9 @@ export default function SwipeCard({
               </div>
 
               <div className="flex flex-wrap gap-1">
-                {card.genres.slice(0, 3).map(g => (
+                {card.genres.map(g => (
                   <span key={g} className="px-2 py-0.5 bg-dark-surface rounded-full text-xs text-gray-400">{g}</span>
                 ))}
-                {card.genres.length > 3 && (
-                  <span className="text-xs text-gray-500 px-1">+{card.genres.length - 3}</span>
-                )}
               </div>
 
               {card.providers.length > 0 && <StreamingLogos providers={card.providers} />}
@@ -218,7 +230,7 @@ export default function SwipeCard({
               <div className="flex gap-3 flex-wrap">
                 <div className="bg-dark-surface rounded-lg px-3 py-2 text-center min-w-[56px]">
                   <div className="text-yellow-400 text-lg font-bold">{card.voteAverage.toFixed(1)}</div>
-                  <div className="text-xs text-gray-500">IMDB</div>
+                  <div className="mt-0.5"><span className="bg-[#F5C518] text-black text-[9px] font-extrabold px-1 py-0.5 rounded leading-none">IMDb</span></div>
                 </div>
                 {card.rottenTomatoesScore !== null && (
                   <div className="bg-dark-surface rounded-lg px-3 py-2 text-center min-w-[56px]">

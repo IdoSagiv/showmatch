@@ -15,6 +15,8 @@ interface CardStackProps {
   /** Other players — shown in the "All done" waiting state */
   otherPlayers?: Player[];
   totalCards?: number;
+  onUndo?: () => void;
+  canUndo?: boolean;
 }
 
 export default function CardStack({
@@ -22,6 +24,7 @@ export default function CardStack({
   superLikeUsed = false,
   pendingDecision, onPendingConsumed,
   otherPlayers = [], totalCards,
+  onUndo, canUndo = false,
 }: CardStackProps) {
   if (currentIndex >= cards.length) {
     const total = totalCards ?? cards.length;
@@ -83,6 +86,8 @@ export default function CardStack({
             superLikeUsed={isTop ? superLikeUsed : false}
             pendingDecision={isTop ? pendingDecision : null}
             onPendingConsumed={isTop ? onPendingConsumed : undefined}
+            onUndo={isTop ? onUndo : undefined}
+            canUndo={isTop ? canUndo : false}
           />
         );
       })}

@@ -8,7 +8,6 @@ import CardStack from '@/components/game/CardStack';
 import SwipeButtons from '@/components/game/SwipeButtons';
 import ProgressBar from '@/components/game/ProgressBar';
 import TimerBar from '@/components/game/TimerBar';
-import PlayerAvatar from '@/components/lobby/PlayerAvatar';
 import Logo from '@/components/ui/Logo';
 import TutorialOverlay, { TutorialReplayButton } from '@/components/game/TutorialOverlay';
 import { useBeforeUnload } from '@/hooks/useBeforeUnload';
@@ -133,22 +132,10 @@ export default function GamePage() {
       {/* Header */}
       <header className="flex items-center justify-between p-3 border-b border-dark-border">
         <Logo size="sm" />
-        <div className="flex items-center gap-2">
-          <TutorialReplayButton onClick={() => {
-            localStorage.removeItem('showmatch-tutorial-seen');
-            setShowTutorial(true);
-          }} />
-          {otherPlayers.map(p => (
-            <PlayerAvatar
-              key={p.id}
-              name={p.displayName}
-              connected={p.connected}
-              size="sm"
-              progress={p.progress}
-              total={titlePool.length}
-            />
-          ))}
-        </div>
+        <TutorialReplayButton onClick={() => {
+          localStorage.removeItem('showmatch-tutorial-seen');
+          setShowTutorial(true);
+        }} />
       </header>
 
       <div className="flex-1 min-h-0 flex flex-col p-4 max-w-lg mx-auto w-full">
@@ -178,6 +165,8 @@ export default function GamePage() {
             onPendingConsumed={() => setPendingDecision(null)}
             otherPlayers={otherPlayers}
             totalCards={titlePool.length}
+            onUndo={handleUndo}
+            canUndo={canUndo}
           />
         </div>
 
@@ -187,8 +176,6 @@ export default function GamePage() {
             onPass={() => setPendingDecision('pass')}
             onLike={() => setPendingDecision('like')}
             onSuperLike={() => setPendingDecision('superlike')}
-            onUndo={handleUndo}
-            canUndo={canUndo}
             superLikeUsed={me?.superLikeUsed ?? false}
             disabled={isFinished || !!pendingDecision}
           />

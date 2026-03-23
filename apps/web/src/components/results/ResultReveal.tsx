@@ -84,10 +84,9 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
                   <h3 className="text-xl font-bold">{winner.title}</h3>
                   <p className="text-gray-400">({winner.year})</p>
                   <div className="flex justify-center gap-3 text-sm">
-                    <span className="flex items-center gap-1">
-                      <span className="text-yellow-400">★</span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="bg-[#F5C518] text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded leading-none">IMDb</span>
                       <span>{winner.voteAverage.toFixed(1)}</span>
-                      <span className="text-gray-600 text-xs">IMDB</span>
                     </span>
                     {winner.rottenTomatoesScore !== null && (
                       <span className="flex items-center gap-1">
@@ -101,7 +100,7 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
                       <StreamingLogos providers={winner.providers} />
                     </div>
                   )}
-                  <p className="text-xs text-gray-600 pt-1">Tap for details ↕</p>
+                  <p className="text-xs text-gray-600 pt-1 text-center">ⓘ tap for details</p>
                 </div>
               </motion.div>
 
@@ -121,7 +120,7 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
                   <div className="flex gap-3 flex-wrap">
                     <div className="bg-dark-surface rounded-lg px-3 py-2 text-center min-w-[56px]">
                       <div className="text-yellow-400 text-lg font-bold">{winner.voteAverage.toFixed(1)}</div>
-                      <div className="text-xs text-gray-500">IMDB</div>
+                      <div className="mt-0.5"><span className="bg-[#F5C518] text-black text-[9px] font-extrabold px-1 py-0.5 rounded leading-none">IMDb</span></div>
                     </div>
                     {winner.rottenTomatoesScore !== null && (
                       <div className="bg-dark-surface rounded-lg px-3 py-2 text-center min-w-[56px]">
