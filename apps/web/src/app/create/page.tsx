@@ -282,7 +282,7 @@ export default function CreatePage() {
         <PlayerList players={room.players} />
 
         {/* Start Button */}
-        <div className="sticky bottom-4 pb-safe flex flex-col gap-2">
+        <div className="sticky bottom-4 pb-safe flex flex-col gap-2 z-10">
           {error && (
             <p className="text-sm text-accent-red text-center bg-dark-card rounded-xl px-4 py-2 border border-red-900">
               {error}
