@@ -46,7 +46,7 @@ export default function JoinGameForm() {
         />
 
         {/* Join button — springs to life when 5 chars entered */}
-        <div className="relative shrink-0">
+        <div className="relative shrink-0 self-stretch flex flex-col">
           {/* Pulsing glow ring — only when ready */}
           <AnimatePresence>
             {ready && !checking && (
@@ -66,7 +66,7 @@ export default function JoinGameForm() {
           <motion.button
             onClick={handleJoin}
             disabled={!ready || checking}
-            className="relative px-6 py-4 rounded-xl font-black text-sm text-white overflow-hidden"
+            className="relative flex-1 px-6 rounded-xl font-black text-sm text-white overflow-hidden flex items-center justify-center"
             animate={
               ready
                 ? { scale: 1, opacity: 1 }
