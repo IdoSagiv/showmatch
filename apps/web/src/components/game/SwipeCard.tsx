@@ -201,7 +201,7 @@ export default function SwipeCard({
                   {card.mediaType === 'tv' ? (
                     <>
                       {card.seriesStatus === 'running'
-                        ? <>{card.year} – <span className="text-primary font-bold">ongoing</span></>
+                        ? `${card.year} –`
                         : card.endYear ? `${card.year} – ${card.endYear}` : card.year}
                       {card.seasons && (
                         <span className="text-white/60"> · {card.seasons} {card.seasons === 1 ? 'season' : 'seasons'}</span>
@@ -311,7 +311,7 @@ export default function SwipeCard({
                 <span className="text-gray-500 font-normal text-base">
                   ({card.mediaType === 'tv'
                     ? card.seriesStatus === 'running'
-                      ? `${card.year} – ongoing`
+                      ? `${card.year} –`
                       : card.endYear
                         ? `${card.year} – ${card.endYear}`
                         : card.year
