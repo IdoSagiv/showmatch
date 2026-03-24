@@ -8,9 +8,13 @@ One person creates a room, friends join with a 5-letter code, everyone swipes th
 
 ## Screenshots
 
-| Home | Create | Join | Lobby |
-|------|--------|------|-------|
-| ![Home](apps/web/public/screenshots/home.png) | ![Create](apps/web/public/screenshots/create.png) | ![Join](apps/web/public/screenshots/join.png) | ![Lobby](apps/web/public/screenshots/lobby.png) |
+| Home | Create | Join |
+|------|--------|------|
+| ![Home](apps/web/public/screenshots/home.png) | ![Create](apps/web/public/screenshots/create.png) | ![Join](apps/web/public/screenshots/join.png) |
+
+| Lobby | Swipe | Winner | Results |
+|-------|-------|--------|---------|
+| ![Lobby](apps/web/public/screenshots/lobby.png) | ![Swipe](apps/web/public/screenshots/swipe.png) | ![Winner](apps/web/public/screenshots/winner.png) | ![Results](apps/web/public/screenshots/results.png) |
 
 ---
 
