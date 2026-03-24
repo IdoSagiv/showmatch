@@ -87,6 +87,10 @@ export function useSocket() {
       store.setWildcardCandidates(candidates);
     });
 
+    socket.on('wildcardResult', (winner) => {
+      store.setWinner(winner);
+    });
+
     (socket as any).on('roomReset', (room: any) => {
       // Reset game-specific flags so the new game starts clean.
       // Don't call store.reset() — that would wipe playerId.
@@ -126,6 +130,7 @@ export function useSocket() {
       socket.off('gameStats');
       socket.off('roomClosed');
       (socket as any).off('wildcardCandidates');
+      socket.off('wildcardResult');
       (socket as any).off('roomReset');
       (socket as any).off('loadingProgress');
       (socket as any).off('gameRejoined');

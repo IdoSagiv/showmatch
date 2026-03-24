@@ -145,4 +145,18 @@ export function registerGameHandlers(io: Server, socket: Socket) {
       socket.emit('swipeUndone', undone);
     }
   });
+
+  // Host picks the wildcard winner (no-matches flow)
+  socket.on('wildcardPick', (tmdbId: number) => {
+    if (!roomManager.isCreator(socket.id)) return;
+    const room = roomManager.getRoomBySocket(socket.id);
+    if (!room || room.status !== 'finished') return;
+
+    const title = room.titlePool.find(t => t.tmdbId === tmdbId);
+    if (!title) return;
+
+    room.winner = title;
+    io.to(room.code).emit('wildcardResult', title);
+    console.log(`[wildcardPick] Room ${room.code} wildcard winner: ${title.title}`);
+  });
 }
