@@ -42,7 +42,7 @@ export default function JoinGameForm() {
           maxLength={5}
           spellCheck={false}
           autoComplete="off"
-          className="flex-1 min-w-0 bg-dark-surface/80 border border-dark-border rounded-xl px-4 py-4 text-center font-mono text-xl tracking-[0.35em] text-white placeholder:text-gray-700 placeholder:tracking-normal placeholder:text-sm focus:outline-none focus:border-primary/60 focus:bg-dark-surface transition-all"
+          className="flex-1 min-w-0 bg-dark-surface/80 border border-dark-border rounded-xl px-4 py-4 text-center font-mono text-xl tracking-[0.35em] text-white placeholder:text-gray-500 placeholder:tracking-normal placeholder:text-sm focus:outline-none focus:border-primary/60 focus:bg-dark-surface transition-all"
         />
 
         {/* Join button — springs to life when 5 chars entered */}

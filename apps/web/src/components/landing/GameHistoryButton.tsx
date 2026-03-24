@@ -17,7 +17,7 @@ export default function GameHistoryButton() {
       >
         <button
           onClick={() => setShowHistory(true)}
-          className="text-gray-500 hover:text-gray-300 text-sm transition-colors"
+          className="text-gray-400 hover:text-white text-sm transition-colors"
         >
           Game History
         </button>
