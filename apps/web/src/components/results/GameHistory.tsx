@@ -20,9 +20,9 @@ interface RowProps {
 function DeletableHistoryItem({ entry, onDelete }: RowProps) {
   const x = useMotionValue(0);
 
-  // Red bg + trash icon fade in as the drag distance grows
-  const bgOpacity  = useTransform(x, [-50, -10, 0, 10, 50], [1, 0.6, 0, 0.6, 1]);
-  const iconScale  = useTransform(x, [-50, -10, 0, 10, 50], [1, 0.8, 0.5, 0.8, 1]);
+  // Red bg punches in fast — near full at just 20px, 100% at 40px
+  const bgOpacity  = useTransform(x, [-40, -5, 0, 5, 40], [1, 0.85, 0, 0.85, 1]);
+  const iconScale  = useTransform(x, [-40, -5, 0, 5, 40], [1.1, 0.9, 0.5, 0.9, 1.1]);
 
   const handleDragEnd = (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
     const far   = Math.abs(info.offset.x) > 80;
@@ -56,7 +56,7 @@ function DeletableHistoryItem({ entry, onDelete }: RowProps) {
             opacity: bgOpacity,
           }}
         >
-          <motion.span style={{ scale: iconScale, fontSize: '1.3rem' }}>🗑️</motion.span>
+          <motion.span style={{ scale: iconScale, fontSize: '1.8rem' }}>🗑️</motion.span>
         </motion.div>
 
         {/* Draggable card — sits on top of the red layer */}
