@@ -34,7 +34,7 @@ export default function Logo({ size = 'sm' }: LogoProps) {
   const longFiredRef = useRef(false);   // block the click that follows a long press
   const [pressing, setPressing] = useState(false); // subtle visual feedback
 
-  const isInGame = !!room && room.status !== 'lobby';
+  const isInGame = !!room; // confirm any time there's an active room (lobby or in-game)
 
   const clearTimer = () => {
     if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
@@ -108,7 +108,9 @@ export default function Logo({ size = 'sm' }: LogoProps) {
       {/* ── Leave-game confirmation modal ── */}
       <Modal isOpen={showConfirm} onClose={() => setShowConfirm(false)} title="Leave Game?">
         <p className="text-gray-400 mb-6">
-          Are you sure you want to leave? Your progress will be lost.
+          {room?.status === 'lobby'
+            ? 'Are you sure? Players waiting in the lobby will be disconnected.'
+            : 'Are you sure you want to leave? Your progress will be lost.'}
         </p>
         <div className="flex gap-3">
           <Button onClick={() => setShowConfirm(false)} variant="secondary" className="flex-1">
