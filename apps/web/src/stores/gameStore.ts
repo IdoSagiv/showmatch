@@ -19,6 +19,8 @@ interface GameStore {
   isFirstMatch: boolean;
   loadingProgress: { stage: string; progress: number; total?: number } | null;
   gameOver: boolean;
+  /** True while attempting socket rejoin after a page refresh. Prevents premature redirects. */
+  reconnecting: boolean;
 
   setRoom: (room: Room | null) => void;
   setPlayerId: (id: string) => void;
@@ -40,6 +42,9 @@ interface GameStore {
   setIsFirstMatch: (val: boolean) => void;
   setLoadingProgress: (data: { stage: string; progress: number; total?: number } | null) => void;
   setGameOver: (val: boolean) => void;
+  setReconnecting: (val: boolean) => void;
+  setCurrentCardIndex: (idx: number) => void;
+  setTitlePool: (pool: TitleCard[]) => void;
   reset: () => void;
 }
 
@@ -59,6 +64,7 @@ const initialState = {
   isFirstMatch: false,
   loadingProgress: null as { stage: string; progress: number; total?: number } | null,
   gameOver: false,
+  reconnecting: false,
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -150,6 +156,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setIsFirstMatch: (val) => set({ isFirstMatch: val }),
   setLoadingProgress: (data) => set({ loadingProgress: data }),
   setGameOver: (val) => set({ gameOver: val }),
+  setReconnecting: (val) => set({ reconnecting: val }),
+  setCurrentCardIndex: (idx) => set({ currentCardIndex: idx }),
+  setTitlePool: (pool) => set({ titlePool: pool }),
 
   reset: () => set(initialState),
 }));

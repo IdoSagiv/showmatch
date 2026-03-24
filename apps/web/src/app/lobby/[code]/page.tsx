@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
 import { getSocket } from '@/lib/socket';
+import { clearSession } from '@/lib/session';
 import CopyableCode from '@/components/ui/CopyableCode';
 import FilterPanel from '@/components/lobby/FilterPanel';
 import FilterPreview from '@/components/lobby/FilterPreview';
@@ -20,13 +21,13 @@ export default function LobbyPage() {
   const params = useParams();
   const code = (params.code as string).toUpperCase();
   const socket = useSocket();
-  const { room, playerId, updateSettings } = useGameStore();
+  const { room, playerId, updateSettings, reconnecting } = useGameStore();
 
   useEffect(() => {
-    if (!room) {
+    if (!reconnecting && !room) {
       router.push(`/join/${code}`);
     }
-  }, [room, code, router]);
+  }, [reconnecting, room, code, router]);
 
   useEffect(() => {
     if (room?.status === 'swiping') {
@@ -51,12 +52,21 @@ export default function LobbyPage() {
         if (!leavingRef.current) return; // StrictMode remount already reset this
         const { room: currentRoom } = useGameStore.getState();
         if (currentRoom?.status === 'lobby') {
+          clearSession();
           getSocket().emit('leaveRoom');
         }
       }, 0);
     };
   }, []);
 
+  if (reconnecting) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center space-y-3">
+        <div className="text-3xl animate-pulse">🎬</div>
+        <p className="text-gray-400 text-sm tracking-wide">Reconnecting...</p>
+      </div>
+    </div>
+  );
   if (!room) return null;
 
   const isCreator = room.players.find(p => p.id === playerId)?.isCreator ?? false;

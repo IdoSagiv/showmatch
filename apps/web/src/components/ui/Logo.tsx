@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useGameStore } from '@/stores/gameStore';
 import { getSocket } from '@/lib/socket';
+import { clearSession } from '@/lib/session';
 import Modal from './Modal';
 import Button from './Button';
 
@@ -76,6 +77,7 @@ export default function Logo({ size = 'sm', fontSize }: LogoProps) {
     try {
       getSocket().emit('leaveRoom', { playerId: playerId ?? undefined });
     } catch {}
+    clearSession();
     reset();
     setShowConfirm(false);
     router.push('/');

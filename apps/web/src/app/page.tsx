@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CreateGameButton from '@/components/landing/CreateGameButton';
+import { clearSession } from '@/lib/session';
 import JoinGameForm from '@/components/landing/JoinGameForm';
 import GameHistoryButton from '@/components/landing/GameHistoryButton';
 import Logo from '@/components/ui/Logo';
@@ -25,6 +26,8 @@ export default function Home() {
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
+    // User reached home intentionally — clear any stale reconnect session
+    clearSession();
     const msg = sessionStorage.getItem('showmatch-toast');
     if (msg) {
       setToast(msg);

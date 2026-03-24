@@ -9,6 +9,7 @@ import { getSocket } from '@/lib/socket';
 import CopyableCode from '@/components/ui/CopyableCode';
 import { NAME_ADJECTIVES, NAME_NOUNS } from '@/lib/constants';
 import FilterPanel from '@/components/lobby/FilterPanel';
+import { saveSession, clearSession } from '@/lib/session';
 import FilterPreview from '@/components/lobby/FilterPreview';
 import PlayerList from '@/components/lobby/PlayerList';
 import ShareButton from '@/components/lobby/ShareButton';
@@ -36,10 +37,10 @@ export default function CreatePage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const leavingRef = useRef(false);
 
-  // If room already in store (e.g. back-navigation), skip to room step
+  // If room already in store (back-navigation or rejoin after refresh), skip to room step
   useEffect(() => {
     if (room) setStep('room');
-  }, []);
+  }, [room]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (step === 'name') setTimeout(() => inputRef.current?.select(), 50);
@@ -59,6 +60,7 @@ export default function CreatePage() {
         // If Logo's handleLeave already ran, reset() clears the room → skip.
         const { room: currentRoom } = useGameStore.getState();
         if (currentRoom?.status === 'lobby') {
+          clearSession();
           getSocket().emit('leaveRoom');
         }
       }, 0);
@@ -78,6 +80,7 @@ export default function CreatePage() {
       }
       setRoom(response.room);
       setPlayerId(socket.id || '');
+      saveSession({ code: response.room.code, displayName: trimmed });
       setStep('room');
       setCreating(false);
     });

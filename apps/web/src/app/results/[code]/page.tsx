@@ -11,6 +11,7 @@ import SwipeReveal from '@/components/results/SwipeReveal';
 import GameStats from '@/components/results/GameStats';
 import Logo from '@/components/ui/Logo';
 import { saveGameToHistory } from '@/lib/history';
+import { clearSession } from '@/lib/session';
 import { safeCopy } from '@/lib/clipboard';
 import { shareText } from '@/lib/share';
 
@@ -21,7 +22,7 @@ export default function ResultsPage() {
   const socket = useSocket();
   const {
     room, matchedTitles, winner, fullRankings, wildcardCandidates, wildcardSpinning,
-    isFirstMatch, playerId, swipeReveal, gameStats, gameOver, setWinner, reset,
+    isFirstMatch, playerId, swipeReveal, gameStats, gameOver, setWinner, reset, reconnecting,
   } = useGameStore();
   const [rankingSubmitted, setRankingSubmitted] = useState(false);
   const [historySaved, setHistorySaved] = useState(false);
@@ -49,10 +50,10 @@ export default function ResultsPage() {
   }, [winner, room, historySaved, code, gameStats]);
 
   useEffect(() => {
-    if (!room) {
+    if (!reconnecting && !room) {
       router.push('/');
     }
-  }, [room, router]);
+  }, [reconnecting, room, router]);
 
   useEffect(() => {
     if (room?.status === 'lobby') {
@@ -71,8 +72,7 @@ export default function ResultsPage() {
 
   const handleEndGame = useCallback(() => {
     (socket as any).emit('endGame', { playerId });
-    // Host navigates themselves — server will notify guests via socket.to() (not io.to())
-    // so the host won't receive the roomClosed toast.
+    clearSession();
     reset();
     router.push('/');
   }, [socket, playerId, reset, router]);
@@ -87,6 +87,14 @@ export default function ResultsPage() {
     }
   }, [winner]);
 
+  if (reconnecting) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center space-y-3">
+        <div className="text-3xl animate-pulse">🎬</div>
+        <p className="text-gray-400 text-sm tracking-wide">Reconnecting...</p>
+      </div>
+    </div>
+  );
   if (!room) return null;
 
   const isCreator = room.players.find(p => p.id === playerId)?.isCreator ?? false;
