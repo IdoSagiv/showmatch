@@ -72,9 +72,9 @@ export default function Home() {
             transition={{ type: 'spring', stiffness: 200, damping: 24 }}
           >
             {/* Logo */}
-            <div className="flex flex-col items-center lg:items-start mb-8 lg:mb-10">
+            <div className="flex flex-col items-center mb-8 lg:mb-10">
               <Logo fontSize="clamp(3rem, 10vw, 6rem)" />
-              <p className="mt-3 text-xs text-white/55 tracking-[0.3em] uppercase font-semibold text-center lg:text-left">
+              <p className="mt-3 text-xs text-white/55 tracking-[0.3em] uppercase font-semibold text-center">
                 Swipe · Match · Watch
               </p>
             </div>
@@ -140,7 +140,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="mt-5 flex justify-center lg:justify-start"
+              className="mt-5 flex justify-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.42 }}
