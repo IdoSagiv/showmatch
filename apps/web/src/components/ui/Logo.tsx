@@ -61,13 +61,12 @@ export default function Logo({ size = 'sm' }: LogoProps) {
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (longFiredRef.current) { longFiredRef.current = false; return; }
+    if (longFiredRef.current) { longFiredRef.current = false; e.preventDefault(); return; }
     if (isInGame) {
+      e.preventDefault();
       setShowConfirm(true);
-    } else {
-      router.push('/');
     }
+    // else: let the <a href="/"> navigate naturally
   };
 
   // ── Leave handler ──
@@ -82,11 +81,9 @@ export default function Logo({ size = 'sm' }: LogoProps) {
 
   return (
     <>
-      <motion.div
-        role="button"
-        tabIndex={0}
+      <motion.a
+        href="/"
         onClick={handleClick}
-        onKeyDown={e => e.key === 'Enter' && handleClick(e as any)}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerLeave}
@@ -94,7 +91,7 @@ export default function Logo({ size = 'sm' }: LogoProps) {
         // Prevent the context menu on mobile long press (we handle it ourselves)
         onContextMenu={e => e.preventDefault()}
         className="flex items-center gap-2 cursor-pointer select-none"
-        style={{ WebkitUserSelect: 'none', userSelect: 'none', WebkitTouchCallout: 'none' } as any}
+        style={{ WebkitUserSelect: 'none', userSelect: 'none', WebkitTouchCallout: 'none', textDecoration: 'none' } as any}
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: pressing ? 0.92 : 1, opacity: 1 }}
         transition={{ type: 'spring', duration: pressing ? 0.15 : 0.5, stiffness: 400, damping: 22 }}
@@ -103,7 +100,7 @@ export default function Logo({ size = 'sm' }: LogoProps) {
           <span className="text-white">Show</span>
           <span className="gradient-text">Match</span>
         </span>
-      </motion.div>
+      </motion.a>
 
       {/* ── Leave-game confirmation modal ── */}
       <Modal isOpen={showConfirm} onClose={() => setShowConfirm(false)} title="Leave Game?">
