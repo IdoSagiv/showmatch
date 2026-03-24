@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import CreateGameButton from '@/components/landing/CreateGameButton';
 import JoinGameForm from '@/components/landing/JoinGameForm';
 import GameHistoryButton from '@/components/landing/GameHistoryButton';
+import Logo from '@/components/ui/Logo';
 
 /** Decorative poster cards for the right panel (TMDB public CDN) */
 const POSTER_CARDS = [
@@ -72,13 +73,7 @@ export default function Home() {
           >
             {/* Logo */}
             <div className="text-center lg:text-left mb-8 lg:mb-10">
-              <h1
-                className="font-black tracking-tight leading-none"
-                style={{ fontSize: 'clamp(3rem, 10vw, 6rem)' }}
-              >
-                <span className="text-white">Show</span>
-                <span className="gradient-text">Match</span>
-              </h1>
+              <Logo fontSize="clamp(3rem, 10vw, 6rem)" />
               <p className="mt-3 text-xs text-white/55 tracking-[0.3em] uppercase font-semibold">
                 Swipe · Match · Watch
               </p>
