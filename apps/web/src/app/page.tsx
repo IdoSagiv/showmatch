@@ -39,19 +39,19 @@ export default function Home() {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           className="absolute -top-32 left-1/3 w-[700px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(229,9,20,0.40) 0%, transparent 65%)' }}
+          style={{ background: 'radial-gradient(ellipse, rgba(229,9,20,0.26) 0%, transparent 65%)' }}
           animate={{ scale: [1, 1.12, 1], opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
           className="absolute bottom-0 -right-32 w-[600px] h-[600px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(109,40,217,0.28) 0%, transparent 65%)' }}
+          style={{ background: 'radial-gradient(ellipse, rgba(109,40,217,0.18) 0%, transparent 65%)' }}
           animate={{ scale: [1.1, 1, 1.1], opacity: [0.4, 0.7, 0.4] }}
           transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
         />
         <motion.div
           className="absolute top-1/3 -left-24 w-[400px] h-[400px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(255,107,53,0.50) 0%, transparent 65%)' }}
+          style={{ background: 'radial-gradient(ellipse, rgba(255,107,53,0.32) 0%, transparent 65%)' }}
           animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
         />
