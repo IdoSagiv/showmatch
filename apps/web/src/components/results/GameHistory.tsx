@@ -68,10 +68,10 @@ function DeletableHistoryItem({ entry, onDelete }: RowProps) {
       className="overflow-hidden"
     >
       <div className="relative rounded-xl overflow-hidden">
-        {/* Solid red layer — always present, revealed as card slides */}
+        {/* Delete layer — dark crimson gradient, easy on the eyes */}
         <div
           className="absolute inset-0"
-          style={{ background: '#e50914' }}
+          style={{ background: 'linear-gradient(135deg, #1c0a0a 0%, #7f1d1d 100%)' }}
         >
           {/* Left icon — visible when dragging left */}
           <motion.div
