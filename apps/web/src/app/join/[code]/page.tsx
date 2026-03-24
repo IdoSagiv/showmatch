@@ -73,7 +73,7 @@ export default function JoinPage() {
   };
 
   return (
-    <main className="min-h-screen relative overflow-hidden bg-dark flex flex-col">
+    <main className="min-h-screen relative overflow-hidden flex flex-col">
 
       {/* ── Atmospheric blobs ── */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

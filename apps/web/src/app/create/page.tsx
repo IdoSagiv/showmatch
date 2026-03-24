@@ -85,7 +85,7 @@ export default function CreatePage() {
   /* ── Step 1: Name picker ── */
   if (step === 'name') {
     return (
-      <main className="min-h-screen relative overflow-hidden bg-dark flex flex-col">
+      <main className="min-h-screen relative overflow-hidden flex flex-col">
         {/* Atmospheric blobs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
@@ -226,7 +226,7 @@ export default function CreatePage() {
   const connectedCount = room.players.filter(p => p.connected).length;
 
   return (
-    <main className="min-h-screen bg-dark">
+    <main className="min-h-screen">
       <header className="flex items-center justify-between p-4 border-b border-dark-border">
         <Logo size="sm" />
       </header>
