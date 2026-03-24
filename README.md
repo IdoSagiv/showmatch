@@ -8,16 +8,9 @@ One person creates a room, friends join with a 5-letter code, everyone swipes th
 
 ## Screenshots
 
-| Home | Lobby | Swiping | Results |
-|------|-------|---------|---------|
-| ![Home](apps/web/public/screenshots/home.png) | ![Lobby](apps/web/public/screenshots/lobby.png) | ![Swipe](apps/web/public/screenshots/swipe.png) | ![Results](apps/web/public/screenshots/results.png) |
-
-<details>
-<summary>📸 How to add your own screenshots</summary>
-
-Run the app, open `http://localhost:3000` in your browser, and screenshot each screen. Save them to `apps/web/public/screenshots/`.
-
-</details>
+| Home | Create | Join | Lobby |
+|------|--------|------|-------|
+| ![Home](apps/web/public/screenshots/home.png) | ![Create](apps/web/public/screenshots/create.png) | ![Join](apps/web/public/screenshots/join.png) | ![Lobby](apps/web/public/screenshots/lobby.png) |
 
 ---
 
