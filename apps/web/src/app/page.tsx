@@ -10,7 +10,7 @@ import GameHistoryButton from '@/components/landing/GameHistoryButton';
 const POSTER_CARDS = [
   { path: '/qJ2tW6WMUDux911r6m7haRef0WH.jpg', rotate: -11, cx: -115, cy: -55, z: 1, delay: 0.1 },
   { path: '/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg', rotate:   5, cx:  55, cy: -80, z: 4, delay: 0.4 },
-  { path: '/gEU2QniE6E77NI6lZfecAnxyqbi.jpg', rotate:  -4, cx: -30, cy:  75, z: 3, delay: 0.2 },
+  { path: '/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg', rotate:  -4, cx: -30, cy:  75, z: 3, delay: 0.2 },
   { path: '/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg', rotate:  14, cx: 140, cy:  30, z: 2, delay: 0.6 },
 ];
 
