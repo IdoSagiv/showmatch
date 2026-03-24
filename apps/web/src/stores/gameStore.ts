@@ -10,6 +10,7 @@ interface GameStore {
   currentCardIndex: number;
   matchedTitles: TitleCard[];
   wildcardCandidates: TitleCard[];
+  wildcardSpinning: boolean;
   winner: TitleCard | null;
   fullRankings: Array<{ title: TitleCard; avgRank: number }>;
   swipeReveal: Array<{ title: TitleCard; playerDecisions: Array<{ playerName: string; decision: string }> }>;
@@ -31,6 +32,7 @@ interface GameStore {
   updatePlayerProgress: (playerId: string, progress: number) => void;
   setMatchedTitles: (titles: TitleCard[]) => void;
   setWildcardCandidates: (titles: TitleCard[]) => void;
+  setWildcardSpinning: (spinning: boolean) => void;
   setWinner: (winner: TitleCard) => void;
   setFullRankings: (rankings: Array<{ title: TitleCard; avgRank: number }>) => void;
   setSwipeReveal: (reveal: Array<{ title: TitleCard; playerDecisions: Array<{ playerName: string; decision: string }> }>) => void;
@@ -48,6 +50,7 @@ const initialState = {
   currentCardIndex: 0,
   matchedTitles: [] as TitleCard[],
   wildcardCandidates: [] as TitleCard[],
+  wildcardSpinning: false,
   winner: null as TitleCard | null,
   fullRankings: [] as Array<{ title: TitleCard; avgRank: number }>,
   swipeReveal: [] as Array<{ title: TitleCard; playerDecisions: Array<{ playerName: string; decision: string }> }>,
@@ -139,6 +142,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setMatchedTitles: (titles) => set({ matchedTitles: titles }),
   setWildcardCandidates: (titles) => set({ wildcardCandidates: titles }),
+  setWildcardSpinning: (spinning) => set({ wildcardSpinning: spinning }),
   setWinner: (winner) => set({ winner }),
   setFullRankings: (rankings) => set({ fullRankings: rankings }),
   setSwipeReveal: (reveal) => set({ swipeReveal: reveal }),

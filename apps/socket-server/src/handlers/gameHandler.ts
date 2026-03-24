@@ -146,6 +146,14 @@ export function registerGameHandlers(io: Server, socket: Socket) {
     }
   });
 
+  // Host started the wildcard spin — broadcast to guests so they see the animation too
+  socket.on('wildcardSpinStart', () => {
+    if (!roomManager.isCreator(socket.id)) return;
+    const room = roomManager.getRoomBySocket(socket.id);
+    if (!room) return;
+    socket.to(room.code).emit('wildcardSpinStart');
+  });
+
   // Host picks the wildcard winner (no-matches flow)
   socket.on('wildcardPick', (tmdbId: number) => {
     if (!roomManager.isCreator(socket.id)) return;

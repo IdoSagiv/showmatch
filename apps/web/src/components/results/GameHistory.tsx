@@ -96,7 +96,7 @@ function DeletableHistoryItem({ entry, onDelete }: RowProps) {
           drag="x"
           dragMomentum={false}
           onDragEnd={handleDragEnd}
-          style={{ x, touchAction: 'pan-y' }}
+          style={{ x, touchAction: 'pan-y', willChange: 'transform' }}
           className="relative bg-dark-surface rounded-xl p-3 border border-dark-border cursor-grab active:cursor-grabbing select-none"
         >
           <div className="flex items-center gap-3">
@@ -165,7 +165,7 @@ export default function GameHistory({ isOpen, onClose }: GameHistoryProps) {
       ) : (
         <div className="space-y-2 max-h-[60vh] overflow-y-auto">
           <p className="text-xs text-gray-600 text-center pb-1">Swipe left or right to delete</p>
-          <AnimatePresence mode="popLayout" initial={false}>
+          <AnimatePresence mode="sync" initial={false}>
             {history.map(entry => (
               <DeletableHistoryItem
                 key={entry.id}

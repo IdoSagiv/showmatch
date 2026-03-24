@@ -20,7 +20,7 @@ export default function ResultsPage() {
   const code = (params.code as string).toUpperCase();
   const socket = useSocket();
   const {
-    room, matchedTitles, winner, fullRankings, wildcardCandidates,
+    room, matchedTitles, winner, fullRankings, wildcardCandidates, wildcardSpinning,
     isFirstMatch, playerId, swipeReveal, gameStats, gameOver, setWinner, reset,
   } = useGameStore();
   const [rankingSubmitted, setRankingSubmitted] = useState(false);
@@ -115,6 +115,8 @@ export default function ResultsPage() {
           <WildcardPicker
             candidates={wildcardCandidates}
             isCreator={isCreator}
+            wildcardSpinning={wildcardSpinning}
+            onSpinStart={() => socket.emit('wildcardSpinStart' as any)}
             onPick={(tmdbId) => socket.emit('wildcardPick' as any, tmdbId)}
           />
         )}

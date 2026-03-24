@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import type { TitleCard } from '@/types/game';
 import { useSound } from '@/hooks/useSound';
@@ -8,18 +8,24 @@ import { useSound } from '@/hooks/useSound';
 interface WildcardPickerProps {
   candidates: TitleCard[];
   isCreator: boolean;
+  wildcardSpinning: boolean; // true when host has started the spin (guests use this)
+  onSpinStart: () => void;   // emits wildcardSpinStart socket event
   onPick: (tmdbId: number) => void;
 }
 
-export default function WildcardPicker({ candidates, isCreator, onPick }: WildcardPickerProps) {
+export default function WildcardPicker({
+  candidates, isCreator, wildcardSpinning, onSpinStart, onPick,
+}: WildcardPickerProps) {
   const [spinning, setSpinning] = useState(false);
   const [picked, setPicked] = useState(false);
   const [displayIndex, setDisplayIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout>();
   const { playTick, playWildcard } = useSound();
 
+  // Host spin: accelerating slowdown, then picks winner
   const handleSpin = useCallback(() => {
     if (spinning || picked || candidates.length === 0) return;
+    onSpinStart();
     setSpinning(true);
 
     let speed = 80;
@@ -44,24 +50,48 @@ export default function WildcardPicker({ candidates, isCreator, onPick }: Wildca
     };
 
     tick();
-  }, [candidates, spinning, picked, playTick, playWildcard, onPick]);
+  }, [candidates, spinning, picked, playTick, playWildcard, onSpinStart, onPick]);
+
+  // Guest spin: starts when host triggers, runs at constant speed until
+  // wildcardResult arrives and this component unmounts
+  useEffect(() => {
+    if (isCreator || !wildcardSpinning) return;
+
+    let idx = 0;
+    let alive = true;
+
+    const tick = () => {
+      if (!alive) return;
+      idx = (idx + 1) % candidates.length;
+      setDisplayIndex(idx);
+      playTick();
+      intervalRef.current = setTimeout(tick, 100);
+    };
+
+    tick();
+    return () => { alive = false; clearTimeout(intervalRef.current); };
+  }, [wildcardSpinning, isCreator, candidates, playTick]);
 
   if (candidates.length === 0) {
     return <p className="text-gray-400 text-center">No close matches found.</p>;
   }
+
+  const isSpinning = spinning || (!isCreator && wildcardSpinning);
 
   return (
     <div className="text-center space-y-4">
       <h2 className="text-xl font-bold">No one could agree! 🤷</h2>
       <p className="text-gray-400">But here&apos;s what came closest...</p>
 
-      {/* Candidates */}
+      {/* Candidates — spinning highlight tracks displayIndex */}
       <div className="flex justify-center gap-2 mb-4">
         {candidates.slice(0, 3).map((c, i) => (
           <motion.div
             key={c.tmdbId}
             className={`w-20 rounded-lg overflow-hidden border-2 transition-colors ${
-              spinning && displayIndex === i ? 'border-primary' : 'border-dark-border'
+              isSpinning && displayIndex % candidates.slice(0, 3).length === i
+                ? 'border-primary'
+                : 'border-dark-border'
             }`}
           >
             {c.posterPath && <img src={c.posterPath} alt={c.title} className="w-full aspect-[2/3] object-cover" />}
@@ -82,13 +112,18 @@ export default function WildcardPicker({ candidates, isCreator, onPick }: Wildca
         </motion.button>
       )}
 
-      {/* Host: picking in progress */}
+      {/* Host: revealing */}
       {isCreator && picked && (
         <p className="text-accent-gold font-semibold animate-pulse">Revealing…</p>
       )}
 
-      {/* Guest: waiting for host */}
-      {!isCreator && (
+      {/* Guest: spinning in progress */}
+      {!isCreator && wildcardSpinning && (
+        <p className="text-accent-gold text-sm animate-pulse">Picking the wildcard…</p>
+      )}
+
+      {/* Guest: waiting for host to start */}
+      {!isCreator && !wildcardSpinning && (
         <div className="flex flex-col items-center gap-3 py-2">
           <div className="w-6 h-6 border-2 border-accent-gold border-t-transparent rounded-full animate-spin" />
           <p className="text-gray-400 text-sm">Waiting for host to pick…</p>
