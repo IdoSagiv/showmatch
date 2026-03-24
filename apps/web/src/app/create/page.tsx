@@ -250,7 +250,7 @@ export default function CreatePage() {
 
   return (
     <main className="min-h-screen">
-      <header className="flex items-center justify-between p-4 border-b border-dark-border">
+      <header className="flex items-center justify-between p-4">
         <Logo size="sm" />
       </header>
 

@@ -97,7 +97,7 @@ export default function ResultsPage() {
 
   return (
     <main className="min-h-screen pb-36">
-      <header className="flex items-center px-4 py-3 border-b border-dark-border bg-dark/90 backdrop-blur-md sticky top-0 z-20">
+      <header className="flex items-center px-4 py-3 bg-dark/90 backdrop-blur-md sticky top-0 z-20">
         <Logo size="sm" />
       </header>
 
