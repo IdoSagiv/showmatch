@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
 import { getSocket } from '@/lib/socket';
+import CopyableCode from '@/components/ui/CopyableCode';
 import FilterPanel from '@/components/lobby/FilterPanel';
 import FilterPreview from '@/components/lobby/FilterPreview';
 import PlayerList from '@/components/lobby/PlayerList';
@@ -93,11 +94,7 @@ export default function LobbyPage() {
           />
 
           <p className="text-xs text-gray-500 uppercase tracking-[0.2em] mb-2">Room Code</p>
-          <p
-            className="relative text-5xl font-mono font-black tracking-[0.4em] code-glow text-white"
-          >
-            {room.code}
-          </p>
+          <CopyableCode code={room.code} />
           <div className="mt-3 flex justify-center">
             <ShareButton code={room.code} />
           </div>
