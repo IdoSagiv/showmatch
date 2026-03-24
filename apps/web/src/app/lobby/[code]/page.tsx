@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
+import { getSocket } from '@/lib/socket';
 import FilterPanel from '@/components/lobby/FilterPanel';
 import FilterPreview from '@/components/lobby/FilterPreview';
 import PlayerList from '@/components/lobby/PlayerList';
@@ -31,6 +32,19 @@ export default function LobbyPage() {
       router.push(`/game/${room.code}`);
     }
   }, [room?.status, room?.code, router]);
+
+  // When the player navigates away (SPA or tab close) while still in the
+  // lobby, tell the server so other players see an updated list immediately.
+  // Guard: don't emit when the game starts — room.status will be 'swiping'
+  // by the time this cleanup runs (game navigation triggers before unmount).
+  useEffect(() => {
+    return () => {
+      const { room: currentRoom } = useGameStore.getState();
+      if (currentRoom?.status === 'lobby') {
+        getSocket().emit('leaveRoom');
+      }
+    };
+  }, []);
 
   if (!room) return null;
 

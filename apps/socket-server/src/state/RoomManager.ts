@@ -199,11 +199,12 @@ class RoomManager {
     player.connected = false;
 
     const timerKey = `${room.code}:${socketId}`;
+    // Lobby: 5s grace — no in-progress state to preserve; fast feedback for others.
     // Finished rooms: 5s grace (feels responsive, survives brief reconnects).
     // Host in active game: 15s grace — long enough to survive a brief network blip,
     //   short enough that guests don't wait forever if the host leaves for real.
-    // Other players: 60s grace (allows full reconnect mid-game).
-    const graceMs = room.status === 'finished'
+    // Other players in active game: 60s grace (allows full reconnect mid-game).
+    const graceMs = (room.status === 'lobby' || room.status === 'finished')
       ? 5_000
       : (player.isCreator ? 15_000 : 60_000);
     const timer = setTimeout(() => {
