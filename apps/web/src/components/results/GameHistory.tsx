@@ -21,8 +21,8 @@ function DeletableHistoryItem({ entry, onDelete }: RowProps) {
   const x = useMotionValue(0);
 
   // Red bg + trash icon fade in as the drag distance grows
-  const bgOpacity  = useTransform(x, [-90, -30, 0, 30, 90], [1, 0.4, 0, 0.4, 1]);
-  const iconScale  = useTransform(x, [-90, -30, 0, 30, 90], [1, 0.6, 0.4, 0.6, 1]);
+  const bgOpacity  = useTransform(x, [-50, -10, 0, 10, 50], [1, 0.6, 0, 0.6, 1]);
+  const iconScale  = useTransform(x, [-50, -10, 0, 10, 50], [1, 0.8, 0.5, 0.8, 1]);
 
   const handleDragEnd = (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
     const far   = Math.abs(info.offset.x) > 80;
@@ -52,7 +52,7 @@ function DeletableHistoryItem({ entry, onDelete }: RowProps) {
         <motion.div
           className="absolute inset-0 rounded-xl flex items-center justify-center gap-2"
           style={{
-            background: 'rgba(229,9,20,0.88)',
+            background: '#e50914',
             opacity: bgOpacity,
           }}
         >
