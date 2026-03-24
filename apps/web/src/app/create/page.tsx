@@ -85,63 +85,112 @@ export default function CreatePage() {
   /* ── Step 1: Name picker ── */
   if (step === 'name') {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-6">
-        <motion.div
-          className="w-full max-w-sm flex flex-col items-center gap-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+      <main className="min-h-screen relative overflow-hidden bg-dark flex flex-col">
+        {/* Atmospheric blobs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            className="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full"
+            style={{ background: 'radial-gradient(ellipse, rgba(229,9,20,0.15) 0%, transparent 65%)' }}
+            animate={{ scale: [1, 1.1, 1], opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute bottom-0 -left-32 w-[500px] h-[500px] rounded-full"
+            style={{ background: 'radial-gradient(ellipse, rgba(109,40,217,0.1) 0%, transparent 65%)' }}
+            animate={{ scale: [1.1, 1, 1.1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+          />
+        </div>
+
+        {/* Header */}
+        <header className="relative z-10 flex items-center px-5 pt-5 pb-3">
           <Logo size="sm" />
+        </header>
 
-          <div className="w-full text-center">
-            <h2 className="text-xl font-bold mb-1">What's your name?</h2>
-            <p className="text-sm text-gray-500">Others will see this in the lobby</p>
-          </div>
-
-          <div className="w-full flex flex-col gap-3">
-            <div className="relative">
-              <input
-                ref={inputRef}
-                value={name}
-                onChange={e => setName(e.target.value.slice(0, 50))}
-                onKeyDown={e => e.key === 'Enter' && handleCreate()}
-                placeholder="Your name"
-                maxLength={50}
-                className="
-                  w-full bg-dark-surface border border-dark-border rounded-xl
-                  px-4 py-3 text-center text-lg font-medium text-white
-                  focus:outline-none focus:border-primary transition-colors
-                "
-              />
-              <button
-                type="button"
-                onClick={() => setName(randomName())}
-                title="Random name"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors text-lg"
-              >
-                🎲
-              </button>
+        {/* Content */}
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 py-8">
+          <motion.div
+            className="w-full max-w-sm flex flex-col items-center gap-8"
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 24 }}
+          >
+            {/* Title */}
+            <div className="text-center">
+              <h2 className="font-black tracking-tight" style={{ fontSize: 'clamp(1.8rem, 8vw, 2.4rem)' }}>
+                Create a Room
+              </h2>
+              <p className="text-gray-400 text-sm mt-2">Friends will join with a code you share</p>
             </div>
 
-            {error && <p className="text-sm text-accent-red text-center">{error}</p>}
-
-            <Button
-              size="lg"
-              onClick={handleCreate}
-              disabled={!name.trim() || creating}
-              className="w-full"
+            {/* Name card */}
+            <div
+              className="w-full rounded-3xl p-5 space-y-4"
+              style={{ background: 'rgba(12,11,24,0.75)', border: '1px solid rgba(255,255,255,0.07)', backdropFilter: 'blur(20px)' }}
             >
-              {creating ? 'Creating…' : 'Create Room'}
-            </Button>
+              <p className="text-xs text-gray-400 tracking-widest uppercase font-semibold">Your Name</p>
 
-            <button
+              <div className="flex gap-2 items-stretch">
+                <input
+                  ref={inputRef}
+                  value={name}
+                  onChange={e => setName(e.target.value.slice(0, 50))}
+                  onKeyDown={e => e.key === 'Enter' && handleCreate()}
+                  placeholder="Your name"
+                  maxLength={50}
+                  className="flex-1 min-w-0 bg-dark-surface/70 border border-dark-border rounded-2xl px-4 py-3.5 text-center text-base font-semibold text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-all"
+                />
+                <motion.button
+                  type="button"
+                  onClick={() => setName(randomName())}
+                  title="Random name"
+                  className="shrink-0 w-[52px] rounded-2xl border border-dark-border bg-dark-surface/70 text-xl flex items-center justify-center"
+                  whileTap={{ scale: 0.88 }}
+                  whileHover={{ borderColor: 'rgba(229,9,20,0.4)' }}
+                >
+                  🎲
+                </motion.button>
+              </div>
+
+              {error && (
+                <p className="text-accent-red text-sm text-center">{error}</p>
+              )}
+
+              <motion.button
+                onClick={handleCreate}
+                disabled={!name.trim() || creating}
+                className="relative w-full rounded-2xl overflow-hidden font-black text-base text-white py-4 tracking-wide disabled:opacity-40"
+                style={{
+                  background: 'linear-gradient(135deg, #e50914 0%, #ff4b2b 50%, #ff6b35 100%)',
+                  boxShadow: name.trim() && !creating ? '0 4px 28px rgba(229,9,20,0.45), 0 1px 0 rgba(255,255,255,0.1) inset' : 'none',
+                }}
+                whileTap={{ scale: 0.97 }}
+                whileHover={name.trim() && !creating ? { scale: 1.01 } : {}}
+                transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+              >
+                {creating ? (
+                  <span className="flex items-center justify-center gap-2">
+                    {[0, 1, 2].map(i => (
+                      <motion.span key={i} className="w-1.5 h-1.5 rounded-full bg-white block"
+                        animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
+                        transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }} />
+                    ))}
+                  </span>
+                ) : 'Create Room →'}
+              </motion.button>
+            </div>
+
+            <motion.button
               onClick={() => router.push('/')}
-              className="text-sm text-gray-500 hover:text-gray-300 transition-colors text-center"
+              className="text-xs text-gray-400 hover:text-white transition-colors tracking-wide"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
             >
               ← Back
-            </button>
-          </div>
-        </motion.div>
+            </motion.button>
+          </motion.div>
+        </div>
       </main>
     );
   }

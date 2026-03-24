@@ -84,29 +84,47 @@ export default function Home() {
               </p>
             </div>
 
-            {/* How it works — desktop only */}
-            <div className="hidden lg:flex flex-col gap-3 mb-10">
-              {STEPS.map((step, i) => (
-                <motion.div
-                  key={step.label}
-                  className="flex items-start gap-4 px-5 py-4 rounded-2xl"
-                  style={{
-                    background: 'rgba(15,14,31,0.6)',
-                    border: '1px solid rgba(255,255,255,0.055)',
-                    backdropFilter: 'blur(12px)',
-                  }}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 + i * 0.1, type: 'spring', stiffness: 240, damping: 26 }}
-                >
-                  <span className="text-2xl leading-none mt-0.5 shrink-0">{step.emoji}</span>
-                  <div>
-                    <p className="text-white font-bold text-sm leading-snug">{step.label}</p>
-                    <p className="text-gray-500 text-xs mt-1 leading-relaxed">{step.desc}</p>
+            {/* How it works — compact row on mobile, full cards on desktop */}
+            <motion.div
+              className="w-full mb-7 lg:mb-10"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, type: 'spring', stiffness: 220, damping: 26 }}
+            >
+              {/* Mobile: 3 compact horizontal tiles */}
+              <div className="flex gap-2 lg:hidden">
+                {STEPS.map((step) => (
+                  <div
+                    key={step.label}
+                    className="flex-1 flex flex-col items-center gap-1.5 px-2 py-3 rounded-2xl text-center"
+                    style={{ background: 'rgba(15,14,31,0.65)', border: '1px solid rgba(255,255,255,0.055)', backdropFilter: 'blur(12px)' }}
+                  >
+                    <span className="text-xl">{step.emoji}</span>
+                    <p className="text-white text-[11px] font-bold leading-tight">{step.label}</p>
                   </div>
-                </motion.div>
-              ))}
-            </div>
+                ))}
+              </div>
+
+              {/* Desktop: full description cards */}
+              <div className="hidden lg:flex flex-col gap-3">
+                {STEPS.map((step, i) => (
+                  <motion.div
+                    key={step.label}
+                    className="flex items-start gap-4 px-5 py-4 rounded-2xl"
+                    style={{ background: 'rgba(15,14,31,0.6)', border: '1px solid rgba(255,255,255,0.055)', backdropFilter: 'blur(12px)' }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 + i * 0.1, type: 'spring', stiffness: 240, damping: 26 }}
+                  >
+                    <span className="text-2xl leading-none mt-0.5 shrink-0">{step.emoji}</span>
+                    <div>
+                      <p className="text-white font-bold text-sm leading-snug">{step.label}</p>
+                      <p className="text-gray-500 text-xs mt-1 leading-relaxed">{step.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
 
             {/* Action buttons */}
             <motion.div

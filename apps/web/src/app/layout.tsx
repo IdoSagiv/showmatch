@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import PageTransitionWrapper from '@/components/ui/PageTransitionWrapper';
 
 export const metadata: Metadata = {
   title: 'ShowMatch — Swipe. Match. Watch.',
@@ -22,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-dark text-white overscroll-none">
-        {children}
+        <PageTransitionWrapper>{children}</PageTransitionWrapper>
       </body>
     </html>
   );
