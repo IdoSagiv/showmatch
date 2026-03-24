@@ -178,13 +178,14 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
       }
     }
 
-    // TV series — end year + status
+    // TV series — end year, status, seasons
     if (type === 'tv' && detailRes.status === 'fulfilled' && detailRes.value && detailRes.value.ok) {
       const detail = await detailRes.value.json();
-      const lastAir = detail.last_air_date ? parseInt(detail.last_air_date.split('-')[0]) : undefined;
+      const lastAir = detail.last_air_date ? parseInt((detail.last_air_date as string).split('-')[0]) : undefined;
       if (lastAir && lastAir !== title.year) title.endYear = lastAir;
       const s = detail.status as string | undefined;
       title.seriesStatus = (s === 'Ended' || s === 'Canceled') ? 'ended' : 'running';
+      if (detail.number_of_seasons) title.seasons = detail.number_of_seasons as number;
     }
 
     // Content rating
@@ -231,9 +232,15 @@ function buildDiscoverParams(settings: GameSettings, mediaType: 'movie' | 'tv'):
     params.set('vote_average.gte', settings.minRating.toString());
   }
 
-  const dateField = mediaType === 'movie' ? 'primary_release_date' : 'first_air_date';
-  params.set(`${dateField}.gte`, `${settings.yearRange[0]}-01-01`);
-  params.set(`${dateField}.lte`, `${settings.yearRange[1]}-12-31`);
+  if (mediaType === 'movie') {
+    params.set('primary_release_date.gte', `${settings.yearRange[0]}-01-01`);
+    params.set('primary_release_date.lte', `${settings.yearRange[1]}-12-31`);
+  } else {
+    // For TV, match any show that had episodes airing WITHIN the range —
+    // this includes long-running shows that started before the range.
+    params.set('air_date.gte', `${settings.yearRange[0]}-01-01`);
+    params.set('air_date.lte', `${settings.yearRange[1]}-12-31`);
+  }
 
   if (settings.language) {
     params.set('with_original_language', settings.language);

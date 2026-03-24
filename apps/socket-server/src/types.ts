@@ -20,6 +20,7 @@ export interface TitleCard {
   year: number;
   endYear?: number;           // TV only — last season year
   seriesStatus?: 'running' | 'ended'; // TV only
+  seasons?: number;           // TV only — number of seasons
   posterPath: string;
   overview: string;
   voteAverage: number;
