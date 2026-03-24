@@ -9,7 +9,13 @@ let socket: TypedSocket | null = null;
 
 export function getSocket(): TypedSocket {
   if (!socket) {
-    const url = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
+    // Derive the socket URL from the current browser hostname so the app works
+    // over any network (LAN, Tailscale, localhost) without reconfiguration.
+    // NEXT_PUBLIC_SOCKET_URL overrides this if set explicitly.
+    const url = process.env.NEXT_PUBLIC_SOCKET_URL
+      ?? (typeof window !== 'undefined'
+        ? `http://${window.location.hostname}:3001`
+        : 'http://localhost:3001');
     socket = io(url, {
       autoConnect: false,
       transports: ['websocket', 'polling'],

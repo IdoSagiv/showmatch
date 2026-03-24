@@ -10,12 +10,13 @@ import { registerRankingHandlers } from './handlers/rankingHandler';
 dotenv.config();
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000' }));
+// Allow any origin — this app runs on a private LAN / Tailscale VPN
+app.use(cors({ origin: true }));
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: true,
     methods: ['GET', 'POST'],
   },
 });
