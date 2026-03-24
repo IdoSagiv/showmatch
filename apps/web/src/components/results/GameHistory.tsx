@@ -10,6 +10,28 @@ import type { GameHistoryEntry } from '@/types/game';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 
+// ─── SVG trash icon ───────────────────────────────────────────────────────
+
+function TrashIcon() {
+  return (
+    <svg
+      width="20" height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="white"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+      <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+    </svg>
+  );
+}
+
 // ─── Single swipeable row ──────────────────────────────────────────────────
 
 interface RowProps {
@@ -20,26 +42,24 @@ interface RowProps {
 function DeletableHistoryItem({ entry, onDelete }: RowProps) {
   const x = useMotionValue(0);
 
-  // Red bg punches in fast — near full at just 20px, 100% at 40px
-  const bgOpacity  = useTransform(x, [-40, -5, 0, 5, 40], [1, 0.85, 0, 0.85, 1]);
-  const iconScale  = useTransform(x, [-40, -5, 0, 5, 40], [1.1, 0.9, 0.5, 0.9, 1.1]);
+  // Icon fades in on the side being dragged towards; other side stays hidden
+  const leftIconOpacity  = useTransform(x, [-45, -12, 0],   [1, 0.7, 0]);
+  const rightIconOpacity = useTransform(x, [0,   12, 45],   [0, 0.7, 1]);
+  const iconScale        = useTransform(x, [-55, -12, 0, 12, 55], [1.2, 1, 0.5, 1, 1.2]);
 
   const handleDragEnd = (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
     const far   = Math.abs(info.offset.x) > 80;
     const fast  = Math.abs(info.velocity.x) > 450;
     if (far || fast) {
       const dir = info.offset.x >= 0 ? 1 : -1;
-      // Fly card off screen, then remove from list
       animate(x, dir * 600, { type: 'tween', duration: 0.22, ease: 'easeOut' });
       setTimeout(() => onDelete(entry.id), 200);
     } else {
-      // Snap back
       animate(x, 0, { type: 'spring', stiffness: 500, damping: 38 });
     }
   };
 
   return (
-    // Height-collapse wrapper — exits by collapsing to 0
     <motion.div
       layout
       initial={false}
@@ -47,17 +67,27 @@ function DeletableHistoryItem({ entry, onDelete }: RowProps) {
       transition={{ duration: 0.22, ease: 'easeInOut' }}
       className="overflow-hidden"
     >
-      {/* Red background (revealed as card slides) */}
-      <div className="relative rounded-xl overflow-hidden mb-0">
-        <motion.div
-          className="absolute inset-0 rounded-xl flex items-center justify-center gap-2"
-          style={{
-            background: '#e50914',
-            opacity: bgOpacity,
-          }}
+      <div className="relative rounded-xl overflow-hidden">
+        {/* Solid red layer — always present, revealed as card slides */}
+        <div
+          className="absolute inset-0"
+          style={{ background: '#e50914' }}
         >
-          <motion.span style={{ scale: iconScale, fontSize: '1.8rem' }}>🗑️</motion.span>
-        </motion.div>
+          {/* Left icon — visible when dragging left */}
+          <motion.div
+            className="absolute inset-y-0 left-4 flex items-center"
+            style={{ opacity: leftIconOpacity, scale: iconScale }}
+          >
+            <TrashIcon />
+          </motion.div>
+          {/* Right icon — visible when dragging right */}
+          <motion.div
+            className="absolute inset-y-0 right-4 flex items-center"
+            style={{ opacity: rightIconOpacity, scale: iconScale }}
+          >
+            <TrashIcon />
+          </motion.div>
+        </div>
 
         {/* Draggable card — sits on top of the red layer */}
         <motion.div
