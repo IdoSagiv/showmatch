@@ -79,7 +79,7 @@ export default function Home() {
                 <span className="text-white">Show</span>
                 <span className="gradient-text">Match</span>
               </h1>
-              <p className="mt-3 text-xs text-gray-500 tracking-[0.3em] uppercase font-semibold">
+              <p className="mt-3 text-xs text-white/55 tracking-[0.3em] uppercase font-semibold">
                 Swipe · Match · Watch
               </p>
             </div>
@@ -97,7 +97,7 @@ export default function Home() {
                   <div
                     key={step.label}
                     className="flex-1 flex flex-col items-center gap-1.5 px-2 py-3 rounded-2xl text-center"
-                    style={{ background: 'rgba(15,14,31,0.65)', border: '1px solid rgba(255,255,255,0.055)', backdropFilter: 'blur(12px)' }}
+                    style={{ background: 'rgba(8,8,15,0.88)', border: '1px solid rgba(255,255,255,0.055)', backdropFilter: 'blur(12px)' }}
                   >
                     <span className="text-xl">{step.emoji}</span>
                     <p className="text-white text-[11px] font-bold leading-tight">{step.label}</p>
@@ -111,7 +111,7 @@ export default function Home() {
                   <motion.div
                     key={step.label}
                     className="flex items-start gap-4 px-5 py-4 rounded-2xl"
-                    style={{ background: 'rgba(15,14,31,0.6)', border: '1px solid rgba(255,255,255,0.055)', backdropFilter: 'blur(12px)' }}
+                    style={{ background: 'rgba(8,8,15,0.88)', border: '1px solid rgba(255,255,255,0.055)', backdropFilter: 'blur(12px)' }}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 + i * 0.1, type: 'spring', stiffness: 240, damping: 26 }}
@@ -119,7 +119,7 @@ export default function Home() {
                     <span className="text-2xl leading-none mt-0.5 shrink-0">{step.emoji}</span>
                     <div>
                       <p className="text-white font-bold text-sm leading-snug">{step.label}</p>
-                      <p className="text-gray-500 text-xs mt-1 leading-relaxed">{step.desc}</p>
+                      <p className="text-gray-300 text-xs mt-1 leading-relaxed">{step.desc}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -135,10 +135,10 @@ export default function Home() {
             >
               <CreateGameButton />
 
-              <div className="flex items-center gap-3 text-gray-700 text-xs my-1">
-                <div className="flex-1 h-px bg-dark-border" />
+              <div className="flex items-center gap-3 text-gray-400 text-xs my-1">
+                <div className="flex-1 h-px bg-white/15" />
                 <span className="tracking-widest uppercase">or</span>
-                <div className="flex-1 h-px bg-dark-border" />
+                <div className="flex-1 h-px bg-white/15" />
               </div>
 
               <JoinGameForm />
@@ -205,7 +205,7 @@ export default function Home() {
             />
 
             <motion.p
-              className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs text-gray-600 tracking-widest uppercase whitespace-nowrap"
+              className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs text-gray-400 tracking-widest uppercase whitespace-nowrap"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.8 }}
