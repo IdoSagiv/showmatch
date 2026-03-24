@@ -181,7 +181,7 @@ export default function SwipeCard({
               className="absolute inset-x-0 bottom-0 pb-4 px-4 pointer-events-none"
               style={{
                 paddingTop: '4.5rem',
-                background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.78) 25%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.08) 68%, transparent 80%)',
+                background: 'linear-gradient(to top, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.88) 25%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.15) 68%, transparent 82%)',
               }}
             >
               {/* Title */}
@@ -197,14 +197,14 @@ export default function SwipeCard({
 
               {/* Year (range for TV) + ratings on one compact line */}
               <div className="flex items-center gap-3 mt-1 flex-wrap">
-                <span className="text-white/50 text-sm font-medium" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.9)' }}>
+                <span className="text-white/80 text-sm font-semibold" style={{ textShadow: '0 1px 12px rgba(0,0,0,1)' }}>
                   {card.mediaType === 'tv' ? (
                     <>
                       {card.seriesStatus === 'running'
-                        ? <>{card.year} – <span className="text-primary/80 font-semibold">ongoing</span></>
+                        ? <>{card.year} – <span className="text-primary font-bold">ongoing</span></>
                         : card.endYear ? `${card.year} – ${card.endYear}` : card.year}
                       {card.seasons && (
-                        <span className="text-white/35"> · {card.seasons} {card.seasons === 1 ? 'season' : 'seasons'}</span>
+                        <span className="text-white/60"> · {card.seasons} {card.seasons === 1 ? 'season' : 'seasons'}</span>
                       )}
                     </>
                   ) : card.year}
@@ -235,8 +235,8 @@ export default function SwipeCard({
                   {card.genres.slice(0, 3).map(g => (
                     <span
                       key={g}
-                      className="px-2 py-0.5 rounded-full text-[11px] font-medium text-white/70"
-                      style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(4px)' }}
+                      className="px-2 py-0.5 rounded-full text-[11px] font-semibold text-white/90"
+                      style={{ background: 'rgba(255,255,255,0.14)', backdropFilter: 'blur(4px)' }}
                     >
                       {g}
                     </span>
@@ -254,11 +254,11 @@ export default function SwipeCard({
 
             {/* Type + age badges — bottom right */}
             <div className="absolute bottom-4 right-4 flex flex-col items-end gap-1.5 pointer-events-none z-10">
-              <span className="text-[10px] font-bold text-white/65 bg-black/45 backdrop-blur-md px-2.5 py-1 rounded-full tracking-wide uppercase">
+              <span className="text-[10px] font-bold text-white/85 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full tracking-wide uppercase">
                 {card.mediaType === 'movie' ? '🎬 Film' : '📺 Series'}
               </span>
               {card.contentRating && (
-                <span className="text-[10px] font-bold text-white/50 bg-black/45 backdrop-blur-md px-2.5 py-1 rounded-full">
+                <span className="text-[10px] font-bold text-white/75 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full">
                   {card.contentRating}
                 </span>
               )}
