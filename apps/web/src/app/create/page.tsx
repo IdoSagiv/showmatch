@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
+import { getSocket } from '@/lib/socket';
 import { NAME_ADJECTIVES, NAME_NOUNS } from '@/lib/constants';
 import FilterPanel from '@/components/lobby/FilterPanel';
 import FilterPreview from '@/components/lobby/FilterPreview';
@@ -32,6 +33,7 @@ export default function CreatePage() {
   const [gameStarting, setGameStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const leavingRef = useRef(false);
 
   // If room already in store (e.g. back-navigation), skip to room step
   useEffect(() => {
@@ -40,6 +42,26 @@ export default function CreatePage() {
 
   useEffect(() => {
     if (step === 'name') setTimeout(() => inputRef.current?.select(), 50);
+  }, [step]);
+
+  // When host navigates away from the live lobby, notify the server so
+  // waiting players receive `roomClosed` immediately instead of waiting
+  // for the disconnect grace period.
+  // StrictMode guard: ref + setTimeout(0) — same pattern as lobby page.
+  useEffect(() => {
+    if (step !== 'room') return;
+    leavingRef.current = false;
+    return () => {
+      leavingRef.current = true;
+      setTimeout(() => {
+        if (!leavingRef.current) return;
+        // If Logo's handleLeave already ran, reset() clears the room → skip.
+        const { room: currentRoom } = useGameStore.getState();
+        if (currentRoom?.status === 'lobby') {
+          getSocket().emit('leaveRoom');
+        }
+      }, 0);
+    };
   }, [step]);
 
   const handleCreate = useCallback(() => {
