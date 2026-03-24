@@ -17,7 +17,7 @@ export default function StreamingLogos({ providers, searchTitle }: StreamingLogo
 
   return (
     <div className="flex items-center gap-1.5 flex-wrap">
-      <span className="text-xs text-gray-500">On:</span>
+      <span className="text-xs text-gray-300 font-medium">On:</span>
       {providers.slice(0, 5).map(p => {
         const logo = (
           <img
@@ -43,7 +43,7 @@ export default function StreamingLogos({ providers, searchTitle }: StreamingLogo
         ) : logo;
       })}
       {providers.length > 5 && (
-        <span className="text-xs text-gray-500">+{providers.length - 5}</span>
+        <span className="text-xs text-gray-400">+{providers.length - 5}</span>
       )}
     </div>
   );
