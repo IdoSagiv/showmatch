@@ -52,7 +52,7 @@ export default function FilterPreview({ settings }: FilterPreviewProps) {
       ) : count === null ? (
         <span className="text-sm text-gray-500">--</span>
       ) : count === 0 ? (
-        <span className="text-sm text-accent-red">No titles match — try broadening your filters</span>
+        <span className="text-sm text-accent-red">No titles match. Try broadening your filters.</span>
       ) : (
         <span className="text-sm">
           <span className="font-bold text-primary">{count.toLocaleString()}</span>

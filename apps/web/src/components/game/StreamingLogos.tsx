@@ -34,7 +34,7 @@ export default function StreamingLogos({ providers, searchTitle }: StreamingLogo
             href={jwUrl}
             target="_blank"
             rel="noopener noreferrer"
-            title={`Watch on ${p.name} — JustWatch`}
+            title={`Watch on ${p.name} via JustWatch`}
             onClick={e => e.stopPropagation()}
             className="opacity-90 hover:opacity-100 hover:scale-110 transition-all"
           >
