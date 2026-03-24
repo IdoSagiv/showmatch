@@ -21,6 +21,13 @@ export function getGameHistory(): GameHistoryEntry[] {
   }
 }
 
+export function deleteGameFromHistory(id: string): void {
+  try {
+    const history = getGameHistory().filter(e => e.id !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  } catch {}
+}
+
 export function clearGameHistory(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
