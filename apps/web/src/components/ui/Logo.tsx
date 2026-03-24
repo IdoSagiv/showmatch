@@ -25,7 +25,6 @@ export default function Logo({ size = 'sm' }: LogoProps) {
 
   // ── Add-to-home-screen panel ──
   const [showPanel, setShowPanel] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
@@ -49,7 +48,6 @@ export default function Logo({ size = 'sm' }: LogoProps) {
     timerRef.current = setTimeout(() => {
       longFiredRef.current = true;
       setPressing(false);
-      setCopied(false);
       setShowPanel(true);
     }, LONG_PRESS_MS);
   };
@@ -70,27 +68,6 @@ export default function Logo({ size = 'sm' }: LogoProps) {
     } else {
       router.push('/');
     }
-  };
-
-  // ── Copy URL handler ──
-  const handleCopy = async () => {
-    const url = window.location.origin;
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      // Fallback for browsers that block clipboard
-      const el = document.createElement('input');
-      el.value = url;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-    }
-    setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-      setShowPanel(false);
-    }, 2000);
   };
 
   // ── Leave handler ──
@@ -175,58 +152,15 @@ export default function Logo({ size = 'sm' }: LogoProps) {
                 {/* Drag handle */}
                 <div className="mx-auto w-10 h-1 rounded-full bg-white/20 mb-5" />
 
-                <p className="text-center text-base font-bold text-white mb-1">
-                  📲 Add to Home Screen
-                </p>
-                <p className="text-center text-xs text-gray-500 mb-5">
-                  Copy the link → open in Safari → Share → Add to Home Screen
-                </p>
-
-                {/* URL pill */}
-                <div
-                  className="w-full rounded-2xl px-4 py-3 mb-5 text-center font-mono text-sm text-white/80 select-all"
+                {/* URL as a native link — right-click / iOS long-press gives "Copy Link" */}
+                <a
+                  href={typeof window !== 'undefined' ? window.location.origin : '#'}
+                  onClick={e => e.preventDefault()}
+                  className="block w-full rounded-2xl px-4 py-4 text-center font-mono text-sm text-white/80 select-all"
                   style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
                 >
                   {typeof window !== 'undefined' ? window.location.origin : ''}
-                </div>
-
-                {/* Copy button */}
-                <motion.button
-                  onClick={handleCopy}
-                  className="w-full rounded-2xl py-4 font-black text-base text-white overflow-hidden relative"
-                  style={{
-                    background: copied
-                      ? 'linear-gradient(135deg, #00c853 0%, #00875a 100%)'
-                      : 'linear-gradient(135deg, #e50914 0%, #ff4b2b 50%, #ff6b35 100%)',
-                    boxShadow: copied
-                      ? '0 4px 24px rgba(0,200,83,0.35)'
-                      : '0 4px 24px rgba(229,9,20,0.35)',
-                    transition: 'background 0.3s ease, box-shadow 0.3s ease',
-                  }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <AnimatePresence mode="wait">
-                    {copied ? (
-                      <motion.span
-                        key="copied"
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                      >
-                        ✓ Copied!
-                      </motion.span>
-                    ) : (
-                      <motion.span
-                        key="copy"
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                      >
-                        Copy Link
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </motion.button>
+                </a>
               </motion.div>
             </>
           )}
