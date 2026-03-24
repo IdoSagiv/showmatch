@@ -72,9 +72,9 @@ export default function Home() {
             transition={{ type: 'spring', stiffness: 200, damping: 24 }}
           >
             {/* Logo */}
-            <div className="text-center lg:text-left mb-8 lg:mb-10">
+            <div className="flex flex-col items-center lg:items-start mb-8 lg:mb-10">
               <Logo fontSize="clamp(3rem, 10vw, 6rem)" />
-              <p className="mt-3 text-xs text-white/55 tracking-[0.3em] uppercase font-semibold">
+              <p className="mt-3 text-xs text-white/55 tracking-[0.3em] uppercase font-semibold text-center lg:text-left">
                 Swipe · Match · Watch
               </p>
             </div>
