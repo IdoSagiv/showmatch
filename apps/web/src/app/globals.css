@@ -10,8 +10,9 @@
 body {
   color: var(--foreground);
   background:
-    radial-gradient(ellipse at 15% 15%, rgba(229, 9, 20, 0.09) 0%, transparent 50%),
-    radial-gradient(ellipse at 85% 85%, rgba(109, 40, 217, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 15% 15%, rgba(229, 9, 20, 0.25) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, rgba(109, 40, 217, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(229, 9, 20, 0.10) 0%, transparent 50%),
     #08080f;
   background-attachment: fixed;
   font-family: 'Inter', system-ui, sans-serif;
