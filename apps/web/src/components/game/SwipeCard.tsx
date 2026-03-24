@@ -199,11 +199,14 @@ export default function SwipeCard({
               <div className="flex items-center gap-3 mt-1 flex-wrap">
                 <span className="text-white/50 text-sm font-medium" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.9)' }}>
                   {card.mediaType === 'tv' ? (
-                    card.seriesStatus === 'running'
-                      ? <>{card.year} – <span className="text-primary/80 font-bold">ongoing</span></>
-                      : card.endYear
-                        ? `${card.year} – ${card.endYear}`
-                        : card.year
+                    <>
+                      {card.seriesStatus === 'running'
+                        ? <>{card.year} – <span className="text-primary/80 font-semibold">ongoing</span></>
+                        : card.endYear ? `${card.year} – ${card.endYear}` : card.year}
+                      {card.seasons && (
+                        <span className="text-white/35"> · {card.seasons} {card.seasons === 1 ? 'season' : 'seasons'}</span>
+                      )}
+                    </>
                   ) : card.year}
                 </span>
                 {card.voteAverage > 0 && (
@@ -314,6 +317,11 @@ export default function SwipeCard({
                         : card.year
                     : card.year})
                 </span>
+                {card.seasons && (
+                  <span className="text-gray-600 font-normal text-sm ml-1">
+                    · {card.seasons} {card.seasons === 1 ? 'season' : 'seasons'}
+                  </span>
+                )}
               </h2>
 
               {/* Stats grid */}
@@ -342,6 +350,12 @@ export default function SwipeCard({
                       {card.runtime >= 60 ? `${Math.floor(card.runtime / 60)}h ${card.runtime % 60}m` : `${card.runtime}m`}
                     </div>
                     <div className="text-[10px] text-gray-500 mt-0.5">Runtime</div>
+                  </div>
+                )}
+                {card.seasons && (
+                  <div className="bg-white/5 border border-white/8 rounded-xl px-3 py-2 text-center min-w-[58px]">
+                    <div className="text-white text-base font-black">{card.seasons}</div>
+                    <div className="text-[10px] text-gray-500 mt-0.5">{card.seasons === 1 ? 'Season' : 'Seasons'}</div>
                   </div>
                 )}
               </div>
