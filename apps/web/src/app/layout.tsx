@@ -35,6 +35,7 @@ export default function RootLayout({
             background: [
               'radial-gradient(ellipse at 15% 10%,  rgba(229,9,20,0.42)   0%, transparent 55%)',
               'radial-gradient(ellipse at 88% 88%,  rgba(109,40,217,0.30) 0%, transparent 55%)',
+              'radial-gradient(ellipse at 80% 10%,  rgba(255,107,53,0.28) 0%, transparent 50%)',
               'radial-gradient(ellipse at 50% 105%, rgba(229,9,20,0.18)   0%, transparent 45%)',
             ].join(', '),
           }}
