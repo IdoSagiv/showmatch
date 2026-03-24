@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
 import { getSocket } from '@/lib/socket';
+import CopyableCode from '@/components/ui/CopyableCode';
 import { NAME_ADJECTIVES, NAME_NOUNS } from '@/lib/constants';
 import FilterPanel from '@/components/lobby/FilterPanel';
 import FilterPreview from '@/components/lobby/FilterPreview';
@@ -261,7 +262,7 @@ export default function CreatePage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <p className="text-sm text-gray-400 mb-2">Room Code</p>
-          <p className="text-4xl font-mono font-bold tracking-[0.3em] text-white">{room.code}</p>
+          <CopyableCode code={room.code} textSize="text-4xl" tracking="tracking-[0.3em]" />
           <div className="mt-3 flex justify-center">
             <ShareButton code={room.code} />
           </div>
