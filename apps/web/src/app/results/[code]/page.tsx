@@ -97,7 +97,7 @@ export default function ResultsPage() {
 
   return (
     <main className="min-h-screen pb-36">
-      <header className="flex items-center px-4 py-3 bg-dark/90 backdrop-blur-md sticky top-0 z-20">
+      <header className="flex items-center px-4 py-3 bg-dark/60 backdrop-blur-md sticky top-0 z-20">
         <Logo size="sm" />
       </header>
 
@@ -175,7 +175,7 @@ export default function ResultsPage() {
 
       {/* Sticky footer — always visible once game is over */}
       {(winner || noMatches) && (
-        <div className="fixed bottom-0 left-0 right-0 z-10 bg-dark/90 backdrop-blur-md border-t border-dark-border shadow-[0_-4px_32px_rgba(0,0,0,0.5)]">
+        <div className="fixed bottom-0 left-0 right-0 z-10 bg-dark/60 backdrop-blur-md border-t border-dark-border shadow-[0_-4px_32px_rgba(0,0,0,0.5)]">
           <div className="max-w-lg mx-auto p-3 flex gap-2">
             <button
               onClick={handleShare}
