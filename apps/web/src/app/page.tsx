@@ -51,7 +51,7 @@ export default function Home() {
         />
         <motion.div
           className="absolute top-1/3 -left-24 w-[400px] h-[400px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(255,107,53,0.22) 0%, transparent 65%)' }}
+          style={{ background: 'radial-gradient(ellipse, rgba(255,107,53,0.50) 0%, transparent 65%)' }}
           animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
         />
