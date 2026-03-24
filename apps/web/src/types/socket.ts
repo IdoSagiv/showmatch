@@ -8,6 +8,7 @@ export interface ServerToClientEvents {
   gameStarted: (titlePool: TitleCard[]) => void;
   playerProgress: (playerId: string, progress: number) => void;
   allPlayersFinished: (matchedTitles: TitleCard[]) => void;
+  wildcardResult: (winner: TitleCard) => void;
   firstMatch: (title: TitleCard) => void;
   rankingsReady: (winner: TitleCard, rankings: Array<{ title: TitleCard; avgRank: number }>) => void;
   swipeReveal: (reveals: Array<{ title: TitleCard; playerDecisions: Array<{ playerName: string; decision: string }> }>) => void;
@@ -26,6 +27,7 @@ export interface ClientToServerEvents {
   startGame: () => void;
   submitSwipe: (tmdbId: number, decision: 'like' | 'pass' | 'superlike') => void;
   undoSwipe: () => void;
+  wildcardPick: (tmdbId: number) => void;
   submitRanking: (rankings: Array<{ tmdbId: number; rank: number }>) => void;
   playAgain: (payload?: { playerId?: string }) => void;
   endGame: (payload?: { playerId?: string }) => void;

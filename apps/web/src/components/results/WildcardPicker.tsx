@@ -1,26 +1,26 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import type { TitleCard } from '@/types/game';
-import Confetti from './Confetti';
 import { useSound } from '@/hooks/useSound';
 
 interface WildcardPickerProps {
   candidates: TitleCard[];
+  isCreator: boolean;
+  onPick: (tmdbId: number) => void;
 }
 
-export default function WildcardPicker({ candidates }: WildcardPickerProps) {
+export default function WildcardPicker({ candidates, isCreator, onPick }: WildcardPickerProps) {
   const [spinning, setSpinning] = useState(false);
-  const [winner, setWinner] = useState<TitleCard | null>(null);
+  const [picked, setPicked] = useState(false);
   const [displayIndex, setDisplayIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout>();
   const { playTick, playWildcard } = useSound();
 
   const handleSpin = useCallback(() => {
-    if (spinning || candidates.length === 0) return;
+    if (spinning || picked || candidates.length === 0) return;
     setSpinning(true);
-    setWinner(null);
 
     let speed = 80;
     let idx = 0;
@@ -33,10 +33,10 @@ export default function WildcardPicker({ candidates }: WildcardPickerProps) {
 
       if (speed > 400) {
         setSpinning(false);
+        setPicked(true);
         const selected = candidates[Math.floor(Math.random() * candidates.length)];
-        setWinner(selected);
-        // Small delay so last tick sound clears, then play win sound
         setTimeout(() => playWildcard(), 150);
+        onPick(selected.tmdbId);
         return;
       }
 
@@ -44,7 +44,7 @@ export default function WildcardPicker({ candidates }: WildcardPickerProps) {
     };
 
     tick();
-  }, [candidates, spinning, playTick, playWildcard]);
+  }, [candidates, spinning, picked, playTick, playWildcard, onPick]);
 
   if (candidates.length === 0) {
     return <p className="text-gray-400 text-center">No close matches found.</p>;
@@ -61,7 +61,7 @@ export default function WildcardPicker({ candidates }: WildcardPickerProps) {
           <motion.div
             key={c.tmdbId}
             className={`w-20 rounded-lg overflow-hidden border-2 transition-colors ${
-              spinning && displayIndex === i ? 'border-primary' : winner?.tmdbId === c.tmdbId ? 'border-accent-gold' : 'border-dark-border'
+              spinning && displayIndex === i ? 'border-primary' : 'border-dark-border'
             }`}
           >
             {c.posterPath && <img src={c.posterPath} alt={c.title} className="w-full aspect-[2/3] object-cover" />}
@@ -70,7 +70,8 @@ export default function WildcardPicker({ candidates }: WildcardPickerProps) {
         ))}
       </div>
 
-      {!winner && (
+      {/* Host: spin button */}
+      {isCreator && !picked && (
         <motion.button
           onClick={handleSpin}
           disabled={spinning}
@@ -81,22 +82,18 @@ export default function WildcardPicker({ candidates }: WildcardPickerProps) {
         </motion.button>
       )}
 
-      <AnimatePresence>
-        {winner && (
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="mt-4"
-          >
-            <Confetti />
-            <p className="text-accent-gold font-bold text-lg mb-2">The wildcard chose:</p>
-            <div className="bg-dark-card rounded-xl overflow-hidden border border-accent-gold max-w-[200px] mx-auto">
-              {winner.posterPath && <img src={winner.posterPath} alt={winner.title} className="w-full aspect-[2/3] object-cover" />}
-              <p className="p-2 font-bold">{winner.title}</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Host: picking in progress */}
+      {isCreator && picked && (
+        <p className="text-accent-gold font-semibold animate-pulse">Revealing…</p>
+      )}
+
+      {/* Guest: waiting for host */}
+      {!isCreator && (
+        <div className="flex flex-col items-center gap-3 py-2">
+          <div className="w-6 h-6 border-2 border-accent-gold border-t-transparent rounded-full animate-spin" />
+          <p className="text-gray-400 text-sm">Waiting for host to pick…</p>
+        </div>
+      )}
     </div>
   );
 }

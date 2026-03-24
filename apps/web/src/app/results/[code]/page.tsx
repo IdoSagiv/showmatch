@@ -112,7 +112,11 @@ export default function ResultsPage() {
 
         {/* No matches */}
         {noMatches && (
-          <WildcardPicker candidates={wildcardCandidates} />
+          <WildcardPicker
+            candidates={wildcardCandidates}
+            isCreator={isCreator}
+            onPick={(tmdbId) => socket.emit('wildcardPick' as any, tmdbId)}
+          />
         )}
 
         {/* Ranking phase */}
