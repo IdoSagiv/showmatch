@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useSocket } from '@/hooks/useSocket';
@@ -33,16 +33,26 @@ export default function LobbyPage() {
     }
   }, [room?.status, room?.code, router]);
 
-  // When the player navigates away (SPA or tab close) while still in the
-  // lobby, tell the server so other players see an updated list immediately.
-  // Guard: don't emit when the game starts — room.status will be 'swiping'
-  // by the time this cleanup runs (game navigation triggers before unmount).
+  // When the player navigates away (SPA) while still in the lobby, tell the
+  // server so other players see an updated list immediately.
+  //
+  // StrictMode guard: React App Router runs effects twice in development
+  // (mount → cleanup → remount). We use a ref + setTimeout(0) trick:
+  //   - On StrictMode remount, the ref is reset to false before the macrotask fires.
+  //   - On real unmount there is no remount, so the ref stays true → emit fires.
+  // Guard: game start sets room.status → 'swiping' before this cleanup runs.
+  const leavingRef = useRef(false);
   useEffect(() => {
+    leavingRef.current = false; // reset on every mount (real or StrictMode re-mount)
     return () => {
-      const { room: currentRoom } = useGameStore.getState();
-      if (currentRoom?.status === 'lobby') {
-        getSocket().emit('leaveRoom');
-      }
+      leavingRef.current = true;
+      setTimeout(() => {
+        if (!leavingRef.current) return; // StrictMode remount already reset this
+        const { room: currentRoom } = useGameStore.getState();
+        if (currentRoom?.status === 'lobby') {
+          getSocket().emit('leaveRoom');
+        }
+      }, 0);
     };
   }, []);
 
