@@ -87,7 +87,12 @@ export function useSocket() {
       store.setWildcardCandidates(candidates);
     });
 
+    socket.on('wildcardSpinStart', () => {
+      store.setWildcardSpinning(true);
+    });
+
     socket.on('wildcardResult', (winner) => {
+      store.setWildcardSpinning(false);
       store.setWinner(winner);
     });
 
@@ -130,6 +135,7 @@ export function useSocket() {
       socket.off('gameStats');
       socket.off('roomClosed');
       (socket as any).off('wildcardCandidates');
+      socket.off('wildcardSpinStart');
       socket.off('wildcardResult');
       (socket as any).off('roomReset');
       (socket as any).off('loadingProgress');
