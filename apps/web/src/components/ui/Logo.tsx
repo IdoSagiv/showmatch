@@ -11,11 +11,13 @@ import Button from './Button';
 
 interface LogoProps {
   size?: 'sm' | 'lg';
+  /** Override font size (e.g. 'clamp(3rem,10vw,6rem)') */
+  fontSize?: string;
 }
 
 const LONG_PRESS_MS = 500;
 
-export default function Logo({ size = 'sm' }: LogoProps) {
+export default function Logo({ size = 'sm', fontSize }: LogoProps) {
   const textSize = size === 'lg' ? 'text-[3.5rem] md:text-[4rem]' : 'text-2xl';
   const router = useRouter();
   const { room, reset, playerId } = useGameStore();
@@ -96,7 +98,10 @@ export default function Logo({ size = 'sm' }: LogoProps) {
         animate={{ scale: pressing ? 0.92 : 1, opacity: 1 }}
         transition={{ type: 'spring', duration: pressing ? 0.15 : 0.5, stiffness: 400, damping: 22 }}
       >
-        <span className={`font-bold ${textSize} tracking-tight`}>
+        <span
+          className={`font-bold ${fontSize ? '' : textSize} tracking-tight`}
+          style={fontSize ? { fontSize } : undefined}
+        >
           <span className="text-white">Show</span>
           <span className="gradient-text">Match</span>
         </span>
