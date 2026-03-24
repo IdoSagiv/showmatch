@@ -42,9 +42,11 @@ interface RowProps {
 function DeletableHistoryItem({ entry, onDelete }: RowProps) {
   const x = useMotionValue(0);
 
-  // Icon fades in on the side being dragged towards; other side stays hidden
-  const leftIconOpacity  = useTransform(x, [-45, -12, 0],   [1, 0.7, 0]);
-  const rightIconOpacity = useTransform(x, [0,   12, 45],   [0, 0.7, 1]);
+  // Sliding right (x>0) → card uncovers the LEFT side → icon on left
+  // Sliding left  (x<0) → card uncovers the RIGHT side → icon on right
+  // Fade starts immediately at x=0 so the icon appears as soon as dragging begins
+  const leftIconOpacity  = useTransform(x, [0,  20], [0, 1]);   // right-drag → left icon
+  const rightIconOpacity = useTransform(x, [-20, 0], [1, 0]);   // left-drag  → right icon
   const iconScale        = useTransform(x, [-55, -12, 0, 12, 55], [1.2, 1, 0.5, 1, 1.2]);
 
   const handleDragEnd = (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
