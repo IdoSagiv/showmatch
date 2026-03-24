@@ -38,7 +38,7 @@ export default function GamePage() {
   const {
     room, titlePool, currentCardIndex, mySwipes,
     matchedTitles, winner, isFirstMatch, gameOver,
-    recordSwipe, undoLastSwipe, playerId,
+    recordSwipe, undoLastSwipe, playerId, reconnecting,
   } = useGameStore();
   const { playLike, playPass, playSuperLike } = useSound();
 
@@ -55,10 +55,10 @@ export default function GamePage() {
   const [dragDirection, setDragDirection] = useState<'like' | 'pass' | 'superlike' | null>(null);
 
   useEffect(() => {
-    if (!room || !titlePool.length) {
+    if (!reconnecting && !room) {
       router.push('/');
     }
-  }, [room, titlePool, router]);
+  }, [reconnecting, room, router]);
 
   // Redirect to results
   useEffect(() => {
@@ -122,6 +122,14 @@ export default function GamePage() {
     return () => window.removeEventListener('keydown', handler);
   }, [room, titlePool, currentCardIndex, pendingDecision, playerId]);
 
+  if (reconnecting) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center space-y-3">
+        <div className="text-3xl animate-pulse">🎬</div>
+        <p className="text-gray-400 text-sm tracking-wide">Reconnecting...</p>
+      </div>
+    </div>
+  );
   if (!room || !titlePool.length) return null;
 
   const isFinished = currentCardIndex >= titlePool.length;

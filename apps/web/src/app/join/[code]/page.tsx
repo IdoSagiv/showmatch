@@ -5,6 +5,7 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
+import { saveSession } from '@/lib/session';
 import { NAME_ADJECTIVES, NAME_NOUNS } from '@/lib/constants';
 import Logo from '@/components/ui/Logo';
 
@@ -58,6 +59,7 @@ export default function JoinPage() {
         }
         setRoom(response.room);
         setPlayerId(socket.id || '');
+        saveSession({ code, displayName: name.trim() });
         router.push(`/lobby/${code}`);
       });
     };

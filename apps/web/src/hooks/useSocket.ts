@@ -4,27 +4,41 @@ import { useEffect, useRef } from 'react';
 import { connectSocket, getSocket } from '@/lib/socket';
 import { useGameStore } from '@/stores/gameStore';
 import { playSound } from '@/lib/sounds';
+import { loadSession, clearSession } from '@/lib/session';
 import type { Socket } from 'socket.io-client';
 
 export function useSocket() {
   const socketRef = useRef<Socket | null>(null);
   const store = useGameStore();
-  // Track whether this socket has connected at least once so we can
-  // distinguish a reconnect (true) from the initial connection (false).
   const everConnectedRef = useRef(false);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const socket = connectSocket();
     socketRef.current = socket;
 
-    // On every (re)connect: if we were already connected before, try to
-    // re-attach to the room.  Handles both brief disconnects and full
-    // server restarts (server responds with roomClosed if room is gone).
+    // On every (re)connect: try to re-attach to an active room.
+    // • First connect + session in sessionStorage → page refresh case
+    // • Re-connect (socket dropped) + room in Zustand → brief disconnect case
     socket.on('connect', () => {
       if (!everConnectedRef.current) {
         everConnectedRef.current = true;
-        return; // initial connect — nothing to rejoin
+        // Page-refresh case: Zustand is empty but sessionStorage may have a session
+        const session = loadSession();
+        if (session) {
+          useGameStore.getState().setReconnecting(true);
+          socket.emit('rejoinGame', { code: session.code, displayName: session.displayName });
+          // Safety net: if server never responds, stop blocking after 5s
+          reconnectTimerRef.current = setTimeout(() => {
+            if (useGameStore.getState().reconnecting) {
+              clearSession();
+              useGameStore.getState().setReconnecting(false);
+            }
+          }, 5000);
+        }
+        return;
       }
+      // Brief-disconnect case: Zustand still has the room
       const { room, playerId } = useGameStore.getState();
       if (!room) return;
       const me = room.players.find(p => p.id === playerId);
@@ -103,18 +117,51 @@ export function useSocket() {
       store.setRoom(room);
     });
 
-    (socket as any).on('gameRejoined', (room: any) => {
-      // Successfully re-attached to existing room after reconnect.
-      // Update room state; keep client-side progress (currentCardIndex) intact.
+    (socket as any).on('gameRejoined', (room: any, titlePool: any[]) => {
+      if (reconnectTimerRef.current) { clearTimeout(reconnectTimerRef.current); reconnectTimerRef.current = null; }
+      // Successfully re-attached. Restore as much state as possible.
+      const session = loadSession();
+      const me = room.players.find((p: any) =>
+        p.id === socket.id ||
+        (session && p.displayName === session.displayName)
+      );
+
       store.setRoom(room);
+      if (me) store.setPlayerId(me.id);
+
+      if (room.status === 'swiping' && titlePool?.length) {
+        // Active game: restore the title pool and resume from where this player left off
+        store.setTitlePool(titlePool);
+        store.setCurrentCardIndex(me?.progress ?? 0);
+      } else if ((room.status === 'ranking' || room.status === 'finished') && titlePool?.length) {
+        // Results screen: restore pool + end-state flags
+        store.setTitlePool(titlePool);
+        store.setGameOver(true);
+        if (room.matchedTitles?.length) store.setMatchedTitles(room.matchedTitles);
+        if (room.winner) store.setWinner(room.winner);
+      }
+
+      store.setReconnecting(false);
+
+      // Navigate to the correct page based on room status
+      if (typeof window === 'undefined') return;
+      const path = window.location.pathname;
+      if (room.status === 'swiping' && !path.includes('/game/')) {
+        window.location.href = `/game/${room.code}`;
+      } else if ((room.status === 'ranking' || room.status === 'finished') && !path.includes('/results/')) {
+        window.location.href = `/results/${room.code}`;
+      } else if (room.status === 'lobby' && me?.isCreator && !path.includes('/create')) {
+        window.location.href = '/create';
+      } else if (room.status === 'lobby' && !me?.isCreator && !path.includes(`/lobby/${room.code}`)) {
+        window.location.href = `/lobby/${room.code}`;
+      }
+      // If already on the right page, do nothing — store update is enough
     });
 
     socket.on('roomClosed', (reason) => {
-      // Don't call store.reset() here — it nullifies `room` which triggers the
-      // game page's guard effect to do a SPA navigation that races with our
-      // window.location.href below and can eat the toast from sessionStorage.
-      // A full-page reload (window.location.href) already wipes all in-memory
-      // state, so the reset is redundant anyway.
+      if (reconnectTimerRef.current) { clearTimeout(reconnectTimerRef.current); reconnectTimerRef.current = null; }
+      clearSession(); // room is gone — don't attempt rejoin on next refresh
+      store.setReconnecting(false);
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('showmatch-toast', reason);
         window.location.href = '/';
