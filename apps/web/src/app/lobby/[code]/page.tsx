@@ -127,7 +127,7 @@ export default function LobbyPage() {
             >
               {connectedCount < 2
                 ? `Waiting for players… (${connectedCount}/2)`
-                : `Start Game — ${connectedCount} players`
+                : `Start Game · ${connectedCount} players`
               }
             </Button>
           </div>

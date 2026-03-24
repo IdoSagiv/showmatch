@@ -3,7 +3,7 @@ import './globals.css';
 import PageTransitionWrapper from '@/components/ui/PageTransitionWrapper';
 
 export const metadata: Metadata = {
-  title: 'ShowMatch — Swipe. Match. Watch.',
+  title: 'ShowMatch · Swipe. Match. Watch.',
   description: 'Find something everyone wants to watch. Together.',
 };
 
