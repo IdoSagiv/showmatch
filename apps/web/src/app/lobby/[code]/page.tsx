@@ -118,7 +118,7 @@ export default function LobbyPage() {
 
         {/* Start / Waiting */}
         {isCreator ? (
-          <div className="sticky bottom-4">
+          <div className="sticky bottom-4 z-10">
             <Button
               size="lg"
               onClick={handleStartGame}
