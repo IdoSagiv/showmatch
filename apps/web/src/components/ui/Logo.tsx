@@ -35,6 +35,7 @@ export default function Logo({ size = 'sm', fontSize }: LogoProps) {
   // ── Long-press detection ──
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longFiredRef = useRef(false);   // block the click that follows a long press
+  const startPosRef = useRef<{ x: number; y: number } | null>(null);
   const [pressing, setPressing] = useState(false); // subtle visual feedback
 
   const isInGame = !!room; // confirm any time there's an active room (lobby or in-game)
@@ -47,6 +48,7 @@ export default function Logo({ size = 'sm', fontSize }: LogoProps) {
   const handlePointerDown = (e: React.PointerEvent) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     longFiredRef.current = false;
+    startPosRef.current = { x: e.clientX, y: e.clientY };
     setPressing(true);
     timerRef.current = setTimeout(() => {
       longFiredRef.current = true;
@@ -55,12 +57,19 @@ export default function Logo({ size = 'sm', fontSize }: LogoProps) {
     }, LONG_PRESS_MS);
   };
 
-  const handlePointerUp   = () => clearTimer();
-  const handlePointerLeave = () => clearTimer();
-  // Cancel if finger moves significantly (avoid accidental triggers while scrolling)
+  const handlePointerUp = () => { startPosRef.current = null; clearTimer(); };
+  // pointerleave fires unreliably on touch — only cancel for mouse
+  const handlePointerLeave = (e: React.PointerEvent) => {
+    if (e.pointerType !== 'touch') clearTimer();
+  };
+  // Cancel only if finger moves more than 10px (finger tremor at rest won't cancel)
   const handlePointerMove = (e: React.PointerEvent) => {
     if (e.pointerType !== 'touch') return;
-    clearTimer();
+    const start = startPosRef.current;
+    if (!start) return;
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    if (Math.sqrt(dx * dx + dy * dy) > 10) clearTimer();
   };
 
   const handleClick = (e: React.MouseEvent) => {
