@@ -9,7 +9,7 @@
     "dev": "concurrently \"npm run dev --workspace=apps/web\" \"npm run dev --workspace=apps/socket-server\"",
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:socket": "npm run dev --workspace=apps/socket-server",
-    "build": "npm run build --workspace=apps/socket-server && npm run build --workspace=apps/web",
+    "build": "npm run build --workspace=apps/web",
     "start": "concurrently \"npm run start --workspace=apps/web\" \"npm run start --workspace=apps/socket-server\""
   },
   "devDependencies": {
