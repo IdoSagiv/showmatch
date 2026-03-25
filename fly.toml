@@ -13,9 +13,10 @@ primary_region = "cdg"     # cdg=Paris | iad=Virginia | lax=LA | nrt=Tokyo
 [http_service]
   internal_port    = 3001
   force_https      = true
-  auto_stop_machines  = false   # keep alive — in-memory state must not reset
-  auto_start_machines = true
+  auto_stop_machines   = false   # keep alive — in-memory state must not reset
+  auto_start_machines  = true
   min_machines_running = 1
+  max_machines_running = 1      # single instance — in-memory rooms can't be split
 
   [http_service.concurrency]
     type       = "connections"
