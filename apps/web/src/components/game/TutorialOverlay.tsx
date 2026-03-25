@@ -1,71 +1,291 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Button from '@/components/ui/Button';
+import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
 
-const STEPS = [
+// ── Demo card ─────────────────────────────────────────────────────────────────
+function DemoCard({
+  cardControls,
+  frontControls,
+  backControls,
+  stampControls,
+  stamp,
+}: {
+  cardControls: ReturnType<typeof useAnimationControls>;
+  frontControls: ReturnType<typeof useAnimationControls>;
+  backControls: ReturnType<typeof useAnimationControls>;
+  stampControls: ReturnType<typeof useAnimationControls>;
+  stamp: 'like' | 'nope' | 'super' | null;
+}) {
+  const stampStyle = {
+    like:  { label: 'LIKE',       color: '#22c55e', rotate: -22 },
+    nope:  { label: 'NOPE',       color: '#e50914', rotate:  18 },
+    super: { label: 'SUPER LIKE', color: '#ffd700', rotate: -18 },
+  };
+  const s = stamp ? stampStyle[stamp] : null;
+
+  return (
+    <div className="relative flex items-center justify-center" style={{ height: 220 }}>
+      {/* The card */}
+      <motion.div
+        animate={cardControls}
+        style={{ width: 140, height: 200, borderRadius: 18, transformOrigin: 'bottom center', perspective: 1000 }}
+        className="relative cursor-pointer"
+      >
+        {/* Front face */}
+        <motion.div
+          animate={frontControls}
+          initial={{ rotateY: 0 }}
+          style={{ position: 'absolute', inset: 0, borderRadius: 18, backfaceVisibility: 'hidden' }}
+        >
+          {/* Poster gradient */}
+          <div style={{
+            position: 'absolute', inset: 0, borderRadius: 18,
+            background: 'linear-gradient(160deg, #2d1b4e 0%, #1a0a2e 40%, #0d0d1a 100%)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            overflow: 'hidden',
+          }}>
+            {/* Fake poster shimmer */}
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, height: '65%',
+              background: 'linear-gradient(135deg, rgba(109,40,217,0.6) 0%, rgba(229,9,20,0.4) 100%)',
+            }} />
+            {/* Fake title area */}
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px 12px 12px' }}>
+              <div style={{ height: 10, width: '70%', borderRadius: 5, background: 'rgba(255,255,255,0.8)', marginBottom: 6 }} />
+              <div style={{ height: 7, width: '45%', borderRadius: 4, background: 'rgba(255,255,255,0.35)' }} />
+            </div>
+            {/* Fake rating badge */}
+            <div style={{
+              position: 'absolute', top: 10, right: 10,
+              background: 'rgba(0,0,0,0.7)', borderRadius: 8, padding: '3px 7px',
+              fontSize: 10, fontWeight: 700, color: '#ffd700',
+            }}>
+              ★ 8.4
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Back face */}
+        <motion.div
+          animate={backControls}
+          initial={{ rotateY: 180 }}
+          style={{ position: 'absolute', inset: 0, borderRadius: 18, backfaceVisibility: 'hidden' }}
+        >
+          <div style={{
+            position: 'absolute', inset: 0, borderRadius: 18,
+            background: 'linear-gradient(160deg, #1a2744 0%, #0f1a2e 100%)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            padding: '14px 12px',
+          }}>
+            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', marginBottom: 8, letterSpacing: 2, textTransform: 'uppercase' }}>Details</div>
+            {[90, 65, 80, 55].map((w, i) => (
+              <div key={i} style={{ height: 6, width: `${w}%`, borderRadius: 3, background: 'rgba(255,255,255,0.15)', marginBottom: 7 }} />
+            ))}
+            <div style={{ marginTop: 12, display: 'flex', gap: 6 }}>
+              {['Drama', 'Thriller'].map(g => (
+                <div key={g} style={{ fontSize: 9, padding: '2px 7px', borderRadius: 20, background: 'rgba(229,9,20,0.2)', border: '1px solid rgba(229,9,20,0.4)', color: '#ff6b6b' }}>{g}</div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Stamp overlay */}
+        {s && (
+          <motion.div
+            animate={stampControls}
+            initial={{ opacity: 0, scale: 0.6 }}
+            style={{
+              position: 'absolute', inset: 0, borderRadius: 18, zIndex: 10,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <div style={{
+              border: `3px solid ${s.color}`,
+              borderRadius: 8,
+              padding: '4px 10px',
+              transform: `rotate(${s.rotate}deg)`,
+              color: s.color,
+              fontSize: 16,
+              fontWeight: 900,
+              letterSpacing: '0.15em',
+              textShadow: `0 0 20px ${s.color}88`,
+              boxShadow: `0 0 20px ${s.color}44`,
+            }}>
+              {s.label}
+            </div>
+          </motion.div>
+        )}
+      </motion.div>
+
+      {/* Arrow hint */}
+      {stamp === 'like' && (
+        <motion.div
+          animate={{ x: [0, 12, 0], opacity: [0.4, 1, 0.4] }}
+          transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
+          style={{ position: 'absolute', right: 24, fontSize: 22, top: '50%', transform: 'translateY(-50%)' }}
+        >→</motion.div>
+      )}
+      {stamp === 'nope' && (
+        <motion.div
+          animate={{ x: [0, -12, 0], opacity: [0.4, 1, 0.4] }}
+          transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
+          style={{ position: 'absolute', left: 24, fontSize: 22, top: '50%', transform: 'translateY(-50%)' }}
+        >←</motion.div>
+      )}
+      {stamp === 'super' && (
+        <motion.div
+          animate={{ y: [0, -10, 0], opacity: [0.4, 1, 0.4] }}
+          transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
+          style={{ position: 'absolute', top: 4, fontSize: 18 }}
+        >↑</motion.div>
+      )}
+    </div>
+  );
+}
+
+// ── Steps ─────────────────────────────────────────────────────────────────────
+interface Step {
+  title: string;
+  description: string;
+  stamp: 'like' | 'nope' | 'super' | null;
+  runAnimation: (
+    cardCtrl: ReturnType<typeof useAnimationControls>,
+    frontCtrl: ReturnType<typeof useAnimationControls>,
+    backCtrl: ReturnType<typeof useAnimationControls>,
+    stampCtrl: ReturnType<typeof useAnimationControls>,
+  ) => Promise<void>;
+}
+
+const STEPS: Step[] = [
   {
-    icon: '👉',
-    title: 'Swipe Right',
-    description: 'Swipe right if you want to watch this',
-    animation: { x: [0, 80, 0] },
+    title: 'Swipe Right to Like',
+    description: "Like what you see? Swipe right. When everyone agrees — it's a match.",
+    stamp: 'like',
+    runAnimation: async (card, _f, _b, stamp) => {
+      await card.start({ x: 0, rotate: 0, opacity: 1, transition: { duration: 0 } });
+      await stamp.start({ opacity: 0, scale: 0.6, transition: { duration: 0 } });
+      await new Promise(r => setTimeout(r, 400));
+      await Promise.all([
+        card.start({ x: 60, rotate: 12, transition: { duration: 0.25, ease: 'easeIn' } }),
+        stamp.start({ opacity: 1, scale: 1, transition: { duration: 0.2 } }),
+      ]);
+      await card.start({ x: 260, rotate: 25, opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } });
+      await new Promise(r => setTimeout(r, 300));
+      await card.start({ x: 0, rotate: 0, opacity: 1, transition: { duration: 0 } });
+      await stamp.start({ opacity: 0, transition: { duration: 0.15 } });
+      await new Promise(r => setTimeout(r, 800));
+    },
   },
   {
-    icon: '👈',
-    title: 'Swipe Left',
-    description: 'Swipe left to skip',
-    animation: { x: [0, -80, 0] },
+    title: 'Swipe Left to Pass',
+    description: "Not feeling it? Swipe left to skip. Tap the undo button to take it back.",
+    stamp: 'nope',
+    runAnimation: async (card, _f, _b, stamp) => {
+      await card.start({ x: 0, rotate: 0, opacity: 1, transition: { duration: 0 } });
+      await stamp.start({ opacity: 0, scale: 0.6, transition: { duration: 0 } });
+      await new Promise(r => setTimeout(r, 400));
+      await Promise.all([
+        card.start({ x: -60, rotate: -12, transition: { duration: 0.25, ease: 'easeIn' } }),
+        stamp.start({ opacity: 1, scale: 1, transition: { duration: 0.2 } }),
+      ]);
+      await card.start({ x: -260, rotate: -25, opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } });
+      await new Promise(r => setTimeout(r, 300));
+      await card.start({ x: 0, rotate: 0, opacity: 1, transition: { duration: 0 } });
+      await stamp.start({ opacity: 0, transition: { duration: 0.15 } });
+      await new Promise(r => setTimeout(r, 800));
+    },
   },
   {
-    icon: '👆',
-    title: 'Tap to Flip',
-    description: 'Tap the card to see full details, cast, and trailer',
-    animation: { scale: [1, 0.95, 1] },
+    title: 'Tap to See Details',
+    description: 'Tap the card to flip it. See the full description, cast, and streaming info.',
+    stamp: null,
+    runAnimation: async (card, front, back, _stamp) => {
+      await front.start({ rotateY: 0, transition: { duration: 0 } });
+      await back.start({ rotateY: 180, transition: { duration: 0 } });
+      await new Promise(r => setTimeout(r, 500));
+      await front.start({ rotateY: -90, transition: { duration: 0.2, ease: 'easeIn' } });
+      await back.start({ rotateY: 90, transition: { duration: 0 } });
+      await back.start({ rotateY: 0, transition: { duration: 0.2, ease: 'easeOut' } });
+      await new Promise(r => setTimeout(r, 1200));
+      await back.start({ rotateY: 90, transition: { duration: 0.2, ease: 'easeIn' } });
+      await front.start({ rotateY: -90, transition: { duration: 0 } });
+      await front.start({ rotateY: 0, transition: { duration: 0.2, ease: 'easeOut' } });
+      await new Promise(r => setTimeout(r, 600));
+    },
   },
   {
-    icon: '⭐',
     title: 'Super Like',
-    description: 'Use your Super Like to guarantee a pick makes the final round!',
-    animation: { y: [0, -20, 0], scale: [1, 1.2, 1] },
+    description: 'One per game. Guarantees this title makes the final round — use it wisely.',
+    stamp: 'super',
+    runAnimation: async (card, _f, _b, stamp) => {
+      await card.start({ y: 0, opacity: 1, scale: 1, transition: { duration: 0 } });
+      await stamp.start({ opacity: 0, scale: 0.6, transition: { duration: 0 } });
+      await new Promise(r => setTimeout(r, 400));
+      await Promise.all([
+        card.start({ y: -30, scale: 1.05, transition: { duration: 0.2, ease: 'easeOut' } }),
+        stamp.start({ opacity: 1, scale: 1, transition: { duration: 0.2 } }),
+      ]);
+      await card.start({ y: -260, opacity: 0, transition: { duration: 0.35, ease: 'easeIn' } });
+      await new Promise(r => setTimeout(r, 300));
+      await card.start({ y: 0, opacity: 1, scale: 1, transition: { duration: 0 } });
+      await stamp.start({ opacity: 0, transition: { duration: 0.15 } });
+      await new Promise(r => setTimeout(r, 800));
+    },
   },
 ];
 
+// ── Main component ─────────────────────────────────────────────────────────────
 interface TutorialOverlayProps {
   onDismiss: () => void;
-  /** Set to true to force-show the tutorial (e.g. replay button). */
   forceShow?: boolean;
 }
 
 export default function TutorialOverlay({ onDismiss, forceShow }: TutorialOverlayProps) {
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
+  const [running, setRunning] = useState(false);
 
-  // Show on first visit
+  const cardCtrl  = useAnimationControls();
+  const frontCtrl = useAnimationControls();
+  const backCtrl  = useAnimationControls();
+  const stampCtrl = useAnimationControls();
+
   useEffect(() => {
-    const seen = localStorage.getItem('showmatch-tutorial-seen');
-    if (!seen) {
-      setVisible(true);
-    }
+    if (!localStorage.getItem('showmatch-tutorial-seen')) setVisible(true);
   }, []);
 
-  // Re-show when parent requests replay
   useEffect(() => {
-    if (forceShow) {
-      setStep(0);
-      setVisible(true);
-    }
+    if (forceShow) { setStep(0); setVisible(true); }
   }, [forceShow]);
 
-  const handleNext = () => {
+  // Loop animation for current step
+  const loopRef = { current: true };
+  useEffect(() => {
+    if (!visible) return;
+    loopRef.current = true;
+    let cancelled = false;
+
+    const loop = async () => {
+      while (!cancelled) {
+        await STEPS[step].runAnimation(cardCtrl, frontCtrl, backCtrl, stampCtrl);
+        if (cancelled) break;
+      }
+    };
+    loop();
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, visible]);
+
+  const handleNext = useCallback(() => {
     if (step >= STEPS.length - 1) {
       localStorage.setItem('showmatch-tutorial-seen', 'true');
       setVisible(false);
       onDismiss();
     } else {
-      setStep(step + 1);
+      setStep(s => s + 1);
     }
-  };
+  }, [step, onDismiss]);
 
   if (!visible) return null;
 
@@ -74,41 +294,82 @@ export default function TutorialOverlay({ onDismiss, forceShow }: TutorialOverla
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6"
+        className="fixed inset-0 z-50 flex items-center justify-center p-5"
+        style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        onClick={handleNext}
       >
         <motion.div
-          key={step}
-          className="text-center max-w-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
+          className="w-full max-w-xs rounded-3xl overflow-hidden"
+          style={{ background: 'rgba(10,9,25,0.95)', border: '1px solid rgba(255,255,255,0.08)' }}
+          initial={{ scale: 0.92, opacity: 0, y: 24 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+          onClick={e => e.stopPropagation()}
         >
-          <motion.div
-            className="text-7xl mb-6"
-            animate={current.animation}
-            transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-          >
-            {current.icon}
-          </motion.div>
-
-          <h3 className="text-2xl font-bold mb-3">{current.title}</h3>
-          <p className="text-gray-400 mb-8">{current.description}</p>
-
-          <div className="flex justify-center gap-2 mb-6">
-            {STEPS.map((_, i) => (
-              <div
-                key={i}
-                className={`w-2 h-2 rounded-full ${i === step ? 'bg-primary' : 'bg-dark-border'}`}
-              />
-            ))}
+          {/* Demo area */}
+          <div className="relative px-6 pt-8 pb-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <DemoCard
+                  cardControls={cardCtrl}
+                  frontControls={frontCtrl}
+                  backControls={backCtrl}
+                  stampControls={stampCtrl}
+                  stamp={current.stamp}
+                />
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-          <Button onClick={handleNext} size="lg" className="min-w-[160px]">
-            {step >= STEPS.length - 1 ? 'Got it!' : 'Next'}
-          </Button>
+          {/* Text area */}
+          <div className="px-6 pb-7 pt-3">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.22 }}
+              >
+                <h3 className="text-white font-black text-xl mb-2 leading-tight">{current.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{current.description}</p>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Progress dots */}
+            <div className="flex gap-1.5 mt-5 mb-5">
+              {STEPS.map((_, i) => (
+                <motion.div
+                  key={i}
+                  animate={{ width: i === step ? 20 : 6, background: i === step ? '#e50914' : 'rgba(255,255,255,0.2)' }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+                  style={{ height: 6, borderRadius: 3 }}
+                />
+              ))}
+            </div>
+
+            {/* Button */}
+            <motion.button
+              onClick={handleNext}
+              className="w-full py-3.5 rounded-2xl font-black text-sm text-white tracking-wide"
+              style={{
+                background: 'linear-gradient(135deg, #e50914 0%, #ff4b2b 60%, #ff6b35 100%)',
+                boxShadow: '0 4px 20px rgba(229,9,20,0.4)',
+              }}
+              whileTap={{ scale: 0.96 }}
+            >
+              {step >= STEPS.length - 1 ? 'Got it!' : 'Next →'}
+            </motion.button>
+          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>
