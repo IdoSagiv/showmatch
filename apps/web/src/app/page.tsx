@@ -82,47 +82,44 @@ export default function Home() {
               </p>
             </div>
 
-            {/* How it works — compact row on mobile, full cards on desktop */}
-            <motion.div
-              className="w-full mb-7 lg:mb-10"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, type: 'spring', stiffness: 220, damping: 26 }}
-            >
-              {/* Mobile: 3 compact horizontal tiles */}
-              <div className="flex gap-2 lg:hidden">
-                {STEPS.map((step) => (
-                  <div
-                    key={step.label}
-                    className="flex-1 flex flex-col items-center gap-1.5 px-2 py-3 rounded-2xl text-center"
-                    style={{ background: 'rgba(8,8,15,0.88)', border: '1px solid rgba(255,255,255,0.055)', backdropFilter: 'blur(12px)' }}
-                  >
-                    <span className="text-xl">{step.emoji}</span>
-                    <p className="text-white text-[11px] font-bold leading-tight">{step.label}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Desktop: full description cards */}
-              <div className="hidden lg:flex flex-col gap-3">
-                {STEPS.map((step, i) => (
+            {/* How it works — unified step cards with staggered slide-in */}
+            <div className="w-full mb-7 lg:mb-10 flex flex-col gap-2.5">
+              {STEPS.map((step, i) => (
+                <motion.div
+                  key={step.label}
+                  className="flex items-center gap-3 px-4 py-3.5 lg:px-5 lg:py-4 rounded-2xl relative overflow-hidden"
+                  style={{ background: 'rgba(8,8,15,0.88)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)' }}
+                  initial={{ opacity: 0, x: -40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + i * 0.12, type: 'spring', stiffness: 280, damping: 26 }}
+                  whileHover={{ x: 4, borderColor: 'rgba(229,9,20,0.25)' }}
+                >
+                  {/* Subtle left accent bar */}
                   <motion.div
-                    key={step.label}
-                    className="flex items-start gap-4 px-5 py-4 rounded-2xl"
-                    style={{ background: 'rgba(8,8,15,0.88)', border: '1px solid rgba(255,255,255,0.055)', backdropFilter: 'blur(12px)' }}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 + i * 0.1, type: 'spring', stiffness: 240, damping: 26 }}
-                  >
-                    <span className="text-2xl leading-none mt-0.5 shrink-0">{step.emoji}</span>
-                    <div>
-                      <p className="text-white font-bold text-sm leading-snug">{step.label}</p>
-                      <p className="text-gray-300 text-xs mt-1 leading-relaxed">{step.desc}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+                    className="absolute left-0 top-0 bottom-0 w-[3px] rounded-full"
+                    style={{ background: 'linear-gradient(to bottom, #e50914, #ff6b35)' }}
+                    initial={{ scaleY: 0 }}
+                    animate={{ scaleY: 1 }}
+                    transition={{ delay: 0.2 + i * 0.12, duration: 0.4, ease: 'easeOut' }}
+                  />
+
+                  {/* Step number */}
+                  <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black text-primary"
+                    style={{ background: 'rgba(229,9,20,0.15)', border: '1px solid rgba(229,9,20,0.35)' }}>
+                    {i + 1}
+                  </div>
+
+                  {/* Emoji */}
+                  <span className="text-xl lg:text-2xl shrink-0">{step.emoji}</span>
+
+                  {/* Text */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-bold text-sm leading-snug">{step.label}</p>
+                    <p className="text-gray-400 text-[11px] lg:text-xs mt-0.5 leading-relaxed">{step.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
 
             {/* Action buttons */}
             <motion.div
