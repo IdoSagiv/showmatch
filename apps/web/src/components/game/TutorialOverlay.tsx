@@ -203,26 +203,8 @@ const STEPS: Step[] = [
     },
   },
   {
-    title: 'Tap to See Details',
-    description: 'Tap the card to flip it. See the full description, cast, and streaming info.',
-    stamp: null,
-    runAnimation: async (card, front, back, _stamp) => {
-      await front.start({ rotateY: 0, transition: { duration: 0 } });
-      await back.start({ rotateY: 180, transition: { duration: 0 } });
-      await new Promise(r => setTimeout(r, 500));
-      await front.start({ rotateY: -90, transition: { duration: 0.2, ease: 'easeIn' } });
-      await back.start({ rotateY: 90, transition: { duration: 0 } });
-      await back.start({ rotateY: 0, transition: { duration: 0.2, ease: 'easeOut' } });
-      await new Promise(r => setTimeout(r, 1200));
-      await back.start({ rotateY: 90, transition: { duration: 0.2, ease: 'easeIn' } });
-      await front.start({ rotateY: -90, transition: { duration: 0 } });
-      await front.start({ rotateY: 0, transition: { duration: 0.2, ease: 'easeOut' } });
-      await new Promise(r => setTimeout(r, 600));
-    },
-  },
-  {
     title: 'Super Like',
-    description: 'One per game. Guarantees this title makes the final round — use it wisely.',
+    description: 'One per game. Guarantees this title makes the final round. Use it wisely.',
     stamp: 'super',
     runAnimation: async (card, _f, _b, stamp) => {
       await card.start({ y: 0, scale: 1, transition: { duration: 0 } });
@@ -242,6 +224,24 @@ const STEPS: Step[] = [
       await new Promise(r => setTimeout(r, 600));
     },
   },
+  {
+    title: 'Tap to See Details',
+    description: 'Tap the card to flip it. See the full description, cast, and streaming info.',
+    stamp: null,
+    runAnimation: async (card, front, back, _stamp) => {
+      await front.start({ rotateY: 0, transition: { duration: 0 } });
+      await back.start({ rotateY: 180, transition: { duration: 0 } });
+      await new Promise(r => setTimeout(r, 500));
+      await front.start({ rotateY: -90, transition: { duration: 0.2, ease: 'easeIn' } });
+      await back.start({ rotateY: 90, transition: { duration: 0 } });
+      await back.start({ rotateY: 0, transition: { duration: 0.2, ease: 'easeOut' } });
+      await new Promise(r => setTimeout(r, 1200));
+      await back.start({ rotateY: 90, transition: { duration: 0.2, ease: 'easeIn' } });
+      await front.start({ rotateY: -90, transition: { duration: 0 } });
+      await front.start({ rotateY: 0, transition: { duration: 0.2, ease: 'easeOut' } });
+      await new Promise(r => setTimeout(r, 600));
+    },
+  },
 ];
 
 // ── Main component ─────────────────────────────────────────────────────────────
@@ -253,6 +253,7 @@ interface TutorialOverlayProps {
 export default function TutorialOverlay({ onDismiss, forceShow }: TutorialOverlayProps) {
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
+  const [direction, setDirection] = useState<1 | -1>(1); // 1 = forward, -1 = back
   const [running, setRunning] = useState(false);
 
   const cardCtrl  = useAnimationControls();
@@ -292,9 +293,23 @@ export default function TutorialOverlay({ onDismiss, forceShow }: TutorialOverla
       setVisible(false);
       onDismiss();
     } else {
+      setDirection(1);
       setStep(s => s + 1);
     }
   }, [step, onDismiss]);
+
+  const handleBack = useCallback(() => {
+    if (step > 0) {
+      setDirection(-1);
+      setStep(s => s - 1);
+    }
+  }, [step]);
+
+  const handleSkip = useCallback(() => {
+    localStorage.setItem('showmatch-tutorial-seen', 'true');
+    setVisible(false);
+    onDismiss();
+  }, [onDismiss]);
 
   if (!visible) return null;
 
@@ -311,21 +326,36 @@ export default function TutorialOverlay({ onDismiss, forceShow }: TutorialOverla
         onClick={handleNext}
       >
         <motion.div
-          className="w-full max-w-xs rounded-3xl overflow-hidden"
+          className="relative w-full max-w-xs rounded-3xl overflow-hidden"
           style={{ background: 'rgba(10,9,25,0.95)', border: '1px solid rgba(255,255,255,0.08)' }}
           initial={{ scale: 0.92, opacity: 0, y: 24 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 28 }}
           onClick={e => e.stopPropagation()}
         >
+          {/* Skip button */}
+          <button
+            onClick={handleSkip}
+            style={{
+              position: 'absolute', top: 14, right: 16, zIndex: 10,
+              background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 20, width: 28, height: 28,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'rgba(255,255,255,0.45)', fontSize: 14, cursor: 'pointer', lineHeight: 1,
+            }}
+            aria-label="Skip tutorial"
+          >
+            ✕
+          </button>
+
           {/* Demo area */}
           <div className="relative px-6 pt-8 pb-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 20 * direction }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                exit={{ opacity: 0, x: -20 * direction }}
                 transition={{ duration: 0.2 }}
               >
                 <DemoCard
@@ -344,9 +374,9 @@ export default function TutorialOverlay({ onDismiss, forceShow }: TutorialOverla
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, x: 16 * direction }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -16 * direction }}
                 transition={{ duration: 0.22 }}
               >
                 <h3 className="text-white font-black text-xl mb-2 leading-tight">{current.title}</h3>
@@ -366,18 +396,36 @@ export default function TutorialOverlay({ onDismiss, forceShow }: TutorialOverla
               ))}
             </div>
 
-            {/* Button */}
-            <motion.button
-              onClick={handleNext}
-              className="w-full py-3.5 rounded-2xl font-black text-sm text-white tracking-wide"
-              style={{
-                background: 'linear-gradient(135deg, #e50914 0%, #ff4b2b 60%, #ff6b35 100%)',
-                boxShadow: '0 4px 20px rgba(229,9,20,0.4)',
-              }}
-              whileTap={{ scale: 0.96 }}
-            >
-              {step >= STEPS.length - 1 ? 'Got it!' : 'Next →'}
-            </motion.button>
+            {/* Buttons */}
+            <div style={{ display: 'flex', gap: 10 }}>
+              {step > 0 && (
+                <motion.button
+                  onClick={handleBack}
+                  className="py-3.5 rounded-2xl font-black text-sm tracking-wide"
+                  style={{
+                    width: 52, flexShrink: 0,
+                    background: 'rgba(255,255,255,0.07)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    color: 'rgba(255,255,255,0.6)',
+                  }}
+                  whileTap={{ scale: 0.96 }}
+                  aria-label="Previous step"
+                >
+                  ←
+                </motion.button>
+              )}
+              <motion.button
+                onClick={handleNext}
+                className="flex-1 py-3.5 rounded-2xl font-black text-sm text-white tracking-wide"
+                style={{
+                  background: 'linear-gradient(135deg, #e50914 0%, #ff4b2b 60%, #ff6b35 100%)',
+                  boxShadow: '0 4px 20px rgba(229,9,20,0.4)',
+                }}
+                whileTap={{ scale: 0.96 }}
+              >
+                {step >= STEPS.length - 1 ? 'Got it!' : 'Next →'}
+              </motion.button>
+            </div>
           </div>
         </motion.div>
       </motion.div>
