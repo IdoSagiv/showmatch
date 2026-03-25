@@ -44,18 +44,21 @@ export default function Home() {
         <motion.div
           className="absolute -top-32 left-1/3 w-[700px] h-[500px] rounded-full"
           style={{ background: 'radial-gradient(ellipse, rgba(229,9,20,0.26) 0%, transparent 65%)' }}
+          initial={{ opacity: 0.7, scale: 1 }}
           animate={{ scale: [1, 1.12, 1], opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
           className="absolute bottom-0 -right-32 w-[600px] h-[600px] rounded-full"
           style={{ background: 'radial-gradient(ellipse, rgba(109,40,217,0.18) 0%, transparent 65%)' }}
+          initial={{ opacity: 0.4, scale: 1.1 }}
           animate={{ scale: [1.1, 1, 1.1], opacity: [0.4, 0.7, 0.4] }}
           transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
         />
         <motion.div
           className="absolute top-1/3 -left-24 w-[400px] h-[400px] rounded-full"
           style={{ background: 'radial-gradient(ellipse, rgba(255,107,53,0.32) 0%, transparent 65%)' }}
+          initial={{ opacity: 0.3, scale: 1 }}
           animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
         />
@@ -70,8 +73,8 @@ export default function Home() {
         <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 lg:pl-20 lg:pr-10">
           <motion.div
             className="w-full max-w-sm lg:max-w-md"
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ y: 28 }}
+            animate={{ y: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 24 }}
           >
             {/* Logo */}
@@ -89,9 +92,9 @@ export default function Home() {
                   key={step.label}
                   className="flex items-center gap-3 px-4 py-3.5 lg:px-5 lg:py-4 rounded-2xl relative overflow-hidden"
                   style={{ background: 'rgba(8,8,15,0.88)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)' }}
-                  initial={{ opacity: 0, x: -40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 + i * 0.12, type: 'spring', stiffness: 280, damping: 26 }}
+                  initial={{ x: -40 }}
+                  animate={{ x: 0 }}
+                  transition={{ delay: 0.05 + i * 0.08, type: 'spring', stiffness: 280, damping: 26 }}
                   whileHover={{ x: 4, borderColor: 'rgba(229,9,20,0.25)' }}
                 >
                   {/* Subtle left accent bar */}
@@ -124,9 +127,9 @@ export default function Home() {
             {/* Action buttons */}
             <motion.div
               className="flex flex-col gap-3"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.18, type: 'spring', stiffness: 240, damping: 24 }}
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
+              transition={{ delay: 0.1, type: 'spring', stiffness: 240, damping: 24 }}
             >
               <CreateGameButton />
 
@@ -141,9 +144,9 @@ export default function Home() {
 
             <motion.div
               className="mt-5 flex justify-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.42 }}
+              initial={{ y: 10 }}
+              animate={{ y: 0 }}
+              transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 26 }}
             >
               <GameHistoryButton />
             </motion.div>
