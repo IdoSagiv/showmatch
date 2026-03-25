@@ -13,6 +13,11 @@ import type { TitleCard } from '@/types/game';
 import CardOverlay from './CardOverlay';
 import StreamingLogos from './StreamingLogos';
 
+/** "16" → "16+"  |  "PG-13" → "PG-13"  |  "R" → "R" */
+function formatContentRating(rating: string): string {
+  return /^\d+$/.test(rating) ? `${rating}+` : rating;
+}
+
 interface SwipeCardProps {
   card: TitleCard;
   onSwipe: (decision: 'like' | 'pass' | 'superlike') => void;
@@ -274,7 +279,7 @@ export default function SwipeCard({
               </span>
               {card.contentRating && (
                 <span className="text-[10px] font-bold text-white/75 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full">
-                  {card.contentRating}
+                  {formatContentRating(card.contentRating)}
                 </span>
               )}
             </div>
@@ -377,7 +382,7 @@ export default function SwipeCard({
 
               {card.contentRating && (
                 <span className="inline-block px-2.5 py-1 bg-white/8 border border-white/10 rounded-lg text-xs font-bold text-white/70">
-                  {card.contentRating}
+                  {formatContentRating(card.contentRating)}
                 </span>
               )}
 
