@@ -48,23 +48,38 @@ export default function SwipeCard({
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-250, 0, 250], [-18, 0, 18]);
-  const likeOpacity      = useTransform(x, [20, 120], [0, 1]);
-  const nopeOpacity      = useTransform(x, [-120, -20], [1, 0]);
-  const superLikeOpacity = useTransform(y, [-120, -20], [1, 0]);
+  // Super-zone: dragging primarily upward (|y| > |x| and y < 0).
+  // Only one badge shows at a time — super-zone takes priority over left/right.
+  const superZone = (xv: number, yv: number) => yv < -20 && Math.abs(yv) > Math.abs(xv);
+
+  const likeOpacity = useTransform(
+    [x, y] as any,
+    ([xv, yv]: number[]) => superZone(xv, yv) ? 0 : Math.max(0, Math.min(1, (xv - 20) / 100)),
+  );
+  const nopeOpacity = useTransform(
+    [x, y] as any,
+    ([xv, yv]: number[]) => superZone(xv, yv) ? 0 : Math.max(0, Math.min(1, (-xv - 20) / 100)),
+  );
+  const superLikeOpacity = useTransform(
+    [x, y] as any,
+    ([xv, yv]: number[]) => superZone(xv, yv) ? Math.max(0, Math.min(1, (-yv - 20) / 100)) : 0,
+  );
   const decisionRef = useRef<'like' | 'pass' | 'superlike'>('pass');
 
   useMotionValueEvent(x, 'change', (latest) => {
     if (!isTop || exiting || !onDragProgress) return;
+    const yv = y.get();
+    if (superZone(latest, yv)) { onDragProgress('superlike'); return; }
     if (latest > 30) onDragProgress('like');
     else if (latest < -30) onDragProgress('pass');
-    else if (y.get() < -30) onDragProgress('superlike');
     else onDragProgress(null);
   });
   useMotionValueEvent(y, 'change', (latest) => {
     if (!isTop || exiting || !onDragProgress) return;
-    if (latest < -30 && Math.abs(x.get()) < 30) onDragProgress('superlike');
-    else if (x.get() > 30) onDragProgress('like');
-    else if (x.get() < -30) onDragProgress('pass');
+    const xv = x.get();
+    if (superZone(xv, latest)) { onDragProgress('superlike'); return; }
+    if (xv > 30) onDragProgress('like');
+    else if (xv < -30) onDragProgress('pass');
     else onDragProgress(null);
   });
 
