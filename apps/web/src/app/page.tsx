@@ -44,22 +44,19 @@ export default function Home() {
         <motion.div
           className="absolute -top-32 left-1/3 w-[700px] h-[500px] rounded-full"
           style={{ background: 'radial-gradient(ellipse, rgba(229,9,20,0.26) 0%, transparent 65%)' }}
-          initial={{ opacity: 0.7, scale: 1 }}
-          animate={{ scale: [1, 1.12, 1], opacity: [0.7, 1, 0.7] }}
+          animate={{ scale: [1, 1.12, 1] }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
           className="absolute bottom-0 -right-32 w-[600px] h-[600px] rounded-full"
           style={{ background: 'radial-gradient(ellipse, rgba(109,40,217,0.18) 0%, transparent 65%)' }}
-          initial={{ opacity: 0.4, scale: 1.1 }}
-          animate={{ scale: [1.1, 1, 1.1], opacity: [0.4, 0.7, 0.4] }}
+          animate={{ scale: [1.1, 1, 1.1] }}
           transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
         />
         <motion.div
           className="absolute top-1/3 -left-24 w-[400px] h-[400px] rounded-full"
           style={{ background: 'radial-gradient(ellipse, rgba(255,107,53,0.32) 0%, transparent 65%)' }}
-          initial={{ opacity: 0.3, scale: 1 }}
-          animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
+          animate={{ scale: [1, 1.15, 1] }}
           transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
         />
       </div>
@@ -91,11 +88,10 @@ export default function Home() {
                 <motion.div
                   key={step.label}
                   className="flex items-center gap-3 px-4 py-3.5 lg:px-5 lg:py-4 rounded-2xl relative overflow-hidden"
-                  style={{ background: 'rgba(8,8,15,0.88)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)' }}
+                  style={{ background: 'rgba(8,8,15,0.92)', border: '1px solid rgba(255,255,255,0.07)' }}
                   initial={{ x: -40 }}
                   animate={{ x: 0 }}
                   transition={{ delay: 0.05 + i * 0.08, type: 'spring', stiffness: 280, damping: 26 }}
-                  whileHover={{ x: 4, borderColor: 'rgba(229,9,20,0.25)' }}
                 >
                   {/* Subtle left accent bar */}
                   <motion.div
