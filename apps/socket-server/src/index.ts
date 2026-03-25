@@ -10,8 +10,11 @@ import { registerRankingHandlers } from './handlers/rankingHandler';
 dotenv.config();
 
 const app = express();
-// Allow any origin — this app runs on a private LAN / Tailscale VPN
+// Allow any origin — LAN / cloud deployment
 app.use(cors({ origin: true }));
+
+// Health check for Fly.io / load balancers
+app.get('/health', (_req, res) => res.json({ ok: true }));
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {

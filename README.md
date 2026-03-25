@@ -183,6 +183,46 @@ showmatch/
 
 ---
 
+## Cloud Deployment (free)
+
+Frontend → **Vercel** · Socket server → **Fly.io**
+
+### Socket server — Fly.io
+
+```bash
+# Install Fly CLI (once)
+curl -L https://fly.io/install.sh | sh
+
+# From repo root:
+fly launch --no-deploy        # creates app, sets name in fly.toml
+fly secrets set \
+  TMDB_READ_ACCESS_TOKEN=eyJ... \
+  OMDB_API_KEY=abc12345
+fly deploy                    # builds Docker image + deploys
+```
+
+Once deployed, your socket URL will be `https://<app-name>.fly.dev`.
+
+> `auto_stop_machines = false` in `fly.toml` keeps the machine always-on (in-memory rooms can't survive restarts). Fly's free tier covers 1 shared VM.
+
+### Frontend — Vercel
+
+1. Import the GitHub repo at [vercel.com/new](https://vercel.com/new)
+2. Set **Root Directory** → `apps/web`
+3. Add environment variables:
+
+| Variable | Value |
+|---|---|
+| `NEXT_PUBLIC_SOCKET_URL` | `https://<your-fly-app>.fly.dev` |
+| `TMDB_READ_ACCESS_TOKEN` | your TMDB JWT |
+| `OMDB_API_KEY` | your OMDB key |
+
+4. Deploy — every push to `main` auto-deploys.
+
+> If you later change the Fly.io URL, update `NEXT_PUBLIC_SOCKET_URL` in Vercel and redeploy.
+
+---
+
 ## License
 
 MIT
