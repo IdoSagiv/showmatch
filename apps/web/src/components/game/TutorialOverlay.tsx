@@ -163,18 +163,21 @@ const STEPS: Step[] = [
     description: "Like what you see? Swipe right. When everyone agrees — it's a match.",
     stamp: 'like',
     runAnimation: async (card, _f, _b, stamp) => {
-      await card.start({ x: 0, rotate: 0, opacity: 1, transition: { duration: 0 } });
+      await card.start({ x: 0, rotate: 0, transition: { duration: 0 } });
       await stamp.start({ opacity: 0, scale: 0.6, transition: { duration: 0 } });
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 500));
+      // Slide right — stamp appears, but card stays visible
       await Promise.all([
-        card.start({ x: 60, rotate: 12, transition: { duration: 0.25, ease: 'easeIn' } }),
+        card.start({ x: 90, rotate: 14, transition: { type: 'spring', stiffness: 200, damping: 20 } }),
         stamp.start({ opacity: 1, scale: 1, transition: { duration: 0.2 } }),
       ]);
-      await card.start({ x: 260, rotate: 25, opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } });
-      await new Promise(r => setTimeout(r, 300));
-      await card.start({ x: 0, rotate: 0, opacity: 1, transition: { duration: 0 } });
-      await stamp.start({ opacity: 0, transition: { duration: 0.15 } });
-      await new Promise(r => setTimeout(r, 800));
+      await new Promise(r => setTimeout(r, 700));
+      // Spring back
+      await Promise.all([
+        card.start({ x: 0, rotate: 0, transition: { type: 'spring', stiffness: 300, damping: 22 } }),
+        stamp.start({ opacity: 0, transition: { duration: 0.2 } }),
+      ]);
+      await new Promise(r => setTimeout(r, 600));
     },
   },
   {
@@ -182,18 +185,21 @@ const STEPS: Step[] = [
     description: "Not feeling it? Swipe left to skip. Tap the undo button to take it back.",
     stamp: 'nope',
     runAnimation: async (card, _f, _b, stamp) => {
-      await card.start({ x: 0, rotate: 0, opacity: 1, transition: { duration: 0 } });
+      await card.start({ x: 0, rotate: 0, transition: { duration: 0 } });
       await stamp.start({ opacity: 0, scale: 0.6, transition: { duration: 0 } });
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 500));
+      // Slide left — stamp appears, card stays visible
       await Promise.all([
-        card.start({ x: -60, rotate: -12, transition: { duration: 0.25, ease: 'easeIn' } }),
+        card.start({ x: -90, rotate: -14, transition: { type: 'spring', stiffness: 200, damping: 20 } }),
         stamp.start({ opacity: 1, scale: 1, transition: { duration: 0.2 } }),
       ]);
-      await card.start({ x: -260, rotate: -25, opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } });
-      await new Promise(r => setTimeout(r, 300));
-      await card.start({ x: 0, rotate: 0, opacity: 1, transition: { duration: 0 } });
-      await stamp.start({ opacity: 0, transition: { duration: 0.15 } });
-      await new Promise(r => setTimeout(r, 800));
+      await new Promise(r => setTimeout(r, 700));
+      // Spring back
+      await Promise.all([
+        card.start({ x: 0, rotate: 0, transition: { type: 'spring', stiffness: 300, damping: 22 } }),
+        stamp.start({ opacity: 0, transition: { duration: 0.2 } }),
+      ]);
+      await new Promise(r => setTimeout(r, 600));
     },
   },
   {
@@ -219,18 +225,21 @@ const STEPS: Step[] = [
     description: 'One per game. Guarantees this title makes the final round — use it wisely.',
     stamp: 'super',
     runAnimation: async (card, _f, _b, stamp) => {
-      await card.start({ y: 0, opacity: 1, scale: 1, transition: { duration: 0 } });
+      await card.start({ y: 0, scale: 1, transition: { duration: 0 } });
       await stamp.start({ opacity: 0, scale: 0.6, transition: { duration: 0 } });
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 500));
+      // Slide up — stamp appears, card stays visible
       await Promise.all([
-        card.start({ y: -30, scale: 1.05, transition: { duration: 0.2, ease: 'easeOut' } }),
+        card.start({ y: -80, scale: 1.06, transition: { type: 'spring', stiffness: 200, damping: 20 } }),
         stamp.start({ opacity: 1, scale: 1, transition: { duration: 0.2 } }),
       ]);
-      await card.start({ y: -260, opacity: 0, transition: { duration: 0.35, ease: 'easeIn' } });
-      await new Promise(r => setTimeout(r, 300));
-      await card.start({ y: 0, opacity: 1, scale: 1, transition: { duration: 0 } });
-      await stamp.start({ opacity: 0, transition: { duration: 0.15 } });
-      await new Promise(r => setTimeout(r, 800));
+      await new Promise(r => setTimeout(r, 700));
+      // Spring back
+      await Promise.all([
+        card.start({ y: 0, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 22 } }),
+        stamp.start({ opacity: 0, transition: { duration: 0.2 } }),
+      ]);
+      await new Promise(r => setTimeout(r, 600));
     },
   },
 ];
