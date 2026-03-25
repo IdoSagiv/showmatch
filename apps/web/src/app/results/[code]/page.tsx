@@ -35,6 +35,14 @@ export default function ResultsPage() {
     }
   }, [gameOver, matchedTitles, winner, setWinner]);
 
+  // Scroll to top on mount — page can arrive scrolled (browser scroll restoration,
+  // or game page was scrolled when game ended)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    }
+  }, []);
+
   // Save to history when winner is determined
   useEffect(() => {
     if (winner && room && !historySaved) {
