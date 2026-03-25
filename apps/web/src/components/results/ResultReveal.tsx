@@ -27,8 +27,10 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
   }, [countdown, skipCountdown]);
 
   useEffect(() => {
-    if (revealed && !skipCountdown) {
-      playSound('victory');
+    if (revealed) {
+      if (!skipCountdown) playSound('victory');
+      // Make sure the top of the page is visible so the winner card + confetti are seen
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [revealed]);
