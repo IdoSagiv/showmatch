@@ -10,9 +10,6 @@ fuser -k 3000/tcp 2>/dev/null || true
 fuser -k 3001/tcp 2>/dev/null || true
 sleep 1
 
-echo "🔨 Building socket server..."
-npm run build --workspace=apps/socket-server
-
 echo "🔨 Building Next.js..."
 npm run build --workspace=apps/web
 
