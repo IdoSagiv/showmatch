@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import PageTransitionWrapper from '@/components/ui/PageTransitionWrapper';
+import CreditLink from '@/components/ui/CreditLink';
 
 export const metadata: Metadata = {
   title: 'ShowMatch · Swipe. Match. Watch.',
@@ -44,6 +45,7 @@ export default function RootLayout({
           <PageTransitionWrapper>{children}</PageTransitionWrapper>
         </div>
 
+        <CreditLink />
       </body>
     </html>
   );
