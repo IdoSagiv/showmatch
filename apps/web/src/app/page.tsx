@@ -7,7 +7,6 @@ import { clearSession } from '@/lib/session';
 import JoinGameForm from '@/components/landing/JoinGameForm';
 import GameHistoryButton from '@/components/landing/GameHistoryButton';
 import Logo from '@/components/ui/Logo';
-import CreditLink from '@/components/ui/CreditLink';
 
 /** Decorative poster cards for the right panel (TMDB public CDN) */
 const POSTER_CARDS = [
@@ -39,11 +38,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen relative overflow-hidden flex flex-col">
-
-      {/* Credit — top right, home page only */}
-      <div className="absolute top-3 right-4 z-10">
-        <CreditLink />
-      </div>
 
       {/* ── Atmospheric blobs ── */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
