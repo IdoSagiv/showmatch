@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import AtmosphericBlobs from '@/components/ui/AtmosphericBlobs';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
 import { saveSession } from '@/lib/session';
@@ -102,21 +103,7 @@ export default function JoinPage() {
   return (
     <main className="min-h-screen relative overflow-hidden flex flex-col">
 
-      {/* ── Atmospheric blobs ── */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(229,9,20,0.15) 0%, transparent 65%)' }}
-          animate={{ scale: [1, 1.1, 1], opacity: [0.6, 1, 0.6] }}
-          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute bottom-0 -right-32 w-[500px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(109,40,217,0.1) 0%, transparent 65%)' }}
-          animate={{ scale: [1.1, 1, 1.1], opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-        />
-      </div>
+      <AtmosphericBlobs />
 
       {/* ── Header ── */}
       <header className="relative z-10 flex items-center px-5 pt-5 pb-3">
