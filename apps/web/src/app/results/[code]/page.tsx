@@ -74,11 +74,11 @@ export default function ResultsPage() {
   }, [socket]);
 
   const handlePlayAgain = useCallback(() => {
-    (socket as any).emit('playAgain', { playerId });
+    socket.emit('playAgain', { playerId: playerId ?? undefined });
   }, [socket, playerId]);
 
   const handleEndGame = useCallback(() => {
-    (socket as any).emit('endGame', { playerId });
+    socket.emit('endGame', { playerId: playerId ?? undefined });
     clearSession();
     reset();
     router.push('/');
@@ -132,8 +132,8 @@ export default function ResultsPage() {
             candidates={wildcardCandidates}
             isCreator={isCreator}
             wildcardSpinning={wildcardSpinning}
-            onSpinStart={() => socket.emit('wildcardSpinStart' as any)}
-            onPick={(tmdbId) => socket.emit('wildcardPick' as any, tmdbId)}
+            onSpinStart={() => socket.emit('wildcardSpinStart')}
+            onPick={(tmdbId) => socket.emit('wildcardPick', tmdbId)}
           />
         )}
 

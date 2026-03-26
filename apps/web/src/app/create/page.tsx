@@ -129,7 +129,7 @@ export default function CreatePage() {
 
     // Remove any previous error listener so repeated taps don't stack handlers
     if (startErrorHandlerRef.current) {
-      socket.off('error' as any, startErrorHandlerRef.current);
+      socket.off('error', startErrorHandlerRef.current);
     }
     const onError = (msg: string) => {
       setGameStarting(false);
@@ -139,7 +139,7 @@ export default function CreatePage() {
     startErrorHandlerRef.current = onError;
 
     socket.emit('startGame');
-    socket.once('error' as any, onError);
+    socket.once('error', onError);
   }, [socket, room, gameStarting]);
 
   useEffect(() => {

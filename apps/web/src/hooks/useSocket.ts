@@ -59,7 +59,7 @@ export function useSocket() {
       store.removePlayer(playerId);
     });
 
-    (socket as any).on('playerRejoined', (player: any) => {
+    socket.on('playerRejoined', (player) => {
       store.updatePlayer(player);
     });
 
@@ -71,7 +71,7 @@ export function useSocket() {
       store.startGame(titlePool);
     });
 
-    (socket as any).on('loadingProgress', (data: { stage: string; progress: number; total?: number }) => {
+    socket.on('loadingProgress', (data) => {
       store.setLoadingProgress(data);
     });
 
@@ -106,7 +106,7 @@ export function useSocket() {
       store.setGameStats(stats);
     });
 
-    (socket as any).on('wildcardCandidates', (candidates: any) => {
+    socket.on('wildcardCandidates', (candidates) => {
       store.setWildcardCandidates(candidates);
     });
 
@@ -119,18 +119,18 @@ export function useSocket() {
       store.setWinner(winner);
     });
 
-    (socket as any).on('roomReset', (room: any) => {
+    socket.on('roomReset', (room) => {
       // Reset game-specific flags so the new game starts clean.
       // Don't call store.reset() — that would wipe playerId.
       store.setGameOver(false);
       store.setRoom(room);
     });
 
-    (socket as any).on('gameRejoined', (room: any, titlePool: any[]) => {
+    socket.on('gameRejoined', (room, titlePool) => {
       if (reconnectTimerRef.current) { clearTimeout(reconnectTimerRef.current); reconnectTimerRef.current = null; }
       // Successfully re-attached. Restore as much state as possible.
       const session = loadSession();
-      const me = room.players.find((p: any) =>
+      const me = room.players.find(p =>
         p.id === socket.id ||
         (session && p.displayName === session.displayName)
       );
@@ -181,7 +181,7 @@ export function useSocket() {
       socket.off('connect', handleConnect);
       socket.off('playerJoined');
       socket.off('playerLeft');
-      (socket as any).off('playerRejoined');
+      socket.off('playerRejoined');
       socket.off('settingsUpdated');
       socket.off('gameStarted');
       socket.off('playerProgress');
@@ -191,12 +191,12 @@ export function useSocket() {
       socket.off('swipeReveal');
       socket.off('gameStats');
       socket.off('roomClosed');
-      (socket as any).off('wildcardCandidates');
+      socket.off('wildcardCandidates');
       socket.off('wildcardSpinStart');
       socket.off('wildcardResult');
-      (socket as any).off('roomReset');
-      (socket as any).off('loadingProgress');
-      (socket as any).off('gameRejoined');
+      socket.off('roomReset');
+      socket.off('loadingProgress');
+      socket.off('gameRejoined');
     };
   }, []);
 
