@@ -2,6 +2,8 @@
 
 > **Tinder swipes meet Kahoot energy** — the group movie & TV-show picker that ends the "what should we watch?" debate.
 
+**[→ Open the app](https://showmatch.vercel.app)**
+
 One person creates a room, friends join with a 5-letter code, everyone swipes through the same title pool, and whatever the group agrees on wins. No more arguing.
 
 ---
@@ -101,9 +103,9 @@ OMDB_API_KEY=abc12345
 
 | Script | Purpose |
 |---|---|
-| `npm run dev` | Development — hot-reload, both servers |
-| `bash scripts/prod.sh` | **Local production** — rebuild + restart on the Pi (LAN only) |
-| `bash scripts/deploy.sh` | **Cloud production** — deploy to Fly.io + Vercel |
+| `bash scripts/deploy.sh` | **Cloud deploy** — build + push to Fly.io + Vercel (primary) |
+| `npm run dev` | Development — hot-reload on localhost |
+| `bash scripts/prod.sh` | Local production — for Pi / LAN use only |
 
 ---
 
@@ -119,26 +121,17 @@ Starts both servers with hot-reload:
 - **Next.js** → `http://localhost:3000`
 - **Socket server** → `http://localhost:3001`
 
-> Pages compile on first visit in dev mode — expect a 1–2 s pause the first time you navigate to each screen.
+> Pages compile on first visit in dev mode — expect a short pause the first time you navigate to each screen.
 
-### Local production (Raspberry Pi / always-on LAN server)
+### Local production _(optional — Pi / LAN only)_
 
-Build once, then start. Pages are pre-compiled — navigation is instant.
+Only needed if you want a local network copy independent of the cloud. Not required for normal use — the live app at **https://showmatch.vercel.app** runs 24/7 regardless of whether this machine is on.
 
 ```bash
-# First run (or after pulling code changes):
 bash scripts/prod.sh
 ```
 
-This kills any running servers, builds Next.js, and starts both servers in the background. Logs go to `/tmp/showmatch-prod.log`.
-
-**Quick restart** (no rebuild needed — e.g. after a reboot):
-```bash
-cd showmatch
-setsid bash -c 'npm run start >> /tmp/showmatch-prod.log 2>&1' &
-```
-
-Access from any device on the network at `http://<pi-ip>:3000`.
+Kills any running servers, rebuilds Next.js, and starts both in the background. Logs: `/tmp/showmatch-prod.log`.
 
 ---
 
