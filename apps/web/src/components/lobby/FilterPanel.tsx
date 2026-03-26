@@ -73,28 +73,30 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
       <div>
         <label className="text-sm text-gray-400 mb-2 block">Type</label>
         <div className="flex gap-2">
-          {([
-            { label: 'Movies',    value: ['movie'] as ('movie'|'tv')[] },
-            { label: 'Both',      value: ['movie', 'tv'] as ('movie'|'tv')[] },
-            { label: 'TV Series', value: ['tv'] as ('movie'|'tv')[] },
-          ] as const).map(opt => {
-            const active =
-              opt.value.length === settings.mediaTypes.length &&
-              opt.value.every(v => settings.mediaTypes.includes(v));
-            return (
-              <button
-                key={opt.label}
-                onClick={() => update({ mediaTypes: opt.value })}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  active
-                    ? 'bg-primary text-white'
-                    : 'bg-dark-surface text-gray-400 border border-dark-border'
-                }`}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
+          {(['movie', 'tv'] as const).map(type => (
+            <button
+              key={type}
+              onClick={() => {
+                if (settings.mediaTypes.includes(type)) {
+                  // Already active — if it's the only one, do nothing;
+                  // if both are active, keep only this one.
+                  if (settings.mediaTypes.length > 1) {
+                    update({ mediaTypes: [type] });
+                  }
+                } else {
+                  // Not active — add it back (both selected)
+                  update({ mediaTypes: ['movie', 'tv'] });
+                }
+              }}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                settings.mediaTypes.includes(type)
+                  ? 'bg-primary text-white'
+                  : 'bg-dark-surface text-gray-500 border border-dark-border'
+              }`}
+            >
+              {type === 'movie' ? 'Movies' : 'TV Series'}
+            </button>
+          ))}
         </div>
       </div>
 
