@@ -150,7 +150,25 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
 
       {/* Genres */}
       <div>
-        <label className="text-sm text-gray-400 mb-2 block">Genres</label>
+        <div className="flex justify-between items-center mb-2">
+          <label className="text-sm text-gray-400">Genres</label>
+          <div className="flex gap-2">
+            <button
+              onClick={() => update({ genres: [] })}
+              className={`text-xs transition-colors ${settings.genres.length === 0 ? 'text-primary font-semibold' : 'text-gray-500 hover:text-primary'}`}
+            >
+              All
+            </button>
+            {settings.genres.length > 0 && (
+              <button
+                onClick={() => update({ genres: [] })}
+                className="text-xs text-gray-500 hover:text-white transition-colors"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
         <div className="flex flex-wrap gap-2">
           {Object.entries(GENRES).slice(0, 15).map(([id, name]) => (
             <button
@@ -158,14 +176,19 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
               onClick={() => update({ genres: toggleInArray(settings.genres, parseInt(id)) })}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                 settings.genres.length === 0 || settings.genres.includes(parseInt(id))
-                  ? 'bg-primary/20 text-primary'
-                  : 'bg-dark-surface text-gray-500'
+                  ? 'bg-primary/20 text-primary ring-1 ring-primary/30'
+                  : 'bg-dark-surface text-gray-500 hover:text-gray-300'
               }`}
             >
               {name}
             </button>
           ))}
         </div>
+        {settings.genres.length > 0 && (
+          <p className="text-[10px] text-gray-600 mt-1.5">
+            {settings.genres.length} genre{settings.genres.length > 1 ? 's' : ''} selected · tap All to reset
+          </p>
+        )}
       </div>
 
       {/* Pool Size */}

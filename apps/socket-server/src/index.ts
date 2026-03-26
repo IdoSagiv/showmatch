@@ -22,6 +22,12 @@ const io = new Server(httpServer, {
     origin: true,
     methods: ['GET', 'POST'],
   },
+  // Default pingTimeout (20s) is too aggressive for mobile / cloud proxy.
+  // 60s gives enough headroom for brief network blips without holding dead
+  // connections too long.
+  pingTimeout: 60_000,
+  pingInterval: 25_000,
+  connectTimeout: 45_000,
 });
 
 io.on('connection', (socket) => {

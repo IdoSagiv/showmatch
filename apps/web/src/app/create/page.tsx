@@ -73,18 +73,25 @@ export default function CreatePage() {
     if (!trimmed) return;
     setCreating(true);
     setError(null);
-    socket.emit('createRoom', trimmed, (response: any) => {
-      if ('error' in response) {
-        setError(response.error);
+
+    const doCreate = () => {
+      socket.emit('createRoom', trimmed, (response: any) => {
+        if ('error' in response) {
+          setError(response.error);
+          setCreating(false);
+          return;
+        }
+        setRoom(response.room);
+        setPlayerId(socket.id || '');
+        saveSession({ code: response.room.code, displayName: trimmed });
+        setStep('room');
         setCreating(false);
-        return;
-      }
-      setRoom(response.room);
-      setPlayerId(socket.id || '');
-      saveSession({ code: response.room.code, displayName: trimmed });
-      setStep('room');
-      setCreating(false);
-    });
+      });
+    };
+
+    // Wait for socket if not yet connected (avoids silent hang on first load)
+    if (socket.connected) doCreate();
+    else { socket.once('connect', doCreate); socket.connect(); }
   }, [name, socket, setRoom, setPlayerId]);
 
   const handleSettingsChange = useCallback((settings: GameSettings) => {
