@@ -185,10 +185,10 @@ showmatch/
 
 ## Cloud Deployment (free)
 
-| Service | Hosts | Cost |
-|---|---|---|
-| **Fly.io** | Socket server | Free — 1 shared-CPU VM, always-on |
-| **Vercel** | Next.js frontend | Free — global CDN, auto-deploys from `main` |
+| Service | Hosts | URL | Cost |
+|---|---|---|---|
+| **Fly.io** | Socket server | `https://showmatch-socket.fly.dev` | Free — 1 shared-CPU VM, always-on |
+| **Vercel** | Next.js frontend | `https://showmatch.vercel.app` | Free — global CDN |
 
 ---
 
@@ -230,9 +230,9 @@ Your socket server will be live at `https://<app-name>.fly.dev`.
 | `TMDB_READ_ACCESS_TOKEN` | your TMDB JWT | Server-side API routes |
 | `OMDB_API_KEY` | your OMDB key | Server-side API routes |
 
-4. Click **Deploy** — every subsequent push to `main` redeploys automatically.
+4. Click **Deploy** — then use `bash scripts/deploy.sh` for all future deploys.
 
-> `NEXT_PUBLIC_SOCKET_URL` is baked in at build time. If you change the Fly.io app name, update this variable in Vercel and trigger a redeploy.
+> `NEXT_PUBLIC_SOCKET_URL` is baked in at build time. If you change the Fly.io app name, update this variable in Vercel and redeploy.
 
 ---
 
@@ -252,7 +252,11 @@ The script enforces three guards before touching anything:
 | Clean tree | No uncommitted changes |
 | Synced | Local `main` matches `origin/main` exactly (no unpushed or un-pulled commits) |
 
-If all guards pass it runs `fly deploy` (builds a fresh Docker image and rolls it out). Vercel picks up the `main` push automatically — no extra step needed.
+If all guards pass it deploys both services in sequence:
+1. **Fly.io** — builds a fresh Docker image and rolls it out (`fly deploy`)
+2. **Vercel** — deploys the Next.js frontend (`vercel deploy --prod`)
+
+> Credentials are read from `~/.showmatch_creds` (not committed to git).
 
 ---
 
