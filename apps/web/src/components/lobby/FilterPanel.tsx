@@ -73,24 +73,28 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
       <div>
         <label className="text-sm text-gray-400 mb-2 block">Type</label>
         <div className="flex gap-2">
-          {(['movie', 'tv'] as const).map(type => (
-            <button
-              key={type}
-              onClick={() => {
-                const types = settings.mediaTypes.includes(type)
-                  ? settings.mediaTypes.filter(t => t !== type)
-                  : [...settings.mediaTypes, type];
-                if (types.length > 0) update({ mediaTypes: types });
-              }}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                settings.mediaTypes.includes(type)
-                  ? 'bg-primary text-white'
-                  : 'bg-dark-surface text-gray-400 border border-dark-border'
-              }`}
-            >
-              {type === 'movie' ? 'Movies' : 'TV Series'}
-            </button>
-          ))}
+          {([
+            { label: 'Movies',    value: ['movie'] as ('movie'|'tv')[] },
+            { label: 'Both',      value: ['movie', 'tv'] as ('movie'|'tv')[] },
+            { label: 'TV Series', value: ['tv'] as ('movie'|'tv')[] },
+          ] as const).map(opt => {
+            const active =
+              opt.value.length === settings.mediaTypes.length &&
+              opt.value.every(v => settings.mediaTypes.includes(v));
+            return (
+              <button
+                key={opt.label}
+                onClick={() => update({ mediaTypes: opt.value })}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  active
+                    ? 'bg-primary text-white'
+                    : 'bg-dark-surface text-gray-400 border border-dark-border'
+                }`}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
