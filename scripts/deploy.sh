@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────────────────────
-# deploy.sh  —  CLOUD production (Fly.io + Vercel)
+# deploy.sh  —  CLOUD production (Render + Vercel)
 #
 # Deploys:
-#   Socket server  →  Fly.io  (fly deploy, builds Docker image)
+#   Socket server  →  Render  (free tier, via deploy hook)
 #   Frontend       →  Vercel  (vercel deploy --prod)
 #
 # Guards (all must pass before anything is deployed):
 #   1. Must be on the main branch
 #   2. Working tree must be clean (no uncommitted changes)
 #   3. Local main must be in sync with origin/main (no unpushed or un-pulled commits)
+#
+# Required in ~/.showmatch_creds:
+#   export RENDER_DEPLOY_HOOK="https://api.render.com/deploy/srv-xxx?key=yyy"
+#   export RENDER_SOCKET_URL="https://showmatch-socket.onrender.com"
+#   export VERCEL_TOKEN="..."
 #
 # For LOCAL production (Raspberry Pi / LAN) use: bash scripts/prod.sh
 #
@@ -21,7 +26,6 @@ set -euo pipefail
 # Load tokens (stored outside the repo, never committed)
 # shellcheck source=/dev/null
 [ -f "$HOME/.showmatch_creds" ] && source "$HOME/.showmatch_creds"
-export PATH="$HOME/.fly/bin:$PATH"
 
 BOLD='\033[1m'
 RED='\033[0;31m'
@@ -75,18 +79,22 @@ fi
 COMMIT=$(git rev-parse --short HEAD)
 echo -e "${GREEN}✓ In sync with origin/main${NC} ${DIM}($COMMIT)${NC}"
 
-# ── Deploy: socket server → Fly.io ───────────────────────────────────────────
-echo -e "\n${BOLD}Deploying socket server → Fly.io...${NC}"
+# ── Deploy: socket server → Render ───────────────────────────────────────────
+echo -e "\n${BOLD}Deploying socket server → Render...${NC}"
 
-if ! command -v fly &>/dev/null; then
-  echo -e "${RED}✗ fly CLI not found${NC}"
-  echo -e "  Install: curl -L https://fly.io/install.sh | sh\n"
+if [ -z "${RENDER_DEPLOY_HOOK:-}" ]; then
+  echo -e "${RED}✗ RENDER_DEPLOY_HOOK not set${NC}"
+  echo -e "  Add to ~/.showmatch_creds:"
+  echo -e "  ${DIM}export RENDER_DEPLOY_HOOK=\"https://api.render.com/deploy/srv-xxx?key=yyy\"${NC}"
+  echo -e "  (Find it: Render dashboard → your service → Settings → Deploy Hook)\n"
   exit 1
 fi
 
-fly deploy
+curl -s -f -X POST "$RENDER_DEPLOY_HOOK" > /dev/null
 
-echo -e "\n${GREEN}${BOLD}✓ Socket server deployed → https://showmatch-socket.fly.dev${NC}"
+RENDER_URL="${RENDER_SOCKET_URL:-https://showmatch-socket.onrender.com}"
+echo -e "${GREEN}${BOLD}✓ Socket server deploy triggered → ${RENDER_URL}${NC}"
+echo -e "${DIM}  Build takes ~2-3 min. Free tier sleeps after 15 min idle (30s wake-up).${NC}"
 
 # ── Deploy: frontend → Vercel ────────────────────────────────────────────────
 echo -e "\n${BOLD}Deploying frontend → Vercel...${NC}"
