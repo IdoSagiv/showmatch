@@ -18,6 +18,10 @@ export function getSocket(): TypedSocket {
         : 'http://localhost:3001');
     socket = io(url, {
       autoConnect: false,
+      // Start directly with WebSocket — skips the HTTP long-poll handshake
+      // that socket.io normally uses before upgrading. Saves 2–3 round-trips
+      // on initial connect (~200–400ms on a cloud server).
+      // Falls back to polling if WebSocket is blocked.
       transports: ['websocket', 'polling'],
     }) as TypedSocket;
   }
