@@ -196,6 +196,8 @@ export default function Home() {
                       alt=""
                       className="w-full h-full object-cover"
                       draggable={false}
+                      fetchPriority={i === 0 ? 'high' : 'low'}
+                      loading={i === 0 ? 'eager' : 'lazy'}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   </motion.div>
