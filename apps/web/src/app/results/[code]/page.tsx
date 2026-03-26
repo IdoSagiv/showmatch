@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
@@ -36,12 +36,10 @@ export default function ResultsPage() {
     }
   }, [gameOver, matchedTitles, winner, setWinner]);
 
-  // Scroll to top on mount — page can arrive scrolled (browser scroll restoration,
-  // or game page was scrolled when game ended)
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-    }
+  // Scroll to top on mount — useLayoutEffect fires before paint so it wins
+  // over browser scroll restoration (useEffect fires after and can lose the race)
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
   }, []);
 
   // Save to history when winner is determined
