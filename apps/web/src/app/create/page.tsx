@@ -15,6 +15,7 @@ import PlayerList from '@/components/lobby/PlayerList';
 import ShareButton from '@/components/lobby/ShareButton';
 import Button from '@/components/ui/Button';
 import Logo from '@/components/ui/Logo';
+import PlayerBadge from '@/components/ui/PlayerBadge';
 import type { GameSettings } from '@/types/game';
 
 function randomName(): string {
@@ -255,6 +256,7 @@ export default function CreatePage() {
     <main className="min-h-screen">
       <header className="flex items-center justify-between p-4">
         <Logo size="sm" />
+        <PlayerBadge />
       </header>
 
       <div className="max-w-lg mx-auto p-4 space-y-4">
