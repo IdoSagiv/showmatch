@@ -111,7 +111,7 @@ Starts both servers with hot-reload:
 
 > Pages compile on first visit in dev mode — expect a 1–2 s pause the first time you navigate to each screen.
 
-### Production (Raspberry Pi / always-on LAN server)
+### Local production (Raspberry Pi / always-on LAN server)
 
 Build once, then start. Pages are pre-compiled — navigation is instant.
 
@@ -185,41 +185,74 @@ showmatch/
 
 ## Cloud Deployment (free)
 
-Frontend → **Vercel** · Socket server → **Fly.io**
+| Service | Hosts | Cost |
+|---|---|---|
+| **Fly.io** | Socket server | Free — 1 shared-CPU VM, always-on |
+| **Vercel** | Next.js frontend | Free — global CDN, auto-deploys from `main` |
 
-### Socket server — Fly.io
+---
+
+### First-time setup
+
+#### 1. Socket server — Fly.io
 
 ```bash
 # Install Fly CLI (once)
 curl -L https://fly.io/install.sh | sh
 
-# From repo root:
-fly launch --no-deploy        # creates app, sets name in fly.toml
+# From repo root — provision the app (sets a unique name + region):
+fly launch --no-deploy
+
+# Edit fly.toml: replace app = "showmatch-socket" with the name Fly assigned.
+
+# Set secrets (never committed to git):
 fly secrets set \
   TMDB_READ_ACCESS_TOKEN=eyJ... \
   OMDB_API_KEY=abc12345
-fly deploy                    # builds Docker image + deploys
+
+# First deploy:
+fly deploy
 ```
 
-Once deployed, your socket URL will be `https://<app-name>.fly.dev`.
+Your socket server will be live at `https://<app-name>.fly.dev`.
 
-> `auto_stop_machines = false` in `fly.toml` keeps the machine always-on (in-memory rooms can't survive restarts). Fly's free tier covers 1 shared VM.
+> `auto_stop_machines = false` in `fly.toml` keeps the VM always-on. In-memory room state is lost on restarts, so the machine must never spin down mid-game.
 
-### Frontend — Vercel
+#### 2. Frontend — Vercel
 
 1. Import the GitHub repo at [vercel.com/new](https://vercel.com/new)
 2. Set **Root Directory** → `apps/web`
 3. Add environment variables:
 
-| Variable | Value |
+| Variable | Value | When used |
+|---|---|---|
+| `NEXT_PUBLIC_SOCKET_URL` | `https://<your-fly-app>.fly.dev` | Build-time (baked into client bundle) |
+| `TMDB_READ_ACCESS_TOKEN` | your TMDB JWT | Server-side API routes |
+| `OMDB_API_KEY` | your OMDB key | Server-side API routes |
+
+4. Click **Deploy** — every subsequent push to `main` redeploys automatically.
+
+> `NEXT_PUBLIC_SOCKET_URL` is baked in at build time. If you change the Fly.io app name, update this variable in Vercel and trigger a redeploy.
+
+---
+
+### Deploying updates
+
+After merging changes to `main`, run the deploy script from the repo root:
+
+```bash
+bash scripts/deploy.sh
+```
+
+The script enforces three guards before touching anything:
+
+| Guard | What it checks |
 |---|---|
-| `NEXT_PUBLIC_SOCKET_URL` | `https://<your-fly-app>.fly.dev` |
-| `TMDB_READ_ACCESS_TOKEN` | your TMDB JWT |
-| `OMDB_API_KEY` | your OMDB key |
+| Branch | Must be on `main` |
+| Clean tree | No uncommitted changes |
+| Synced | Local `main` matches `origin/main` exactly (no unpushed or un-pulled commits) |
 
-4. Deploy — every push to `main` auto-deploys.
-
-> If you later change the Fly.io URL, update `NEXT_PUBLIC_SOCKET_URL` in Vercel and redeploy.
+If all guards pass it runs `fly deploy` (builds a fresh Docker image and rolls it out). Vercel picks up the `main` push automatically — no extra step needed.
 
 ---
 
