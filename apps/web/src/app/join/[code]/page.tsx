@@ -40,8 +40,18 @@ export default function JoinPage() {
       });
     };
 
-    if (socket.connected) doCheck();
-    else { socket.once('connect', doCheck); socket.connect(); }
+    if (socket.connected) {
+      doCheck();
+    } else {
+      const timeoutId = setTimeout(() => {
+        socket.off('connect', onConnect);
+        sessionStorage.setItem('showmatch-toast', 'Could not reach the server. Please try again.');
+        router.replace('/');
+      }, 8000);
+      const onConnect = () => { clearTimeout(timeoutId); doCheck(); };
+      socket.once('connect', onConnect);
+      socket.connect();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -64,8 +74,18 @@ export default function JoinPage() {
       });
     };
 
-    if (socket.connected) doJoin();
-    else { socket.once('connect', doJoin); socket.connect(); }
+    if (socket.connected) {
+      doJoin();
+    } else {
+      const timeoutId = setTimeout(() => {
+        socket.off('connect', onConnect);
+        setError('Could not reach the server. Please try again in a moment.');
+        setJoining(false);
+      }, 8000);
+      const onConnect = () => { clearTimeout(timeoutId); doJoin(); };
+      socket.once('connect', onConnect);
+      socket.connect();
+    }
   };
 
   const handleShuffle = () => {
