@@ -8,6 +8,21 @@ const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
 const getToken = () => process.env.TMDB_READ_ACCESS_TOKEN || '';
 const getOmdbKey = () => process.env.OMDB_API_KEY || '';
 
+/**
+ * Maps the app's movie-style content ratings to their TV equivalents.
+ * Used when filtering the enriched pool so both movie and TV certifications
+ * are correctly matched against the user's selection.
+ */
+const CONTENT_RATING_EQUIVALENTS: Record<string, string[]> = {
+  'G':     ['G', 'TV-Y', 'TV-G'],
+  'PG':    ['PG', 'TV-PG'],
+  'PG-13': ['PG-13', 'TV-14'],
+  'R':     ['R', 'NC-17', 'TV-MA'],
+};
+
+/** All selectable ratings — when all are chosen, skip filtering entirely. */
+const ALL_CONTENT_RATINGS = ['G', 'PG', 'PG-13', 'R'];
+
 const GENRE_MAP: Record<number, string> = {
   28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime',
   99: 'Documentary', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History',
@@ -109,11 +124,31 @@ export async function fetchDiscoverResults(
     onProgress?.(done, total);
   }
 
-  // Only drop provider-less titles when the user actually filtered by provider.
-  // Without a provider filter, theatrical/un-streamed titles are fair game.
-  const filtered = settings.providers.length > 0
+  // Drop provider-less titles only when the user filtered by provider.
+  let filtered = settings.providers.length > 0
     ? enriched.filter(t => t.providers.length > 0)
     : enriched;
+
+  // Apply content rating filter when the selection is a strict subset of all
+  // ratings (all 4 selected = no filter, same as the genre "All" convention).
+  const ratingsSelected = settings.contentRatings ?? [];
+  const isRatingFiltered =
+    ratingsSelected.length > 0 &&
+    ratingsSelected.length < ALL_CONTENT_RATINGS.length;
+
+  if (isRatingFiltered) {
+    // Build the full set of allowed certification strings (movie + TV equivalents)
+    const allowed = new Set<string>();
+    for (const r of ratingsSelected) {
+      for (const equiv of CONTENT_RATING_EQUIVALENTS[r] ?? [r]) {
+        allowed.add(equiv);
+      }
+    }
+    // Keep titles whose rating is in the allowed set, OR has no rating at all
+    // (unrated/unknown titles shouldn't be silently excluded).
+    filtered = filtered.filter(t => !t.contentRating || allowed.has(t.contentRating));
+  }
+
   return filtered.slice(0, poolSize);
 }
 
