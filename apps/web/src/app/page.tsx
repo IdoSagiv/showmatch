@@ -40,6 +40,11 @@ export default function Home() {
   return (
     <main className="min-h-screen relative overflow-hidden flex flex-col">
 
+      {/* Credit — top right, home page only */}
+      <div className="absolute top-3 right-4 z-10">
+        <CreditLink />
+      </div>
+
       {/* ── Atmospheric blobs ── */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -147,10 +152,6 @@ export default function Home() {
             >
               <GameHistoryButton />
             </motion.div>
-
-            <div className="mt-4 flex justify-center">
-              <CreditLink />
-            </div>
           </motion.div>
         </div>
 
