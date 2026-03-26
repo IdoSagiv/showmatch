@@ -109,6 +109,17 @@ export default function GamePage() {
     handleSwipe('pass');
   }, [handleSwipe]);
 
+  // Preload the next 3 poster images so fast swipes never show a blank card
+  useEffect(() => {
+    for (let i = 1; i <= 3; i++) {
+      const next = titlePool[currentCardIndex + i];
+      if (next?.posterPath) {
+        const img = new window.Image();
+        img.src = next.posterPath;
+      }
+    }
+  }, [currentCardIndex, titlePool]);
+
   // Keyboard shortcuts: ← pass, → like, ↑ superlike
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
