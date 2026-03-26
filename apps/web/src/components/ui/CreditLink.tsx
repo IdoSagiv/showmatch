@@ -1,5 +1,8 @@
 'use client';
 
+/**
+ * Inline (non-fixed) credit link — place inside a page's flow, not in layout.
+ */
 export default function CreditLink() {
   return (
     <a
