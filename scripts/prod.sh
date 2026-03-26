@@ -5,7 +5,7 @@
 # Kills any running servers, rebuilds Next.js, and restarts both servers
 # in the background. Logs go to /tmp/showmatch-prod.log.
 #
-# For CLOUD deployment (Fly.io + Vercel) use: bash scripts/deploy.sh
+# For CLOUD deployment (Render + Vercel) use: bash scripts/deploy.sh
 # ──────────────────────────────────────────────────────────────────────────────
 set -e
 

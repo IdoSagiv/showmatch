@@ -30,7 +30,7 @@ One person creates a room, friends join with a 5-letter code, everyone swipes th
 - 🚀 **Multiplayer rooms** — join with a 5-letter code, no account needed
 - 🎬 **TMDB + OMDB data** — real posters, ratings, trailers, cast, streaming providers
 - 🎛️ **Filters** — movies / TV / both, streaming service, genres, era, min rating, pool size
-- 📍 **Region-aware** — providers matched to your country automatically
+- 📍 **US streaming catalog** — all major providers (Netflix, Disney+, HBO, Apple TV+, Prime Video, Hulu…)
 - 🏆 **Smart winner** — single match wins instantly; multiple matches → ranking round
 - 🃏 **Wildcard mode** — host picks a surprise title from top-liked if nobody agrees
 - 🎉 **Celebrations** — confetti, sounds, swipe reveal, full game stats
@@ -103,7 +103,7 @@ OMDB_API_KEY=abc12345
 
 | Script | Purpose |
 |---|---|
-| `bash scripts/deploy.sh` | **Cloud deploy** — build + push to Fly.io + Vercel (primary) |
+| `bash scripts/deploy.sh` | **Cloud deploy** — trigger Render rebuild + Vercel frontend deploy |
 | `npm run dev` | Development — hot-reload on localhost |
 | `bash scripts/prod.sh` | Local production — for Pi / LAN use only |
 
@@ -190,36 +190,32 @@ showmatch/
 
 | Service | Hosts | URL | Cost |
 |---|---|---|---|
-| **Fly.io** | Socket server | `https://showmatch-socket.fly.dev` | Free — 1 shared-CPU VM, always-on |
+| **Render** | Socket server | `https://showmatch.onrender.com` | Free — sleeps after 15 min idle (~30s wake-up) |
 | **Vercel** | Next.js frontend | `https://showmatch.vercel.app` | Free — global CDN |
+
+> **Note on free-tier sleep:** The Render free tier spins down the socket server after 15 minutes of inactivity. The first connection after idle takes ~30 seconds to wake it up. In-memory room state is lost if the server sleeps mid-game — but in practice a game is finished well within 15 minutes.
 
 ---
 
 ### First-time setup
 
-#### 1. Socket server — Fly.io
+#### 1. Socket server — Render
+
+The repo includes a `render.yaml` Blueprint that configures the service automatically.
+
+1. Go to [render.com](https://render.com) → **New → Blueprint**
+2. Connect the `showmatch` GitHub repo — Render reads `render.yaml` and pre-fills everything
+3. Add secret environment variables when prompted:
+   - `TMDB_READ_ACCESS_TOKEN` — your TMDB Read Access Token (long JWT)
+   - `OMDB_API_KEY` — your OMDB key
+4. Click **Deploy** — your socket server will be live at `https://showmatch.onrender.com` (or similar)
+5. Add the following to `~/.showmatch_creds` (not committed to git):
 
 ```bash
-# Install Fly CLI (once)
-curl -L https://fly.io/install.sh | sh
-
-# From repo root — provision the app (sets a unique name + region):
-fly launch --no-deploy
-
-# Edit fly.toml: replace app = "showmatch-socket" with the name Fly assigned.
-
-# Set secrets (never committed to git):
-fly secrets set \
-  TMDB_READ_ACCESS_TOKEN=eyJ... \
-  OMDB_API_KEY=abc12345
-
-# First deploy:
-fly deploy
+export RENDER_API_KEY="rnd_xxxx"          # dashboard.render.com/u/settings → API Keys
+export RENDER_SERVICE_ID="srv-xxxx"       # your service ID from the Render dashboard
+export RENDER_SOCKET_URL="https://showmatch.onrender.com"
 ```
-
-Your socket server will be live at `https://<app-name>.fly.dev`.
-
-> `auto_stop_machines = false` in `fly.toml` keeps the VM always-on. In-memory room state is lost on restarts, so the machine must never spin down mid-game.
 
 #### 2. Frontend — Vercel
 
@@ -229,13 +225,19 @@ Your socket server will be live at `https://<app-name>.fly.dev`.
 
 | Variable | Value | When used |
 |---|---|---|
-| `NEXT_PUBLIC_SOCKET_URL` | `https://<your-fly-app>.fly.dev` | Build-time (baked into client bundle) |
+| `NEXT_PUBLIC_SOCKET_URL` | `https://showmatch.onrender.com` | Build-time (baked into client bundle) |
 | `TMDB_READ_ACCESS_TOKEN` | your TMDB JWT | Server-side API routes |
 | `OMDB_API_KEY` | your OMDB key | Server-side API routes |
 
-4. Click **Deploy** — then use `bash scripts/deploy.sh` for all future deploys.
+4. Add your Vercel token to `~/.showmatch_creds`:
 
-> `NEXT_PUBLIC_SOCKET_URL` is baked in at build time. If you change the Fly.io app name, update this variable in Vercel and redeploy.
+```bash
+export VERCEL_TOKEN="your-vercel-token"   # vercel.com/account/tokens
+```
+
+5. Click **Deploy** — then use `bash scripts/deploy.sh` for all future deploys.
+
+> `NEXT_PUBLIC_SOCKET_URL` is baked in at build time. If your Render service URL changes, update this variable in Vercel and redeploy.
 
 ---
 
@@ -256,7 +258,7 @@ The script enforces three guards before touching anything:
 | Synced | Local `main` matches `origin/main` exactly (no unpushed or un-pulled commits) |
 
 If all guards pass it deploys both services in sequence:
-1. **Fly.io** — builds a fresh Docker image and rolls it out (`fly deploy`)
+1. **Render** — triggers a new Docker build via the Render API (`curl POST /v1/services/{id}/deploys`)
 2. **Vercel** — deploys the Next.js frontend (`vercel deploy --prod`)
 
 > Credentials are read from `~/.showmatch_creds` (not committed to git).

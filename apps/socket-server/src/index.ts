@@ -13,7 +13,7 @@ const app = express();
 // Allow any origin — LAN / cloud deployment
 app.use(cors({ origin: true }));
 
-// Health check for Fly.io / load balancers
+// Health check for Render / load balancers
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
 const httpServer = createServer(app);
