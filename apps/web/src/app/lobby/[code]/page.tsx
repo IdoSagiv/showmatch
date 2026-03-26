@@ -15,6 +15,7 @@ import ShareButton from '@/components/lobby/ShareButton';
 import WaitingAnimation from '@/components/lobby/WaitingAnimation';
 import Button from '@/components/ui/Button';
 import Logo from '@/components/ui/Logo';
+import PlayerBadge from '@/components/ui/PlayerBadge';
 
 export default function LobbyPage() {
   const router = useRouter();
@@ -87,6 +88,7 @@ export default function LobbyPage() {
       {/* Frosted glass header */}
       <header className="flex items-center justify-between px-4 py-3 bg-transparent backdrop-blur-md sticky top-0 z-20">
         <Logo size="sm" />
+        <PlayerBadge />
       </header>
 
       <div className="max-w-lg mx-auto p-4 pb-32 space-y-4">

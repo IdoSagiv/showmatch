@@ -10,6 +10,7 @@ import WildcardPicker from '@/components/results/WildcardPicker';
 import SwipeReveal from '@/components/results/SwipeReveal';
 import GameStats from '@/components/results/GameStats';
 import Logo from '@/components/ui/Logo';
+import PlayerBadge from '@/components/ui/PlayerBadge';
 import { saveGameToHistory } from '@/lib/history';
 import { clearSession } from '@/lib/session';
 import { safeCopy } from '@/lib/clipboard';
@@ -113,8 +114,9 @@ export default function ResultsPage() {
 
   return (
     <main className="min-h-screen pb-36">
-      <header className="flex items-center px-4 py-3 bg-transparent backdrop-blur-md sticky top-0 z-20">
+      <header className="flex items-center justify-between px-4 py-3 bg-transparent backdrop-blur-md sticky top-0 z-20">
         <Logo size="sm" />
+        <PlayerBadge />
       </header>
 
       <div className="max-w-lg mx-auto p-4 space-y-6">

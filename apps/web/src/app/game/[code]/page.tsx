@@ -9,6 +9,7 @@ import SwipeButtons from '@/components/game/SwipeButtons';
 import ProgressBar from '@/components/game/ProgressBar';
 import TimerBar from '@/components/game/TimerBar';
 import Logo from '@/components/ui/Logo';
+import PlayerBadge from '@/components/ui/PlayerBadge';
 import TutorialOverlay, { TutorialReplayButton } from '@/components/game/TutorialOverlay';
 import { useBeforeUnload } from '@/hooks/useBeforeUnload';
 import { useSound } from '@/hooks/useSound';
@@ -142,6 +143,7 @@ export default function GamePage() {
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-2.5 bg-transparent backdrop-blur-md">
         <Logo size="sm" />
+        <PlayerBadge />
         <TutorialReplayButton onClick={() => {
           localStorage.removeItem('showmatch-tutorial-seen');
           setShowTutorial(true);
