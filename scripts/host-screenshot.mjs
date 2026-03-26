@@ -57,7 +57,7 @@ const safeUrl = (page) => {
 
     const roomCode = (await page.locator('.font-mono').first().textContent()).trim().toUpperCase();
     log(`\n🎯  ROOM CODE: ${roomCode}\n`);
-    log(`👉  Join at: http://192.168.1.236:3000/join/${roomCode}`);
+    log(`👉  Join at: ${BASE}/join/${roomCode}`);
     log('Waiting for a second player to join...\n');
 
     // ── Step 2: Wait for Start Game button to become enabled ────
