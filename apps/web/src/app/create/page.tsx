@@ -89,9 +89,26 @@ export default function CreatePage() {
       });
     };
 
-    // Wait for socket if not yet connected (avoids silent hang on first load)
-    if (socket.connected) doCreate();
-    else { socket.once('connect', doCreate); socket.connect(); }
+    // Wait for socket if not yet connected (avoids silent hang on first load).
+    // Guard with a timeout so the button never freezes forever if the server
+    // is unreachable (e.g. Fly.io machine suspended).
+    if (socket.connected) {
+      doCreate();
+    } else {
+      const timeoutId = setTimeout(() => {
+        socket.off('connect', onConnect);
+        setError('Could not reach the server. Please try again in a moment.');
+        setCreating(false);
+      }, 8000);
+
+      const onConnect = () => {
+        clearTimeout(timeoutId);
+        doCreate();
+      };
+
+      socket.once('connect', onConnect);
+      socket.connect();
+    }
   }, [name, socket, setRoom, setPlayerId]);
 
   const handleSettingsChange = useCallback((settings: GameSettings) => {
