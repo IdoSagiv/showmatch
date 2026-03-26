@@ -36,6 +36,7 @@ export default function CreatePage() {
   const [gameStarting, setGameStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const startErrorHandlerRef = useRef<((msg: string) => void) | null>(null);
   const leavingRef = useRef(false);
 
   // If room already in store (back-navigation or rejoin after refresh), skip to room step
@@ -122,15 +123,24 @@ export default function CreatePage() {
   }, [socket, updateSettings]);
 
   const handleStartGame = useCallback(() => {
-    if (!room) return;
+    if (!room || gameStarting) return; // guard against double-tap before re-render
     setGameStarting(true);
     setError(null);
-    socket.emit('startGame');
-    socket.once('error' as any, (msg: string) => {
+
+    // Remove any previous error listener so repeated taps don't stack handlers
+    if (startErrorHandlerRef.current) {
+      socket.off('error' as any, startErrorHandlerRef.current);
+    }
+    const onError = (msg: string) => {
       setGameStarting(false);
       setError(msg);
-    });
-  }, [socket, room]);
+      startErrorHandlerRef.current = null;
+    };
+    startErrorHandlerRef.current = onError;
+
+    socket.emit('startGame');
+    socket.once('error' as any, onError);
+  }, [socket, room, gameStarting]);
 
   useEffect(() => {
     if (room?.status === 'swiping') {
