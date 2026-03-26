@@ -3,7 +3,7 @@
 # deploy.sh  —  CLOUD production (Render + Vercel)
 #
 # Deploys:
-#   Socket server  →  Render  (free tier, via deploy hook)
+#   Socket server  →  Render  (free tier, via Render API)
 #   Frontend       →  Vercel  (vercel deploy --prod)
 #
 # Guards (all must pass before anything is deployed):
@@ -12,8 +12,9 @@
 #   3. Local main must be in sync with origin/main (no unpushed or un-pulled commits)
 #
 # Required in ~/.showmatch_creds:
-#   export RENDER_DEPLOY_HOOK="https://api.render.com/deploy/srv-xxx?key=yyy"
-#   export RENDER_SOCKET_URL="https://showmatch-socket.onrender.com"
+#   export RENDER_API_KEY="rnd_xxxx"
+#   export RENDER_SERVICE_ID="srv-d72no1idbo4c73cesodg"
+#   export RENDER_SOCKET_URL="https://showmatch.onrender.com"
 #   export VERCEL_TOKEN="..."
 #
 # For LOCAL production (Raspberry Pi / LAN) use: bash scripts/prod.sh
@@ -82,17 +83,28 @@ echo -e "${GREEN}✓ In sync with origin/main${NC} ${DIM}($COMMIT)${NC}"
 # ── Deploy: socket server → Render ───────────────────────────────────────────
 echo -e "\n${BOLD}Deploying socket server → Render...${NC}"
 
-if [ -z "${RENDER_DEPLOY_HOOK:-}" ]; then
-  echo -e "${RED}✗ RENDER_DEPLOY_HOOK not set${NC}"
+if [ -z "${RENDER_API_KEY:-}" ]; then
+  echo -e "${RED}✗ RENDER_API_KEY not set${NC}"
   echo -e "  Add to ~/.showmatch_creds:"
-  echo -e "  ${DIM}export RENDER_DEPLOY_HOOK=\"https://api.render.com/deploy/srv-xxx?key=yyy\"${NC}"
-  echo -e "  (Find it: Render dashboard → your service → Settings → Deploy Hook)\n"
+  echo -e "  ${DIM}export RENDER_API_KEY=\"rnd_xxxx\"${NC}"
+  echo -e "  (Generate: dashboard.render.com/u/settings → API Keys)\n"
   exit 1
 fi
 
-curl -s -f -X POST "$RENDER_DEPLOY_HOOK" > /dev/null
+if [ -z "${RENDER_SERVICE_ID:-}" ]; then
+  echo -e "${RED}✗ RENDER_SERVICE_ID not set${NC}"
+  echo -e "  Add to ~/.showmatch_creds:"
+  echo -e "  ${DIM}export RENDER_SERVICE_ID=\"srv-d72no1idbo4c73cesodg\"${NC}\n"
+  exit 1
+fi
 
-RENDER_URL="${RENDER_SOCKET_URL:-https://showmatch-socket.onrender.com}"
+curl -s -f -X POST \
+  "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys" \
+  -H "Authorization: Bearer ${RENDER_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{}' > /dev/null
+
+RENDER_URL="${RENDER_SOCKET_URL:-https://showmatch.onrender.com}"
 echo -e "${GREEN}${BOLD}✓ Socket server deploy triggered → ${RENDER_URL}${NC}"
 echo -e "${DIM}  Build takes ~2-3 min. Free tier sleeps after 15 min idle (30s wake-up).${NC}"
 
