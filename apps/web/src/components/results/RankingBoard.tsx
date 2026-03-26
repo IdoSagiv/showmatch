@@ -20,6 +20,7 @@ function DraggableItem({ item, index }: { item: TitleCard; index: number }) {
       value={item}
       dragListener={false}
       dragControls={dragControls}
+      style={{ touchAction: 'pan-y' }}
     >
       <motion.div
         className="flex items-center gap-3 bg-dark-card rounded-xl p-3 mb-2 border border-dark-border"
