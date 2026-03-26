@@ -41,6 +41,12 @@ function tmdbFetch(path: string): Promise<Response> {
   });
 }
 
+/** Typed JSON parser — eliminates TS18046 'unknown' errors from res.json() */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function parseJson<T = Record<string, any>>(res: Response): Promise<T> {
+  return res.json() as Promise<T>;
+}
+
 export async function fetchTitleCount(settings: GameSettings): Promise<number> {
   let total = 0;
 
@@ -48,7 +54,7 @@ export async function fetchTitleCount(settings: GameSettings): Promise<number> {
     const params = buildDiscoverParams(settings, mediaType);
     const res = await tmdbFetch(`/discover/${mediaType}?${params}&page=1`);
     if (res.ok) {
-      const data = await res.json();
+      const data = await parseJson<{ total_results: number }>(res);
       total += data.total_results;
     }
   }
@@ -75,7 +81,7 @@ export async function fetchDiscoverResults(
       try {
         const res = await tmdbFetch(`/discover/${mediaType}?${params}&page=${page}`);
         if (!res.ok) break;
-        const data = await res.json();
+        const data = await parseJson<{ results: Record<string, unknown>[]; total_pages: number }>(res);
         if (!data.results || data.results.length === 0) break;
 
         for (const item of data.results) {
@@ -167,17 +173,17 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
 
     // Credits
     if (creditsRes.status === 'fulfilled' && creditsRes.value.ok) {
-      const credits = await creditsRes.value.json();
-      title.cast = (credits.cast || []).slice(0, 4).map((c: any) => c.name);
-      const director = (credits.crew || []).find((c: any) => c.job === 'Director');
+      const credits = await parseJson<{ cast: { name: string }[]; crew: { job: string; name: string }[] }>(creditsRes.value);
+      title.cast = (credits.cast || []).slice(0, 4).map(c => c.name);
+      const director = (credits.crew || []).find(c => c.job === 'Director');
       title.director = director?.name || null;
     }
 
     // Videos
     if (videosRes.status === 'fulfilled' && videosRes.value.ok) {
-      const videos = await videosRes.value.json();
+      const videos = await parseJson<{ results: { type: string; site: string; key: string }[] }>(videosRes.value);
       const trailer = (videos.results || []).find(
-        (v: any) => v.type === 'Trailer' && v.site === 'YouTube'
+        v => v.type === 'Trailer' && v.site === 'YouTube'
       );
       title.trailerKey = trailer?.key || null;
     }
@@ -185,26 +191,27 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
     // Providers — flatrate (subscription) only, filtered via shared util
     // (same logic as the web app's /api/tmdb/providers route)
     if (providersRes.status === 'fulfilled' && providersRes.value.ok) {
-      const providersData = await providersRes.value.json();
+      const providersData = await parseJson<{ results: Record<string, { flatrate?: { provider_id: number; provider_name: string; logo_path: string }[] }> }>(providersRes.value);
       const regionData = providersData.results?.[region];
       const flatrate = regionData?.flatrate || [];
 
-      title.providers = filterProviders(flatrate).map((p: any) => ({
-        id: p.provider_id,
-        name: p.provider_name,
-        logoPath: `${TMDB_IMG}${p.logo_path}`,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      title.providers = filterProviders(flatrate as any[]).map((p: any) => ({
+        id: p.provider_id as number,
+        name: p.provider_name as string,
+        logoPath: `${TMDB_IMG}${p.logo_path as string}`,
       }));
     }
 
     // External IDs + OMDB (movies and TV — OMDB supports both)
     if (externalRes.status === 'fulfilled' && externalRes.value.ok) {
-      const external = await externalRes.value.json();
+      const external = await parseJson<{ imdb_id?: string }>(externalRes.value);
       if (external.imdb_id && getOmdbKey()) {
         try {
           const omdbRes = await fetch(`https://www.omdbapi.com/?i=${external.imdb_id}&apikey=${getOmdbKey()}`);
           if (omdbRes.ok) {
-            const omdb = await omdbRes.json();
-            const rt = (omdb.Ratings || []).find((r: any) => r.Source === 'Rotten Tomatoes');
+            const omdb = await parseJson<{ Ratings?: { Source: string; Value: string }[]; Metascore?: string }>(omdbRes);
+            const rt = (omdb.Ratings || []).find(r => r.Source === 'Rotten Tomatoes');
             title.rottenTomatoesScore = rt ? parseInt(rt.Value) : null;
             const mc = omdb.Metascore && omdb.Metascore !== 'N/A' ? parseInt(omdb.Metascore) : null;
             title.metacriticScore = mc;
@@ -215,12 +222,11 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
 
     // TV series — end year, status, seasons
     if (type === 'tv' && detailRes.status === 'fulfilled' && detailRes.value && detailRes.value.ok) {
-      const detail = await detailRes.value.json();
-      const lastAir = detail.last_air_date ? parseInt((detail.last_air_date as string).split('-')[0]) : undefined;
+      const detail = await parseJson<{ last_air_date?: string; status?: string; number_of_seasons?: number }>(detailRes.value);
+      const lastAir = detail.last_air_date ? parseInt(detail.last_air_date.split('-')[0]) : undefined;
       if (lastAir && lastAir !== title.year) title.endYear = lastAir;
-      const s = detail.status as string | undefined;
-      title.seriesStatus = (s === 'Ended' || s === 'Canceled') ? 'ended' : 'running';
-      if (detail.number_of_seasons) title.seasons = detail.number_of_seasons as number;
+      title.seriesStatus = (detail.status === 'Ended' || detail.status === 'Canceled') ? 'ended' : 'running';
+      if (detail.number_of_seasons) title.seasons = detail.number_of_seasons;
     }
 
     // Content rating
@@ -228,16 +234,16 @@ async function enrichTitle(title: TitleCard, region: string): Promise<TitleCard>
       if (type === 'movie') {
         const ratingRes = await tmdbFetch(`/movie/${id}/release_dates`);
         if (ratingRes.ok) {
-          const data = await ratingRes.json();
-          const regionRelease = (data.results || []).find((r: any) => r.iso_3166_1 === region);
-          const cert = regionRelease?.release_dates?.find((d: any) => d.certification)?.certification;
+          const data = await parseJson<{ results: { iso_3166_1: string; release_dates: { certification: string }[] }[] }>(ratingRes);
+          const regionRelease = (data.results || []).find(r => r.iso_3166_1 === region);
+          const cert = regionRelease?.release_dates?.find(d => d.certification)?.certification;
           title.contentRating = cert || '';
         }
       } else {
         const ratingRes = await tmdbFetch(`/tv/${id}/content_ratings`);
         if (ratingRes.ok) {
-          const data = await ratingRes.json();
-          const regionRating = (data.results || []).find((r: any) => r.iso_3166_1 === region);
+          const data = await parseJson<{ results: { iso_3166_1: string; rating: string }[] }>(ratingRes);
+          const regionRating = (data.results || []).find(r => r.iso_3166_1 === region);
           title.contentRating = regionRating?.rating || '';
         }
       }
@@ -318,7 +324,7 @@ export async function fetchProviderList(region: string): Promise<Array<{ id: num
     try {
       const res = await tmdbFetch(`/watch/providers/${type}?watch_region=${region}`);
       if (res.ok) {
-        const data = await res.json();
+        const data = await parseJson<{ results: { provider_id: number; provider_name: string; logo_path: string; display_priority: number }[] }>(res);
         for (const p of data.results || []) {
           if (!providers.has(p.provider_id)) {
             providers.set(p.provider_id, {
