@@ -163,7 +163,7 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                 settings.genres.length === 0 || settings.genres.includes(parseInt(id))
                   ? 'bg-primary/20 text-primary ring-1 ring-primary/30'
-                  : 'bg-dark-surface text-gray-500 hover:text-gray-300'
+                  : 'bg-dark-surface text-gray-500'
               }`}
             >
               {name}
