@@ -4,6 +4,24 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { GameSettings, StreamingProvider } from '@/types/game';
 import { GENRES, CONTENT_RATINGS, TIMER_OPTIONS, SORT_OPTIONS } from '@/lib/constants';
+
+const REGIONS: { code: string; name: string }[] = [
+  { code: 'IL', name: 'Israel' },
+  { code: 'US', name: 'USA' },
+  { code: 'GB', name: 'UK' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'FR', name: 'France' },
+  { code: 'NL', name: 'Netherlands' },
+  { code: 'ES', name: 'Spain' },
+  { code: 'IT', name: 'Italy' },
+  { code: 'BR', name: 'Brazil' },
+  { code: 'MX', name: 'Mexico' },
+  { code: 'IN', name: 'India' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'KR', name: 'South Korea' },
+];
 import { detectRegion } from '@/lib/detectRegion';
 import YearRangeSlider from '@/components/ui/YearRangeSlider';
 
@@ -110,11 +128,24 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
       {/* Streaming Providers */}
       <div>
         <div className="flex justify-between items-center mb-2">
-          <label className="text-sm text-gray-400">
+          <label className="text-sm text-gray-400 flex items-center gap-1.5">
             Streaming Services
-            <span className="ml-2 px-1.5 py-0.5 bg-dark-surface border border-dark-border rounded text-[10px] text-gray-500 font-mono">
-              {settings.region}
-            </span>
+            {isCreator ? (
+              <select
+                value={settings.region}
+                onChange={e => update({ region: e.target.value, providers: [] })}
+                className="bg-dark-surface border border-dark-border rounded px-1 py-0.5 text-[10px] text-gray-400 font-mono cursor-pointer focus:outline-none focus:border-primary appearance-none"
+                title="Change region"
+              >
+                {REGIONS.map(r => (
+                  <option key={r.code} value={r.code}>{r.code} · {r.name}</option>
+                ))}
+              </select>
+            ) : (
+              <span className="px-1.5 py-0.5 bg-dark-surface border border-dark-border rounded text-[10px] text-gray-500 font-mono">
+                {settings.region}
+              </span>
+            )}
           </label>
           <div className="flex gap-2">
             <button onClick={() => update({ providers: providers.map(p => p.id) })} className="text-xs text-primary">All</button>
