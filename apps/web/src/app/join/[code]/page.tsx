@@ -61,7 +61,12 @@ export default function JoinPage() {
     setError(null);
 
     const doJoin = () => {
-      socket.emit('joinRoom', code, name.trim(), (response: any) => {
+      socket.timeout(6000).emit('joinRoom', code, name.trim(), (err: Error | null, response: any) => {
+        if (err) {
+          setError('Could not reach the server. Please try again.');
+          setJoining(false);
+          return;
+        }
         if ('error' in response) {
           setError(response.error);
           setJoining(false);
