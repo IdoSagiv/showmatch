@@ -41,9 +41,11 @@ export function registerRoomHandlers(io: Server, socket: Socket) {
       socket.emit('roomClosed', 'Connection lost. The room no longer exists.');
       return;
     }
-    const { room } = result;
+    const { room, player } = result;
     socket.join(room.code);
     console.log(`[rejoinGame] ${displayName} re-attached to room ${room.code}`);
+    // Notify other players so their UI reflects the reconnected state
+    socket.to(room.code).emit('playerRejoined', player);
     socket.emit('gameRejoined', roomManager.serializeRoom(room), room.titlePool);
   });
 
