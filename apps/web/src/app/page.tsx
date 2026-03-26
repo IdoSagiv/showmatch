@@ -7,6 +7,7 @@ import { clearSession } from '@/lib/session';
 import JoinGameForm from '@/components/landing/JoinGameForm';
 import GameHistoryButton from '@/components/landing/GameHistoryButton';
 import Logo from '@/components/ui/Logo';
+import CreditLink from '@/components/ui/CreditLink';
 
 /** Decorative poster cards for the right panel (TMDB public CDN) */
 const POSTER_CARDS = [
@@ -146,6 +147,10 @@ export default function Home() {
             >
               <GameHistoryButton />
             </motion.div>
+
+            <div className="mt-4 pb-4 flex justify-center">
+              <CreditLink />
+            </div>
           </motion.div>
         </div>
 
