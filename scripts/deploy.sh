@@ -16,9 +16,9 @@
 # ──────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
-# Load tokens from shell profile if not already in environment
+# Load tokens (stored outside the repo, never committed)
 # shellcheck source=/dev/null
-[ -z "${FLY_API_TOKEN:-}" ] && source ~/.bashrc 2>/dev/null || true
+[ -f "$HOME/.showmatch_creds" ] && source "$HOME/.showmatch_creds"
 export PATH="$HOME/.fly/bin:$PATH"
 
 BOLD='\033[1m'
