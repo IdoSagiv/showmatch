@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────────────────────
-# deploy.sh  —  Deploy ShowMatch to the cloud
+# deploy.sh  —  CLOUD production (Fly.io + Vercel)
 #
 # Deploys:
 #   Socket server  →  Fly.io  (fly deploy, builds Docker image)
-#   Frontend       →  Vercel  (auto-deploys on every push to main — no action needed)
+#   Frontend       →  Vercel  (vercel deploy --prod)
 #
 # Guards (all must pass before anything is deployed):
 #   1. Must be on the main branch
 #   2. Working tree must be clean (no uncommitted changes)
 #   3. Local main must be in sync with origin/main (no unpushed or un-pulled commits)
+#
+# For LOCAL production (Raspberry Pi / LAN) use: bash scripts/prod.sh
 #
 # Usage:
 #   bash scripts/deploy.sh

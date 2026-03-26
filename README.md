@@ -97,6 +97,16 @@ OMDB_API_KEY=abc12345
 
 ---
 
+## Scripts
+
+| Script | Purpose |
+|---|---|
+| `npm run dev` | Development — hot-reload, both servers |
+| `bash scripts/prod.sh` | **Local production** — rebuild + restart on the Pi (LAN only) |
+| `bash scripts/deploy.sh` | **Cloud production** — deploy to Fly.io + Vercel |
+
+---
+
 ## Running
 
 ### Development
