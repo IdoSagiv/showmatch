@@ -20,7 +20,7 @@ export function useSocket() {
     // On every (re)connect: try to re-attach to an active room.
     // • First connect + session in sessionStorage → page refresh case
     // • Re-connect (socket dropped) + room in Zustand → brief disconnect case
-    socket.on('connect', () => {
+    const handleConnect = () => {
       if (!everConnectedRef.current) {
         everConnectedRef.current = true;
         // Page-refresh case: Zustand is empty but sessionStorage may have a session
@@ -44,7 +44,12 @@ export function useSocket() {
       const me = room.players.find(p => p.id === playerId);
       if (!me) return;
       socket.emit('rejoinGame', { code: room.code, displayName: me.displayName });
-    });
+    };
+
+    socket.on('connect', handleConnect);
+    // Socket may already be connected (pre-warmed from home page).
+    // The 'connect' event won't fire again — run the handler immediately.
+    if (socket.connected) handleConnect();
 
     socket.on('playerJoined', (player) => {
       store.addPlayer(player);
@@ -169,7 +174,7 @@ export function useSocket() {
     });
 
     return () => {
-      socket.off('connect');
+      socket.off('connect', handleConnect);
       socket.off('playerJoined');
       socket.off('playerLeft');
       socket.off('settingsUpdated');

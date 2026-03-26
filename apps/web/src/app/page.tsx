@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CreateGameButton from '@/components/landing/CreateGameButton';
 import { clearSession } from '@/lib/session';
+import { connectSocket } from '@/lib/socket';
 import JoinGameForm from '@/components/landing/JoinGameForm';
 import GameHistoryButton from '@/components/landing/GameHistoryButton';
 import Logo from '@/components/ui/Logo';
@@ -35,6 +36,11 @@ export default function Home() {
       sessionStorage.removeItem('showmatch-toast');
       setTimeout(() => setToast(null), 4000);
     }
+    // Pre-warm the socket connection while the user reads the home page.
+    // By the time they tap Create Game / enter their name, the TCP+TLS+WS
+    // handshake is already done and the first emit fires immediately.
+    // (No cleanup — leave connected so /create inherits the live socket.)
+    connectSocket();
   }, []);
 
   return (
