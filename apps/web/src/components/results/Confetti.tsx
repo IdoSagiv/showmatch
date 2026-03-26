@@ -34,9 +34,12 @@ export default function Confetti() {
           if (Date.now() < end) requestAnimationFrame(frame);
         };
 
-        // Big initial burst from the center
+        // Big initial burst from the center.
+        // Scale particles by device capability — low-end phones get half.
+        const cpus = navigator.hardwareConcurrency ?? 2;
+        const burstCount = cpus <= 2 ? 45 : 70;
         (confetti as any)({
-          particleCount: 120,
+          particleCount: burstCount,
           spread: 100,
           origin: { y: 0.55 },
           colors: ['#e50914', '#ffd700', '#00c853', '#ffffff'],
