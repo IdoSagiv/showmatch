@@ -75,7 +75,12 @@ export default function CreatePage() {
     setError(null);
 
     const doCreate = () => {
-      socket.emit('createRoom', trimmed, (response: any) => {
+      socket.timeout(6000).emit('createRoom', trimmed, (err: Error | null, response: any) => {
+        if (err) {
+          setError('Could not reach the server. Please try again.');
+          setCreating(false);
+          return;
+        }
         if ('error' in response) {
           setError(response.error);
           setCreating(false);
