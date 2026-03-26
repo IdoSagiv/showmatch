@@ -59,6 +59,10 @@ export function useSocket() {
       store.removePlayer(playerId);
     });
 
+    (socket as any).on('playerRejoined', (player: any) => {
+      store.updatePlayer(player);
+    });
+
     socket.on('settingsUpdated', (settings) => {
       store.updateSettings(settings);
     });
@@ -177,6 +181,7 @@ export function useSocket() {
       socket.off('connect', handleConnect);
       socket.off('playerJoined');
       socket.off('playerLeft');
+      (socket as any).off('playerRejoined');
       socket.off('settingsUpdated');
       socket.off('gameStarted');
       socket.off('playerProgress');

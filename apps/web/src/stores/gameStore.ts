@@ -27,6 +27,7 @@ interface GameStore {
   updatePlayers: (players: Player[]) => void;
   addPlayer: (player: Player) => void;
   removePlayer: (playerId: string) => void;
+  updatePlayer: (player: Player) => void;
   updateSettings: (settings: GameSettings) => void;
   startGame: (titlePool: TitleCard[]) => void;
   recordSwipe: (decision: SwipeDecision) => void;
@@ -64,7 +65,13 @@ const initialState = {
   isFirstMatch: false,
   loadingProgress: null as { stage: string; progress: number; total?: number } | null,
   gameOver: false,
-  reconnecting: false,
+  // Initialise as `true` on the client if a session exists in sessionStorage.
+  // This prevents lobby/game pages from redirecting away before the socket
+  // has had a chance to connect and fire rejoinGame. The value is synchronous
+  // so it beats any useEffect timing race.
+  reconnecting: typeof window !== 'undefined'
+    ? !!sessionStorage.getItem('showmatch-session')
+    : false,
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -85,6 +92,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     room: state.room ? {
       ...state.room,
       players: state.room.players.filter(p => p.id !== playerId),
+    } : null,
+  })),
+
+  updatePlayer: (player) => set((state) => ({
+    room: state.room ? {
+      ...state.room,
+      players: state.room.players.map(p => p.id === player.id ? player : p),
     } : null,
   })),
 
