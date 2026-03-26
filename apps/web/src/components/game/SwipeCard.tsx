@@ -43,12 +43,50 @@ export default function SwipeCard({
   const [flipped, setFlipped] = useState(false);
   const [exiting, setExiting] = useState(false);
   const backScrollRef = useRef<HTMLDivElement>(null);
+  // Keep a ref to `flipped` so the passive touch listeners can read it without
+  // going stale (effects that close over state values capture the value at
+  // registration time, not at call time).
+  const flippedRef = useRef(flipped);
+  useEffect(() => { flippedRef.current = flipped; }, [flipped]);
 
   useEffect(() => {
     if (!flipped && backScrollRef.current) {
       backScrollRef.current.scrollTop = 0;
     }
   }, [flipped]);
+
+  // Scroll-chain: when the inner info-panel hits its top/bottom boundary,
+  // forward the remaining scroll delta to the window so the page continues.
+  // CSS `overscroll-behavior: none` prevents the browser doing this natively,
+  // so we replicate it in JS for both touch (mobile) and wheel (desktop).
+  useEffect(() => {
+    const el = backScrollRef.current;
+    if (!el) return;
+
+    let touchStartY = 0;
+
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!flippedRef.current) return;
+      const deltaY = touchStartY - e.touches[0].clientY;
+      touchStartY = e.touches[0].clientY;
+      const atTop    = el.scrollTop <= 0;
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+      if ((deltaY < 0 && atTop) || (deltaY > 0 && atBottom)) {
+        window.scrollBy({ top: deltaY, behavior: 'instant' as ScrollBehavior });
+      }
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove',  onTouchMove,  { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove',  onTouchMove);
+    };
+  }, []);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -325,7 +363,19 @@ export default function SwipeCard({
               />
             )}
 
-            <div ref={backScrollRef} className="relative p-5 h-full overflow-y-auto space-y-4" style={{ touchAction: 'pan-y', overscrollBehavior: 'none' }}>
+            <div
+              ref={backScrollRef}
+              className="relative p-5 h-full overflow-y-auto space-y-4"
+              style={{ touchAction: 'pan-y', overscrollBehavior: 'none' }}
+              onWheel={(e) => {
+                // Desktop/trackpad: forward overflow scroll to the page
+                const el = backScrollRef.current;
+                if (!el) return;
+                const atTop    = el.scrollTop <= 0            && e.deltaY < 0;
+                const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1 && e.deltaY > 0;
+                if (atTop || atBottom) window.scrollBy({ top: e.deltaY });
+              }}
+            >
               <h2 className="text-xl font-black leading-tight tracking-tight">
                 {card.title}{' '}
                 <span className="text-gray-500 font-normal text-base">
