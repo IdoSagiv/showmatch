@@ -234,6 +234,8 @@ export default function CreatePage() {
     const stage = loadingProgress?.stage || 'fetching';
     const progress = loadingProgress?.progress || 0;
     const total = loadingProgress?.total;
+    const pct = total ? Math.round((progress / total) * 100) : 0;
+
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-6">
         <motion.div
@@ -241,14 +243,24 @@ export default function CreatePage() {
           transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
           className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full"
         />
-        <div className="text-center">
+        <div className="text-center w-64">
           <p className="text-lg font-semibold text-white mb-1">
-            {stage === 'fetching' ? 'Finding titles…' : 'Loading titles…'}
+            {stage === 'fetching' ? 'Finding titles…' : 'Loading details…'}
           </p>
           {total ? (
-            <p className="text-sm text-gray-400">{progress} / {total}</p>
+            <div className="mt-3">
+              <div className="h-1.5 w-full bg-dark-surface rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-primary rounded-full"
+                  initial={{ width: '0%' }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ ease: 'linear', duration: 0.3 }}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1.5">{pct}%</p>
+            </div>
           ) : (
-            <p className="text-sm text-gray-400">This takes a few seconds ☕</p>
+            <p className="text-sm text-gray-400 mt-1">This takes a few seconds ☕</p>
           )}
         </div>
       </div>
