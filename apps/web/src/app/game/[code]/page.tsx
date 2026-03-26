@@ -41,7 +41,8 @@ export default function GamePage() {
     matchedTitles, winner, isFirstMatch, gameOver,
     recordSwipe, undoLastSwipe, playerId, reconnecting,
   } = useGameStore();
-  const { playLike, playPass, playSuperLike } = useSound();
+  const { playLike, playPass, playSuperLike, toggleMute, isMuted } = useSound();
+  const [muted, setMuted] = useState(() => isMuted());
 
   // Sound is driven from handleSwipe so it fires for both gestures AND button taps
   const soundForDecision = useCallback((decision: 'like' | 'pass' | 'superlike') => {
@@ -144,10 +145,20 @@ export default function GamePage() {
       <header className="flex items-center justify-between px-4 py-2.5 bg-transparent backdrop-blur-md">
         <Logo size="sm" />
         <PlayerBadge />
-        <TutorialReplayButton onClick={() => {
-          localStorage.removeItem('showmatch-tutorial-seen');
-          setShowTutorial(true);
-        }} />
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => { const m = toggleMute(); setMuted(m); }}
+            className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 active:scale-90 transition-all"
+            title={muted ? 'Unmute' : 'Mute'}
+            aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}
+          >
+            <span className="text-base">{muted ? '🔇' : '🔊'}</span>
+          </button>
+          <TutorialReplayButton onClick={() => {
+            localStorage.removeItem('showmatch-tutorial-seen');
+            setShowTutorial(true);
+          }} />
+        </div>
       </header>
 
       <div className="flex-1 min-h-0 flex flex-col p-4 max-w-lg mx-auto w-full">
