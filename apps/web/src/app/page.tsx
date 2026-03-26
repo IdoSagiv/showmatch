@@ -226,7 +226,7 @@ export default function Home() {
       <AnimatePresence>
         {toast && (
           <motion.div
-            className="fixed left-1/2 -translate-x-1/2 glass-card px-5 py-3 rounded-2xl text-sm z-50 whitespace-nowrap"
+            className="fixed left-1/2 -translate-x-1/2 glass-card px-5 py-3 rounded-2xl text-sm z-50 text-center max-w-[calc(100vw-2rem)]"
             style={{ top: 'max(1rem, env(safe-area-inset-top))' }}
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
