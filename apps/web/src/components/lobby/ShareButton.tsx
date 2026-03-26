@@ -16,9 +16,16 @@ export default function ShareButton({ code }: ShareButtonProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const getJoinUrl = () =>
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/join/${code}`
+      : `/join/${code}`;
+
   const handleShare = async () => {
-    const text = `Join my ShowMatch game! Enter code: ${code}`;
-    const result = await shareText(text);
+    const result = await shareText('Join my ShowMatch game! 🎬', {
+      title: 'ShowMatch',
+      url: getJoinUrl(),
+    });
     if (result === 'copied') flash();
   };
 
