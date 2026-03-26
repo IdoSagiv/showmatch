@@ -84,10 +84,25 @@ fi
 
 fly deploy
 
-echo -e "\n${GREEN}${BOLD}✓ Socket server deployed${NC}"
+echo -e "\n${GREEN}${BOLD}✓ Socket server deployed → https://showmatch-socket.fly.dev${NC}"
 
-# ── Vercel: auto-deploys from main, nothing to do ────────────────────────────
-echo -e "\n${YELLOW}ℹ Vercel picks up main automatically — no action needed.${NC}"
-echo -e "  Track: https://vercel.com/dashboard\n"
+# ── Deploy: frontend → Vercel ────────────────────────────────────────────────
+echo -e "\n${BOLD}Deploying frontend → Vercel...${NC}"
 
-echo -e "${GREEN}${BOLD}Deploy complete.${NC} Commit: $COMMIT\n"
+if ! command -v vercel &>/dev/null; then
+  echo -e "${RED}✗ vercel CLI not found${NC}"
+  echo -e "  Install: npm install -g vercel\n"
+  exit 1
+fi
+
+if [ -z "${VERCEL_TOKEN:-}" ]; then
+  echo -e "${RED}✗ VERCEL_TOKEN not set${NC}"
+  exit 1
+fi
+
+vercel deploy --prod --token "$VERCEL_TOKEN" --yes
+
+echo -e "\n${GREEN}${BOLD}✓ Frontend deployed → https://showmatch.vercel.app${NC}"
+
+# ── Done ─────────────────────────────────────────────────────────────────────
+echo -e "\n${GREEN}${BOLD}Deploy complete.${NC} Commit: $COMMIT\n"
