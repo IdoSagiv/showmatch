@@ -231,14 +231,15 @@ export default function JoinPage() {
               whileHover={name.trim() && !joining ? { scale: 1.01 } : {}}
               transition={{ type: 'spring', stiffness: 400, damping: 22 }}
             >
-              <AnimatePresence mode="wait">
+              <AnimatePresence>
                 {joining ? (
                   <motion.span
                     key="joining"
                     className="flex items-center justify-center gap-2"
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.1 }}
                   >
                     {[0, 1, 2].map(i => (
                       <motion.span
