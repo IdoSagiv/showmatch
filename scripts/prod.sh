@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
-# Build and start ShowMatch in production mode.
-# Run from repo root: bash scripts/prod.sh
+# ──────────────────────────────────────────────────────────────────────────────
+# prod.sh  —  LOCAL production (Raspberry Pi / LAN)
+#
+# Kills any running servers, rebuilds Next.js, and restarts both servers
+# in the background. Logs go to /tmp/showmatch-prod.log.
+#
+# For CLOUD deployment (Fly.io + Vercel) use: bash scripts/deploy.sh
+# ──────────────────────────────────────────────────────────────────────────────
 set -e
 
 cd "$(dirname "$0")/.."
