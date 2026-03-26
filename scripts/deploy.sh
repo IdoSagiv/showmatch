@@ -16,6 +16,11 @@
 # ──────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
+# Load tokens from shell profile if not already in environment
+# shellcheck source=/dev/null
+[ -z "${FLY_API_TOKEN:-}" ] && source ~/.bashrc 2>/dev/null || true
+export PATH="$HOME/.fly/bin:$PATH"
+
 BOLD='\033[1m'
 RED='\033[0;31m'
 GREEN='\033[0;32m'
