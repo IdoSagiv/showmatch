@@ -282,6 +282,12 @@ export default function CreatePage() {
             <p className="text-sm text-gray-400 mt-1">This takes a few seconds ☕</p>
           )}
         </div>
+        <button
+          onClick={() => { setGameStarting(false); router.push('/'); }}
+          className="text-sm text-gray-600 hover:text-gray-400 transition-colors mt-2"
+        >
+          Cancel
+        </button>
       </div>
     );
   }
