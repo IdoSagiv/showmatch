@@ -200,21 +200,66 @@ export default function GamePage() {
           />
         )}
 
-        {/* Card Stack */}
+        {/* Card Stack / Done-waiting state */}
         <div className="flex-1 min-h-0 flex items-stretch justify-center mt-4 overflow-hidden">
-          <CardStack
-            cards={titlePool}
-            currentIndex={currentCardIndex}
-            onSwipe={handleSwipe}
-            superLikeUsed={me?.superLikeUsed ?? false}
-            pendingDecision={pendingDecision}
-            onPendingConsumed={() => setPendingDecision(null)}
-            otherPlayers={otherPlayers}
-            totalCards={titlePool.length}
-            onUndo={handleUndo}
-            canUndo={canUndo}
-            onDragProgress={setDragDirection}
-          />
+          {isFinished ? (
+            <div className="flex flex-col items-center justify-center gap-5 w-full">
+              <motion.div
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+                className="w-20 h-20 rounded-full bg-green-900/30 border-2 border-green-500/40 flex items-center justify-center text-4xl"
+              >
+                ✓
+              </motion.div>
+              <motion.p
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="text-lg font-semibold text-gray-200"
+              >
+                You&apos;re done!
+              </motion.p>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.25 }}
+                className="text-sm text-gray-500"
+              >
+                Waiting for everyone to finish...
+              </motion.p>
+              {/* Per-player progress dots */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.35 }}
+                className="flex gap-3 flex-wrap justify-center"
+              >
+                {room.players.filter(p => p.connected).map(p => (
+                  <div key={p.id} className="flex flex-col items-center gap-1">
+                    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold transition-colors ${p.finished ? 'border-green-500/60 bg-green-900/30 text-green-400' : 'border-gray-600 bg-dark-card text-gray-500'}`}>
+                      {p.finished ? '✓' : p.displayName.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-[10px] text-gray-600 max-w-[48px] truncate">{p.displayName.split(' ')[0]}</span>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+          ) : (
+            <CardStack
+              cards={titlePool}
+              currentIndex={currentCardIndex}
+              onSwipe={handleSwipe}
+              superLikeUsed={me?.superLikeUsed ?? false}
+              pendingDecision={pendingDecision}
+              onPendingConsumed={() => setPendingDecision(null)}
+              otherPlayers={otherPlayers}
+              totalCards={titlePool.length}
+              onUndo={handleUndo}
+              canUndo={canUndo}
+              onDragProgress={setDragDirection}
+            />
+          )}
         </div>
 
         {/* Buttons */}
