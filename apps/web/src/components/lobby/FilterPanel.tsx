@@ -55,7 +55,7 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
       <div className="bg-dark-card rounded-2xl p-4 border border-dark-border">
         <h3 className="text-sm font-semibold text-gray-400 mb-3">Game Settings</h3>
         <div className="flex flex-wrap gap-2 text-sm text-gray-300">
-          <span>Pool: {settings.poolSize === 'all' ? 'Max' : settings.poolSize}</span>
+          <span>Cards: {settings.poolSize === 'all' ? 'Max' : settings.poolSize}</span>
           <span>Rating: {settings.minRating}+</span>
           <span>{settings.yearRange[0]}-{settings.yearRange[1]}</span>
           {settings.firstMatchMode && <span className="text-accent-gold">First Match Mode</span>}
@@ -179,10 +179,10 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
         )}
       </div>
 
-      {/* Pool Size */}
+      {/* Cards to swipe */}
       <div>
         <div className="flex justify-between items-center mb-1">
-          <label className="text-sm text-gray-400">Pool Size</label>
+          <label className="text-sm text-gray-400">Cards to swipe</label>
           <span className="text-sm font-mono">{settings.poolSize === 'all' ? 'Max' : settings.poolSize}</span>
         </div>
         <div className="flex items-center gap-3">
