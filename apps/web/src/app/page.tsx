@@ -21,7 +21,7 @@ const POSTER_CARDS = [
 const STEPS = [
   { emoji: '🎬', label: 'Pick the vibe',     desc: "Set the genre, era, and whether you're feeling movies or shows." },
   { emoji: '👆', label: 'Swipe together',   desc: 'Everyone in the room votes on the same titles in real time.' },
-  { emoji: '🎉', label: 'Watch together',  desc: "Mutual likes win, and the crowd's pick is revealed live." },
+  { emoji: '🎉', label: 'Watch together',  desc: "Whatever everyone agrees on wins — revealed live with a countdown." },
 ];
 
 export default function Home() {
