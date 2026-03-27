@@ -80,8 +80,8 @@ export const TIMER_OPTIONS = [
 ];
 
 export const SORT_OPTIONS = [
-  { label: 'Popularity', value: 'popularity.desc' as const },
-  { label: 'Rating', value: 'vote_average.desc' as const },
+  { label: 'Most popular', value: 'popularity.desc' as const },
+  { label: 'Top rated', value: 'vote_average.desc' as const },
   { label: 'Release Date', value: 'primary_release_date.desc' as const },
 ];
 
