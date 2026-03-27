@@ -54,6 +54,7 @@ export default function GamePage() {
   const [flipped, setFlipped] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showSuperlikeHint, setShowSuperlikeHint] = useState(false);
+  const [showTimesUp, setShowTimesUp] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [pendingDecision, setPendingDecision] = useState<'like' | 'pass' | 'superlike' | null>(null);
   const [dragDirection, setDragDirection] = useState<'like' | 'pass' | 'superlike' | null>(null);
@@ -108,6 +109,8 @@ export default function GamePage() {
   }, [socket, undoLastSwipe]);
 
   const handleTimerExpired = useCallback(() => {
+    setShowTimesUp(true);
+    setTimeout(() => setShowTimesUp(false), 600);
     handleSwipe('pass');
   }, [handleSwipe]);
 
@@ -274,6 +277,23 @@ export default function GamePage() {
           />
         )}
       </div>
+
+      {/* Time's up flash */}
+      <AnimatePresence>
+        {showTimesUp && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <div className="bg-accent-red/20 border border-accent-red/40 text-white text-lg font-bold px-6 py-3 rounded-2xl backdrop-blur-sm">
+              ⏱ Time&apos;s up!
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Superlike one-time hint toast */}
       <AnimatePresence>
