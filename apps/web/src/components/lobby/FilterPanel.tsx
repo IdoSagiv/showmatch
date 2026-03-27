@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { GameSettings, StreamingProvider } from '@/types/game';
 import { GENRES, CONTENT_RATINGS, TIMER_OPTIONS, SORT_OPTIONS } from '@/lib/constants';
 import YearRangeSlider from '@/components/ui/YearRangeSlider';
@@ -15,6 +15,7 @@ interface FilterPanelProps {
 export default function FilterPanel({ settings, onSettingsChange, isCreator }: FilterPanelProps) {
   const [providers, setProviders] = useState<StreamingProvider[]>([]);
   const [providerTooltip, setProviderTooltip] = useState<string | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleProviderPointerDown = useCallback((name: string) => {
@@ -197,6 +198,32 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
         )}
       </div>
 
+      {/* Advanced settings toggle */}
+      <button
+        onClick={() => setShowAdvanced(v => !v)}
+        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 transition-colors self-start"
+      >
+        <motion.span
+          animate={{ rotate: showAdvanced ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="inline-block"
+        >
+          ▾
+        </motion.span>
+        Advanced
+      </button>
+
+      <AnimatePresence>
+        {showAdvanced && (
+          <motion.div
+            key="advanced"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.22 }}
+            className="overflow-hidden flex flex-col gap-5"
+          >
+
       {/* Cards to swipe */}
       <div>
         <div className="flex justify-between items-center mb-1">
@@ -309,6 +336,10 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
           ))}
         </div>
       </div>
+
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
