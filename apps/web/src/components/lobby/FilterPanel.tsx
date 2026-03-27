@@ -100,6 +100,24 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
         </div>
       </div>
 
+      {/* First Match Mode */}
+      <div className="flex items-center justify-between">
+        <div>
+          <label className="text-sm font-medium">First Match Mode</label>
+          <p className="text-xs text-gray-500">First title everyone agrees on wins instantly!</p>
+        </div>
+        <button
+          onClick={() => update({ firstMatchMode: !settings.firstMatchMode })}
+          className={`w-12 h-6 rounded-full transition-colors ${settings.firstMatchMode ? 'bg-primary' : 'bg-dark-border'}`}
+        >
+          <motion.div
+            className="w-5 h-5 bg-white rounded-full shadow"
+            animate={{ x: settings.firstMatchMode ? 24 : 2 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+          />
+        </button>
+      </div>
+
       {/* Streaming Providers */}
       <div>
         <div className="flex justify-between items-center mb-2">
@@ -270,24 +288,6 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
             </button>
           ))}
         </div>
-      </div>
-
-      {/* First Match Mode */}
-      <div className="flex items-center justify-between">
-        <div>
-          <label className="text-sm font-medium">First Match Mode</label>
-          <p className="text-xs text-gray-500">First title everyone agrees on wins instantly!</p>
-        </div>
-        <button
-          onClick={() => update({ firstMatchMode: !settings.firstMatchMode })}
-          className={`w-12 h-6 rounded-full transition-colors ${settings.firstMatchMode ? 'bg-primary' : 'bg-dark-border'}`}
-        >
-          <motion.div
-            className="w-5 h-5 bg-white rounded-full shadow"
-            animate={{ x: settings.firstMatchMode ? 24 : 2 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-          />
-        </button>
       </div>
 
       {/* Timer */}
