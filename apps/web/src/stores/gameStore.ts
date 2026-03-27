@@ -16,6 +16,7 @@ interface GameStore {
   swipeReveal: Array<{ title: TitleCard; playerDecisions: Array<{ playerName: string; decision: string }> }>;
   gameStats: GameStatAward[];
   mySwipes: SwipeDecision[];
+  vetoedTmdbIds: number[];
   isFirstMatch: boolean;
   loadingProgress: { stage: string; progress: number; total?: number } | null;
   gameOver: boolean;
@@ -46,6 +47,7 @@ interface GameStore {
   setReconnecting: (val: boolean) => void;
   setCurrentCardIndex: (idx: number) => void;
   setTitlePool: (pool: TitleCard[]) => void;
+  addVeto: (tmdbId: number) => void;
   reset: () => void;
 }
 
@@ -62,6 +64,7 @@ const initialState = {
   swipeReveal: [] as Array<{ title: TitleCard; playerDecisions: Array<{ playerName: string; decision: string }> }>,
   gameStats: [] as GameStatAward[],
   mySwipes: [] as SwipeDecision[],
+  vetoedTmdbIds: [] as number[],
   isFirstMatch: false,
   loadingProgress: null as { stage: string; progress: number; total?: number } | null,
   gameOver: false,
@@ -110,6 +113,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     titlePool,
     currentCardIndex: 0,
     mySwipes: [],
+    vetoedTmdbIds: [],
     matchedTitles: [],
     winner: null,
     fullRankings: [],
@@ -171,6 +175,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setLoadingProgress: (data) => set({ loadingProgress: data }),
   setGameOver: (val) => set({ gameOver: val }),
   setReconnecting: (val) => set({ reconnecting: val }),
+  addVeto: (tmdbId) => set(state => ({ vetoedTmdbIds: [...state.vetoedTmdbIds, tmdbId] })),
   setCurrentCardIndex: (idx) => set({ currentCardIndex: idx }),
   setTitlePool: (pool) => set({ titlePool: pool }),
 

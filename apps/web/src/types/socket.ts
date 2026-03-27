@@ -20,6 +20,7 @@ export interface ServerToClientEvents {
   gameStats: (stats: GameStatAward[]) => void;
   roomClosed: (reason: string) => void;
   roomReset: (room: Room) => void;
+  playerVetoed: (playerId: string, tmdbId: number) => void;
   error: (message: string) => void;
 }
 
@@ -32,6 +33,7 @@ export interface ClientToServerEvents {
   requestTitleCount: (settings: GameSettings) => void;
   startGame: () => void;
   submitSwipe: (tmdbId: number, decision: 'like' | 'pass' | 'superlike') => void;
+  vetoTitle: (tmdbId: number) => void;
   undoSwipe: () => void;
   wildcardSpinStart: () => void;
   wildcardPick: (tmdbId: number) => void;

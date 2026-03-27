@@ -126,6 +126,10 @@ export function useSocket() {
       store.setRoom(room);
     });
 
+    socket.on('playerVetoed', (_playerId, tmdbId) => {
+      store.addVeto(tmdbId);
+    });
+
     socket.on('gameRejoined', (room, titlePool) => {
       if (reconnectTimerRef.current) { clearTimeout(reconnectTimerRef.current); reconnectTimerRef.current = null; }
       // Successfully re-attached. Restore as much state as possible.
@@ -195,6 +199,7 @@ export function useSocket() {
       socket.off('wildcardSpinStart');
       socket.off('wildcardResult');
       socket.off('roomReset');
+      socket.off('playerVetoed');
       socket.off('loadingProgress');
       socket.off('gameRejoined');
     };

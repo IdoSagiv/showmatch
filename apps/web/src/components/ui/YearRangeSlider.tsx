@@ -27,10 +27,10 @@ export default function YearRangeSlider({ min, max, value, onChange }: YearRange
   const loPercent = ((lo - min) / (max - min)) * 100;
   const hiPercent = ((hi - min) / (max - min)) * 100;
 
-  // Clamp bubble left so badges never overflow the slider track edges
-  // (20px ≈ half the width of a 4-digit year badge incl. padding)
+  // Clamp bubble left so badges never overflow the slider track edges.
+  // 44px gives clearance for the widest merged badge ("YYYY – YYYY" ≈ 80px, half=40px).
   const clampedLeft = (pct: number) =>
-    `max(20px, min(calc(100% - 20px), calc(${pct}% + ${10 - pct * 0.2}px)))`;
+    `max(44px, min(calc(100% - 44px), calc(${pct}% + ${10 - pct * 0.2}px)))`;
 
   const handleLoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const next = Math.min(Number(e.target.value), hi - step);
