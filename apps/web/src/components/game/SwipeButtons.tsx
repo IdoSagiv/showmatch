@@ -26,6 +26,7 @@ export default function SwipeButtons({
       <div className="flex items-center gap-7 glass-card rounded-[2rem] px-8 py-4 shadow-card">
 
         {/* Pass ✕ */}
+        <div className="flex flex-col items-center gap-1">
         <motion.button
           onClick={onPass}
           disabled={disabled}
@@ -42,8 +43,11 @@ export default function SwipeButtons({
         >
           ✕
         </motion.button>
+        <kbd className="hidden md:block text-[10px] text-gray-600 bg-dark-border/40 px-1.5 py-0.5 rounded font-mono">←</kbd>
+        </div>
 
         {/* Super Like ★ */}
+        <div className="flex flex-col items-center gap-1">
         <div className="relative">
           {!superLikeUsed && !disabled && !superActive && (
             <span className="absolute inset-0 rounded-full border-2 border-accent-gold animate-ping opacity-40" />
@@ -69,8 +73,11 @@ export default function SwipeButtons({
             ★
           </motion.button>
         </div>
+        <kbd className="hidden md:block text-[10px] text-gray-600 bg-dark-border/40 px-1.5 py-0.5 rounded font-mono">↑</kbd>
+        </div>
 
         {/* Like ♥ */}
+        <div className="flex flex-col items-center gap-1">
         <motion.button
           onClick={onLike}
           disabled={disabled}
@@ -87,6 +94,8 @@ export default function SwipeButtons({
         >
           ♥
         </motion.button>
+        <kbd className="hidden md:block text-[10px] text-gray-600 bg-dark-border/40 px-1.5 py-0.5 rounded font-mono">→</kbd>
+        </div>
 
       </div>
     </div>
