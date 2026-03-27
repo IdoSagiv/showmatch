@@ -201,12 +201,12 @@ class RoomManager {
     const timerKey = `${room.code}:${socketId}`;
     // Lobby: 5s grace — no in-progress state to preserve; fast feedback for others.
     // Finished rooms: 5s grace (feels responsive, survives brief reconnects).
-    // Host in active game: 15s grace — long enough to survive a brief network blip,
-    //   short enough that guests don't wait forever if the host leaves for real.
+    // Host in active game: 30s grace — mobile browsers can background briefly;
+    //   30s gives enough time to re-foreground without destroying the room.
     // Other players in active game: 60s grace (allows full reconnect mid-game).
     const graceMs = (room.status === 'lobby' || room.status === 'finished')
       ? 5_000
-      : (player.isCreator ? 15_000 : 60_000);
+      : (player.isCreator ? 30_000 : 60_000);
     const timer = setTimeout(() => {
       this.disconnectTimers.delete(timerKey);
       onExpire(room, player);

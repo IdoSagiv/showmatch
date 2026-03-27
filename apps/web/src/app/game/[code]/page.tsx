@@ -12,12 +12,9 @@ import TimerBar from '@/components/game/TimerBar';
 import Logo from '@/components/ui/Logo';
 import PlayerBadge from '@/components/ui/PlayerBadge';
 import TutorialOverlay, { TutorialReplayButton } from '@/components/game/TutorialOverlay';
-import { useBeforeUnload } from '@/hooks/useBeforeUnload';
 import { useSound } from '@/hooks/useSound';
 
 export default function GamePage() {
-  useBeforeUnload();
-
   // Use visualViewport.height (true visible height on mobile) via React state.
   // useLayoutEffect fires before the browser paints, so the correct height is
   // applied on the very first frame — no flash of wrong layout.
