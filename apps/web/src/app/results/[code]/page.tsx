@@ -149,15 +149,20 @@ export default function ResultsPage() {
         {/* Waiting for rankings */}
         {rankingSubmitted && !winner && (
           <div className="text-center py-8">
-            <p className="text-gray-400 animate-pulse">Waiting for other players to submit rankings...</p>
-            <div className="mt-4 flex justify-center gap-2">
-              {room.players.filter(p => p.connected).map(p => (
-                <div key={p.id} className="text-center">
-                  <div className="w-8 h-8 rounded-full bg-dark-surface flex items-center justify-center text-xs">
-                    {p.displayName.split(' ').map(w => w[0]).join('')}
+            <p className="text-sm text-gray-500 mb-5">Waiting for everyone to rank...</p>
+            <div className="flex justify-center gap-4 flex-wrap">
+              {room.players.filter(p => p.connected).map(p => {
+                const isMe = p.id === playerId;
+                const done = isMe && rankingSubmitted;
+                return (
+                  <div key={p.id} className="flex flex-col items-center gap-1.5">
+                    <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold transition-all ${done ? 'border-green-500/60 bg-green-900/30 text-green-400' : 'border-dark-border bg-dark-surface text-gray-400 animate-pulse'}`}>
+                      {done ? '✓' : p.displayName.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-[11px] text-gray-500 max-w-[56px] truncate">{p.displayName.split(' ')[0]}</span>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
