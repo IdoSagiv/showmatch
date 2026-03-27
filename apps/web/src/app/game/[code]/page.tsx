@@ -125,6 +125,17 @@ export default function GamePage() {
     }
   }, [currentCardIndex, titlePool]);
 
+  // Guard browser back button — push a dummy history entry so back is intercepted
+  useEffect(() => {
+    history.pushState(null, '', location.href);
+    const handler = () => {
+      history.pushState(null, '', location.href);
+      router.push('/');
+    };
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
+  }, [router]);
+
   // One-time Superlike hint on first card of each game session
   useEffect(() => {
     if (!titlePool.length || currentCardIndex !== 0) return;
