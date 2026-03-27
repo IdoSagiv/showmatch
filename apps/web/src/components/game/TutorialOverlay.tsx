@@ -15,12 +15,13 @@ function DemoCard({
   frontControls: ReturnType<typeof useAnimationControls>;
   backControls: ReturnType<typeof useAnimationControls>;
   stampControls: ReturnType<typeof useAnimationControls>;
-  stamp: 'like' | 'nope' | 'super' | null;
+  stamp: 'like' | 'nope' | 'super' | 'veto' | null;
 }) {
   const stampStyle = {
     like:  { label: 'LIKE',       color: '#22c55e', rotate: -22 },
     nope:  { label: 'NOPE',       color: '#e50914', rotate:  18 },
     super: { label: 'SUPER LIKE', color: '#ffd700', rotate: -18 },
+    veto:  { label: '🚫 VETO',    color: '#ff6400', rotate:   0 },
   };
   const s = stamp ? stampStyle[stamp] : null;
 
@@ -140,6 +141,17 @@ function DemoCard({
           style={{ position: 'absolute', top: 4, fontSize: 18 }}
         >↑</motion.div>
       )}
+      {stamp === 'veto' && (
+        <motion.div
+          animate={{ scale: [1, 1.15, 1], opacity: [0.5, 1, 0.5] }}
+          transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
+          style={{
+            position: 'absolute', bottom: 0, fontSize: 11,
+            background: 'rgba(255,100,0,0.15)', border: '1px solid rgba(255,100,0,0.5)',
+            color: 'rgba(255,130,0,0.9)', borderRadius: 20, padding: '3px 10px', fontWeight: 700,
+          }}
+        >🚫 Veto button</motion.div>
+      )}
     </div>
   );
 }
@@ -148,7 +160,7 @@ function DemoCard({
 interface Step {
   title: string;
   description: string;
-  stamp: 'like' | 'nope' | 'super' | null;
+  stamp: 'like' | 'nope' | 'super' | 'veto' | null;
   runAnimation: (
     cardCtrl: ReturnType<typeof useAnimationControls>,
     frontCtrl: ReturnType<typeof useAnimationControls>,
@@ -222,6 +234,25 @@ const STEPS: Step[] = [
         stamp.start({ opacity: 0, transition: { duration: 0.2 } }),
       ]);
       await new Promise(r => setTimeout(r, 600));
+    },
+  },
+  {
+    title: 'Veto a Title',
+    description: "Once per game, block a title from ever winning — even if others like it. Use it on something you really don't want to watch.",
+    stamp: 'veto',
+    runAnimation: async (card, _f, _b, stamp) => {
+      await card.start({ x: 0, scale: 1, transition: { duration: 0 } });
+      await stamp.start({ opacity: 0, scale: 0.6, transition: { duration: 0 } });
+      await new Promise(r => setTimeout(r, 500));
+      await stamp.start({ opacity: 1, scale: 1, transition: { duration: 0.2 } });
+      // Shake + stamp
+      await card.start({ x: [-6, 6, -5, 5, -3, 3, 0], transition: { duration: 0.45, ease: 'easeInOut' } });
+      await new Promise(r => setTimeout(r, 700));
+      await Promise.all([
+        stamp.start({ opacity: 0, transition: { duration: 0.2 } }),
+        card.start({ scale: 1, transition: { duration: 0 } }),
+      ]);
+      await new Promise(r => setTimeout(r, 500));
     },
   },
   {

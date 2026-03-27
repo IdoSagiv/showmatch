@@ -126,8 +126,9 @@ export function useSocket() {
       store.setRoom(room);
     });
 
-    socket.on('playerVetoed', (_playerId, tmdbId) => {
+    socket.on('playerVetoed', (playerId, tmdbId) => {
       store.addVeto(tmdbId);
+      store.markPlayerVetoed(playerId);
     });
 
     socket.on('gameRejoined', (room, titlePool) => {
