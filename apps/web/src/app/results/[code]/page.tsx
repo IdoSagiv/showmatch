@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useState, useCallback } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter, useParams } from 'next/navigation';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
@@ -28,6 +29,7 @@ export default function ResultsPage() {
   const [rankingSubmitted, setRankingSubmitted] = useState(false);
   const [historySaved, setHistorySaved] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [playAgainNotify, setPlayAgainNotify] = useState(false);
 
   // Auto-set winner when there's exactly 1 match (server skips ranking round)
   useEffect(() => {
@@ -64,7 +66,9 @@ export default function ResultsPage() {
 
   useEffect(() => {
     if (room?.status === 'lobby') {
-      router.push(`/lobby/${code}`);
+      setPlayAgainNotify(true);
+      const t = setTimeout(() => router.push(`/lobby/${code}`), 1500);
+      return () => clearTimeout(t);
     }
   }, [room?.status, code, router]);
 
@@ -227,6 +231,26 @@ export default function ResultsPage() {
           </div>
         </div>
       )}
+      {/* Play Again notification */}
+      <AnimatePresence>
+        {playAgainNotify && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-dark-DEFAULT/60 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-dark-card border border-dark-border rounded-2xl px-8 py-6 text-center shadow-xl"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.05 }}
+            >
+              <p className="text-lg font-semibold text-white">🔄 Host is starting a new game...</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
