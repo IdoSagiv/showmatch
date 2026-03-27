@@ -6,15 +6,17 @@ interface SwipeButtonsProps {
   onPass: () => void;
   onLike: () => void;
   onSuperLike: () => void;
+  onVeto: () => void;
   superLikeUsed: boolean;
+  vetoUsed: boolean;
   disabled: boolean;
   /** Which direction the card is currently being dragged toward */
   dragDirection?: 'like' | 'pass' | 'superlike' | null;
 }
 
 export default function SwipeButtons({
-  onPass, onLike, onSuperLike,
-  superLikeUsed, disabled,
+  onPass, onLike, onSuperLike, onVeto,
+  superLikeUsed, vetoUsed, disabled,
   dragDirection = null,
 }: SwipeButtonsProps) {
   const passActive   = dragDirection === 'pass';
@@ -22,7 +24,7 @@ export default function SwipeButtons({
   const superActive  = dragDirection === 'superlike';
 
   return (
-    <div className="flex justify-center mt-3">
+    <div className="flex flex-col items-center gap-2 mt-3">
       <div className="flex items-center gap-7 glass-card rounded-[2rem] px-8 py-4 shadow-card">
 
         {/* Pass ✕ */}
@@ -98,6 +100,22 @@ export default function SwipeButtons({
         </div>
 
       </div>
+
+      {/* Veto — one-time per player, removes title from winning */}
+      <motion.button
+        onClick={onVeto}
+        disabled={disabled || vetoUsed}
+        className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors disabled:opacity-30"
+        style={{
+          borderColor: vetoUsed ? 'rgba(107,107,107,0.3)' : 'rgba(255,100,0,0.6)',
+          color: vetoUsed ? 'rgba(107,107,107,0.5)' : 'rgba(255,130,0,0.9)',
+          backgroundColor: 'rgba(15,14,31,0)',
+        }}
+        whileTap={{ scale: 0.88 }}
+        title={vetoUsed ? 'Veto already used' : 'Veto this title (once per game)'}
+      >
+        🚫 {vetoUsed ? 'Vetoed' : 'Veto'}
+      </motion.button>
     </div>
   );
 }

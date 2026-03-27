@@ -24,7 +24,7 @@ export default function ResultsPage() {
   const socket = useSocket();
   const {
     room, matchedTitles, winner, fullRankings, wildcardCandidates, wildcardSpinning,
-    isFirstMatch, playerId, swipeReveal, gameStats, gameOver, setWinner, reset, reconnecting,
+    isFirstMatch, playerId, swipeReveal, gameStats, gameOver, setWinner, reset, reconnecting, vetoedTmdbIds,
   } = useGameStore();
   const [rankingSubmitted, setRankingSubmitted] = useState(false);
   const [historySaved, setHistorySaved] = useState(false);
@@ -180,7 +180,7 @@ export default function ResultsPage() {
             />
 
             <div className="mt-4">
-              <SwipeReveal reveals={swipeReveal} />
+              <SwipeReveal reveals={swipeReveal} vetoedTmdbIds={vetoedTmdbIds} />
             </div>
 
             <div className="mt-6">
