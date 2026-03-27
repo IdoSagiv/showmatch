@@ -211,10 +211,11 @@ export default function ResultsPage() {
                 </button>
                 <button
                   onClick={handleEndGame}
-                  className="flex items-center justify-center px-4 py-3 rounded-xl border border-red-900/40 bg-red-950/30 hover:bg-red-950/60 transition-colors text-red-400 text-sm active:scale-95"
+                  className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl border border-red-900/40 bg-red-950/30 hover:bg-red-950/60 transition-colors text-red-400 text-sm active:scale-95"
                   title="End Game"
+                  aria-label="End Game"
                 >
-                  🚪
+                  🚪 <span>End</span>
                 </button>
               </>
             )}
