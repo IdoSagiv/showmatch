@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useCallback, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter, useParams } from 'next/navigation';
 import { useSocket } from '@/hooks/useSocket';
 import { useGameStore } from '@/stores/gameStore';
@@ -52,6 +53,7 @@ export default function GamePage() {
   }, [playLike, playPass, playSuperLike]);
   const [flipped, setFlipped] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showSuperlikeHint, setShowSuperlikeHint] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [pendingDecision, setPendingDecision] = useState<'like' | 'pass' | 'superlike' | null>(null);
   const [dragDirection, setDragDirection] = useState<'like' | 'pass' | 'superlike' | null>(null);
@@ -119,6 +121,18 @@ export default function GamePage() {
       }
     }
   }, [currentCardIndex, titlePool]);
+
+  // One-time Superlike hint on first card of each game session
+  useEffect(() => {
+    if (!titlePool.length || currentCardIndex !== 0) return;
+    const key = 'showmatch-superlike-hint';
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+    setShowSuperlikeHint(true);
+    const t = setTimeout(() => setShowSuperlikeHint(false), 3000);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [titlePool.length]);
 
   // Keyboard shortcuts: ← pass, → like, ↑ superlike
   useEffect(() => {
@@ -215,6 +229,22 @@ export default function GamePage() {
           />
         )}
       </div>
+
+      {/* Superlike one-time hint toast */}
+      <AnimatePresence>
+        {showSuperlikeHint && (
+          <motion.div
+            className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+          >
+            <div className="bg-dark-surface/95 border border-yellow-500/30 text-sm text-gray-200 px-4 py-2.5 rounded-2xl shadow-lg backdrop-blur-sm whitespace-nowrap">
+              ⭐ You have 1 Super Like — use it wisely!
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
