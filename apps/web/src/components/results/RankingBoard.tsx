@@ -52,10 +52,13 @@ function DraggableItem({ item, index }: { item: TitleCard; index: number }) {
           style={{ touchAction: 'none' }}
           onPointerDown={(e) => dragControls.start(e)}
         >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
-            <rect x="2" y="3" width="14" height="2" rx="1" />
-            <rect x="2" y="8" width="14" height="2" rx="1" />
-            <rect x="2" y="13" width="14" height="2" rx="1" />
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <circle cx="5" cy="3" r="1.5" />
+            <circle cx="5" cy="8" r="1.5" />
+            <circle cx="5" cy="13" r="1.5" />
+            <circle cx="11" cy="3" r="1.5" />
+            <circle cx="11" cy="8" r="1.5" />
+            <circle cx="11" cy="13" r="1.5" />
           </svg>
         </div>
       </motion.div>
@@ -81,7 +84,7 @@ export default function RankingBoard({ titles, onSubmit, submitted }: RankingBoa
           You agreed on {titles.length} titles! Rank them.
         </h2>
         {!submitted && (
-          <p className="text-xs text-gray-500 mt-1">Hold the <span className="text-gray-400">≡</span> handle to drag</p>
+          <p className="text-xs text-gray-500 mt-1">Hold the grip handle to reorder</p>
         )}
       </div>
 
