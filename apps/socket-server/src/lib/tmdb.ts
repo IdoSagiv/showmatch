@@ -67,7 +67,7 @@ export async function fetchDiscoverResults(
   onProgress?: (done: number, total: number) => void
 ): Promise<TitleCard[]> {
   const allResults: TitleCard[] = [];
-  const poolSize = settings.poolSize === 'all' ? 500 : settings.poolSize;
+  const poolSize = settings.poolSize === 'all' ? 50 : settings.poolSize;
   // Fetch 1.5× more raw results to compensate for titles filtered out after
   // enrichment (theatrical/pre-streaming releases with no flatrate providers).
   const fetchSize = Math.min(Math.ceil(poolSize * 1.5), 500);

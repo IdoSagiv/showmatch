@@ -55,7 +55,7 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
       <div className="bg-dark-card rounded-2xl p-4 border border-dark-border">
         <h3 className="text-sm font-semibold text-gray-400 mb-3">Game Settings</h3>
         <div className="flex flex-wrap gap-2 text-sm text-gray-300">
-          <span>Cards: {settings.poolSize === 'all' ? 'Max' : settings.poolSize}</span>
+          <span>Cards: {settings.poolSize === 'all' ? 'Marathon' : settings.poolSize}</span>
           <span>Rating: {settings.minRating}+</span>
           <span>{settings.yearRange[0]}-{settings.yearRange[1]}</span>
           {settings.firstMatchMode && <span className="text-accent-gold">First Match Mode</span>}
@@ -183,15 +183,15 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
       <div>
         <div className="flex justify-between items-center mb-1">
           <label className="text-sm text-gray-400">Cards to swipe</label>
-          <span className="text-sm font-mono">{settings.poolSize === 'all' ? 'Max' : settings.poolSize}</span>
+          <span className="text-sm font-mono">{settings.poolSize === 'all' ? 'Marathon' : settings.poolSize}</span>
         </div>
         <div className="flex items-center gap-3">
           <input
             type="range"
             min={10}
-            max={100}
+            max={50}
             step={5}
-            value={settings.poolSize === 'all' ? 100 : settings.poolSize}
+            value={settings.poolSize === 'all' ? 50 : settings.poolSize}
             onChange={e => update({ poolSize: parseInt(e.target.value) })}
             className="flex-1 accent-primary"
           />
@@ -199,7 +199,7 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
             onClick={() => update({ poolSize: settings.poolSize === 'all' ? 30 : 'all' })}
             className={`px-3 py-1 rounded-lg text-xs ${settings.poolSize === 'all' ? 'bg-primary text-white' : 'bg-dark-surface text-gray-400'}`}
           >
-            Max
+            Marathon
           </button>
         </div>
       </div>
