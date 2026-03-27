@@ -94,7 +94,7 @@ export default function ResultReveal({ winner, skipCountdown = false }: ResultRe
             <p className="text-sm text-gray-500 mb-5">Everyone agreed on this one</p>
 
             {/* Winner card */}
-            <div className="relative mx-auto" style={{ width: 280, height: 420 }}>
+            <div className="relative mx-auto w-full max-w-[280px] aspect-[2/3]">
               {/* Glow ring behind card */}
               <div
                 className="absolute inset-0 rounded-2xl"
