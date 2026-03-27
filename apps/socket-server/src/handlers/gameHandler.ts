@@ -146,6 +146,43 @@ export function registerGameHandlers(io: Server, socket: Socket) {
     }
   });
 
+  // One-time per-player veto — permanently excludes a title from winning and wildcard
+  socket.on('vetoTitle', (tmdbId: number) => {
+    const room = roomManager.getRoomBySocket(socket.id);
+    if (!room || room.status !== 'swiping') return;
+
+    const player = room.players.find(p => p.id === socket.id);
+    if (!player || player.vetoUsed) return;
+    if (room.vetoedTmdbIds.includes(tmdbId)) return;
+
+    player.vetoUsed = true;
+    room.vetoedTmdbIds.push(tmdbId);
+
+    // Record as a pass swipe internally so progress tracking works
+    GameSession.recordSwipe(room, socket.id, tmdbId, 'veto');
+
+    io.to(room.code).emit('playerProgress', socket.id, player.progress);
+    io.to(room.code).emit('playerVetoed', socket.id, tmdbId);
+
+    if (player.finished) {
+      const connected = room.players.filter(p => p.connected);
+      if (connected.every(p => p.finished)) {
+        const matches = GameSession.computeMatches(room);
+        room.matchedTitles = matches;
+        if (matches.length === 0) {
+          const wildcards = GameSession.computeWildcardCandidates(room);
+          const stats = GameSession.computeStats(room);
+          const reveal = GameSession.computeSwipeReveal(room);
+          room.status = 'finished';
+          io.to(room.code).emit('allPlayersFinished', []);
+          io.to(room.code).emit('wildcardCandidates', wildcards);
+          io.to(room.code).emit('swipeReveal', reveal);
+          io.to(room.code).emit('gameStats', stats);
+        }
+      }
+    }
+  });
+
   // Host started the wildcard spin — broadcast to guests so they see the animation too
   socket.on('wildcardSpinStart', () => {
     if (!roomManager.isCreator(socket.id)) return;

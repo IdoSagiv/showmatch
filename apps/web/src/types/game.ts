@@ -49,11 +49,12 @@ export interface Player {
   progress: number;
   finished: boolean;
   superLikeUsed: boolean;
+  vetoUsed: boolean;
 }
 
 export interface SwipeDecision {
   tmdbId: number;
-  decision: 'like' | 'pass' | 'superlike';
+  decision: 'like' | 'pass' | 'superlike' | 'veto';
   timestamp: number;
 }
 
@@ -65,6 +66,7 @@ export interface Room {
   titlePool: TitleCard[];
   matchedTitles: TitleCard[];
   winner: TitleCard | null;
+  vetoedTmdbIds?: number[];
 }
 
 export interface GameStatAward {

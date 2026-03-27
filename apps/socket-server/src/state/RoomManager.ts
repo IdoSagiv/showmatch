@@ -38,6 +38,7 @@ class RoomManager {
       progress: 0,
       finished: false,
       superLikeUsed: false,
+      vetoUsed: false,
     };
 
     const room: Room = {
@@ -51,6 +52,7 @@ class RoomManager {
       createdAt: Date.now(),
       swipes: new Map(),
       rankings: new Map(),
+      vetoedTmdbIds: [],
     };
 
     this.rooms.set(code, room);
@@ -76,6 +78,7 @@ class RoomManager {
       progress: 0,
       finished: false,
       superLikeUsed: false,
+      vetoUsed: false,
     };
 
     room.players.push(player);

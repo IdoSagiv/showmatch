@@ -20,6 +20,7 @@ export interface ServerToClientEvents {
   gameStats: (stats: GameStatAward[]) => void;
   roomClosed: (reason: string) => void;
   roomReset: (room: Room) => void;
+  playerVetoed: (playerId: string, tmdbId: number) => void;
   error: (message: string) => void;
 }
 

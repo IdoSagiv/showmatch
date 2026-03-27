@@ -8,14 +8,16 @@ export class GameSession {
     room.rankings.clear();
     room.matchedTitles = [];
     room.winner = null;
+    room.vetoedTmdbIds = [];
     for (const player of room.players) {
       player.progress = 0;
       player.finished = false;
       player.superLikeUsed = false;
+      player.vetoUsed = false;
     }
   }
 
-  static recordSwipe(room: Room, playerId: string, tmdbId: number, decision: 'like' | 'pass' | 'superlike'): void {
+  static recordSwipe(room: Room, playerId: string, tmdbId: number, decision: 'like' | 'pass' | 'superlike' | 'veto'): void {
     if (!room.swipes.has(playerId)) {
       room.swipes.set(playerId, []);
     }
@@ -52,6 +54,7 @@ export class GameSession {
   }
 
   static checkFirstMatch(room: Room, tmdbId: number): TitleCard | null {
+    if (room.vetoedTmdbIds.includes(tmdbId)) return null;
     const connectedPlayers = room.players.filter(p => p.connected);
     if (connectedPlayers.length < 2) return null;
 
@@ -73,10 +76,12 @@ export class GameSession {
   static computeMatches(room: Room): TitleCard[] {
     const connectedPlayers = room.players.filter(p => p.connected);
     if (connectedPlayers.length === 0) return [];
+    const vetoed = new Set(room.vetoedTmdbIds);
 
     const matches: TitleCard[] = [];
 
     for (const title of room.titlePool) {
+      if (vetoed.has(title.tmdbId)) continue;
       let allLiked = true;
       let anySuperLiked = false;
 
@@ -102,8 +107,10 @@ export class GameSession {
   static computeWildcardCandidates(room: Room): TitleCard[] {
     const connectedPlayers = room.players.filter(p => p.connected);
     const titleLikes: Map<number, number> = new Map();
+    const vetoed = new Set(room.vetoedTmdbIds);
 
     for (const title of room.titlePool) {
+      if (vetoed.has(title.tmdbId)) continue;
       let likes = 0;
       for (const player of connectedPlayers) {
         const swipes = room.swipes.get(player.id) || [];
