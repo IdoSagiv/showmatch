@@ -26,6 +26,14 @@ const STEPS = [
 
 export default function Home() {
   const [toast, setToast] = useState<string | null>(null);
+  const [posterUrls, setPosterUrls] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch('/api/tmdb/trending')
+      .then(r => r.json())
+      .then(d => { if (d.paths?.length) setPosterUrls(d.paths); })
+      .catch(() => {/* keep fallback */});
+  }, []);
 
   useEffect(() => {
     // User reached home intentionally — clear any stale reconnect session
@@ -192,7 +200,7 @@ export default function Home() {
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={`https://image.tmdb.org/t/p/w342${card.path}`}
+                      src={posterUrls[i] || `https://image.tmdb.org/t/p/w342${card.path}`}
                       alt=""
                       className="w-full h-full object-cover"
                       draggable={false}
