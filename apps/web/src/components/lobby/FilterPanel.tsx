@@ -52,16 +52,62 @@ export default function FilterPanel({ settings, onSettingsChange, isCreator }: F
     arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val];
 
   if (!isCreator) {
+    const typeLabel = settings.mediaTypes.length === 2
+      ? 'Movies + TV'
+      : settings.mediaTypes[0] === 'movie' ? 'Movies only' : 'TV only';
+    const selectedProviders = providers.filter(p => settings.providers.includes(p.id));
+    const selectedGenres = settings.genres.map(id => GENRES[id]).filter(Boolean);
+
     return (
-      <div className="bg-dark-card rounded-2xl p-4 border border-dark-border">
-        <h3 className="text-sm font-semibold text-gray-400 mb-3">Game Settings</h3>
-        <div className="flex flex-wrap gap-2 text-sm text-gray-300">
-          <span>Cards: {settings.poolSize === 'all' ? 'Marathon' : settings.poolSize}</span>
-          <span>Rating: {settings.minRating}+</span>
-          <span>{settings.yearRange[0]}-{settings.yearRange[1]}</span>
-          {settings.firstMatchMode && <span className="text-accent-gold">First Match Mode</span>}
-          {settings.timerSeconds && <span>{settings.timerSeconds}s timer</span>}
+      <div className="bg-dark-card rounded-2xl p-4 border border-dark-border space-y-3">
+        <h3 className="text-sm font-semibold text-gray-400">Game Settings</h3>
+
+        {/* First Match Mode badge */}
+        {settings.firstMatchMode && (
+          <div className="flex items-center gap-2 bg-accent-gold/10 border border-accent-gold/20 rounded-lg px-3 py-2">
+            <span className="text-accent-gold text-sm font-semibold">⚡ First Match Mode</span>
+          </div>
+        )}
+
+        {/* Row 1: type + key numbers */}
+        <div className="flex flex-wrap gap-2">
+          <span className="text-xs bg-dark-surface border border-dark-border text-gray-300 px-2.5 py-1 rounded-lg">{typeLabel}</span>
+          <span className="text-xs bg-dark-surface border border-dark-border text-gray-300 px-2.5 py-1 rounded-lg">
+            {settings.poolSize === 'all' ? 'Marathon' : `${settings.poolSize} cards`}
+          </span>
+          <span className="text-xs bg-dark-surface border border-dark-border text-gray-300 px-2.5 py-1 rounded-lg">★ {settings.minRating}+</span>
+          <span className="text-xs bg-dark-surface border border-dark-border text-gray-300 px-2.5 py-1 rounded-lg">{settings.yearRange[0]}–{settings.yearRange[1]}</span>
+          {settings.timerSeconds && (
+            <span className="text-xs bg-dark-surface border border-dark-border text-gray-300 px-2.5 py-1 rounded-lg">⏱ {settings.timerSeconds}s</span>
+          )}
         </div>
+
+        {/* Streaming providers */}
+        {settings.providers.length > 0 && (
+          <div>
+            <p className="text-xs text-gray-500 mb-1.5">Streaming</p>
+            <div className="flex flex-wrap gap-1.5">
+              {selectedProviders.length > 0
+                ? selectedProviders.map(p => (
+                    <span key={p.id} className="text-xs bg-dark-surface border border-dark-border text-gray-300 px-2 py-0.5 rounded-md">{p.name}</span>
+                  ))
+                : <span className="text-xs text-gray-400">{settings.providers.length} service{settings.providers.length > 1 ? 's' : ''}</span>
+              }
+            </div>
+          </div>
+        )}
+
+        {/* Genres */}
+        {selectedGenres.length > 0 && (
+          <div>
+            <p className="text-xs text-gray-500 mb-1.5">Genres</p>
+            <div className="flex flex-wrap gap-1.5">
+              {selectedGenres.map(g => (
+                <span key={g} className="text-xs bg-primary/10 border border-primary/20 text-primary px-2 py-0.5 rounded-md">{g}</span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
