@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { playSound, toggleMuteSound, isSoundMuted } from '@/lib/sounds';
+import { playSound, toggleMuteSound, isSoundMuted, setVolumeLevel, getVolumeLevel } from '@/lib/sounds';
 
 export function useSound() {
   const play = useCallback((name: Parameters<typeof playSound>[0]) => playSound(name), []);
@@ -18,5 +18,7 @@ export function useSound() {
     playWildcard:  () => play('wildcard'),
     toggleMute:    toggleMuteSound,
     isMuted:       isSoundMuted,
+    setVolume:     setVolumeLevel,
+    getVolume:     getVolumeLevel,
   };
 }
