@@ -104,9 +104,15 @@ export default function GamePage() {
     if (!titlePool[currentCardIndex]) return;
     const tmdbId = titlePool[currentCardIndex].tmdbId;
     socket.emit('vetoTitle', tmdbId);
+    recordSwipe({ tmdbId, decision: 'veto', timestamp: Date.now() });
+    setDragDirection(null);
+    setFlipped(false);
+    setCanUndo(false); // veto can't be undone
+    playPass();
     setShowVetoFlash(true);
     setTimeout(() => setShowVetoFlash(false), 700);
-  }, [socket, titlePool, currentCardIndex]);
+    try { navigator.vibrate?.(80); } catch {}
+  }, [socket, titlePool, currentCardIndex, recordSwipe, setDragDirection, playPass]);
 
   const handleUndo = useCallback(() => {
     const undone = undoLastSwipe();
