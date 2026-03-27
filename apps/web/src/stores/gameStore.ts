@@ -48,6 +48,7 @@ interface GameStore {
   setCurrentCardIndex: (idx: number) => void;
   setTitlePool: (pool: TitleCard[]) => void;
   addVeto: (tmdbId: number) => void;
+  markPlayerVetoed: (playerId: string) => void;
   reset: () => void;
 }
 
@@ -176,6 +177,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setGameOver: (val) => set({ gameOver: val }),
   setReconnecting: (val) => set({ reconnecting: val }),
   addVeto: (tmdbId) => set(state => ({ vetoedTmdbIds: [...state.vetoedTmdbIds, tmdbId] })),
+  markPlayerVetoed: (playerId) => set(state => ({
+    room: state.room ? {
+      ...state.room,
+      players: state.room.players.map(p => p.id === playerId ? { ...p, vetoUsed: true } : p),
+    } : null,
+  })),
   setCurrentCardIndex: (idx) => set({ currentCardIndex: idx }),
   setTitlePool: (pool) => set({ titlePool: pool }),
 
