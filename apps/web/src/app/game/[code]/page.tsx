@@ -42,8 +42,10 @@ export default function GamePage() {
     matchedTitles, winner, isFirstMatch, gameOver,
     recordSwipe, undoLastSwipe, playerId, reconnecting,
   } = useGameStore();
-  const { playLike, playPass, playSuperLike, toggleMute, isMuted } = useSound();
+  const { playLike, playPass, playSuperLike, toggleMute, isMuted, setVolume, getVolume } = useSound();
   const [muted, setMuted] = useState(() => isMuted());
+  const [showSettings, setShowSettings] = useState(false);
+  const [volume, setVolumeState] = useState(() => getVolume());
 
   // Sound is driven from handleSwipe so it fires for both gestures AND button taps
   const soundForDecision = useCallback((decision: 'like' | 'pass' | 'superlike') => {
@@ -186,10 +188,10 @@ export default function GamePage() {
         <PlayerBadge />
         <div className="flex items-center gap-1">
           <button
-            onClick={() => { const m = toggleMute(); setMuted(m); }}
+            onClick={() => setShowSettings(v => !v)}
             className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 active:scale-90 transition-all"
-            title={muted ? 'Unmute' : 'Mute'}
-            aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}
+            title="Sound settings"
+            aria-label="Sound settings"
           >
             <span className="text-base">{muted ? '🔇' : '🔊'}</span>
           </button>
@@ -288,6 +290,68 @@ export default function GamePage() {
           />
         )}
       </div>
+
+      {/* Settings drawer */}
+      <AnimatePresence>
+        {showSettings && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              className="fixed inset-0 z-40 bg-black/40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowSettings(false)}
+            />
+            {/* Drawer */}
+            <motion.div
+              className="fixed bottom-0 left-0 right-0 z-50 bg-dark-card border-t border-dark-border rounded-t-3xl p-6 pb-safe max-w-lg mx-auto"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', stiffness: 350, damping: 35 }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-base font-semibold text-white">Sound</h3>
+                <button onClick={() => setShowSettings(false)} className="text-gray-500 hover:text-white text-xl leading-none">×</button>
+              </div>
+
+              {/* Mute toggle */}
+              <div className="flex items-center justify-between mb-5">
+                <span className="text-sm text-gray-300">Sound</span>
+                <button
+                  onClick={() => { const m = toggleMute(); setMuted(m); }}
+                  className={`w-12 h-6 rounded-full transition-colors relative ${muted ? 'bg-dark-border' : 'bg-primary'}`}
+                  aria-label={muted ? 'Unmute' : 'Mute'}
+                >
+                  <motion.div
+                    className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow"
+                    animate={{ x: muted ? 2 : 25 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                </button>
+              </div>
+
+              {/* Volume */}
+              <div>
+                <span className="text-sm text-gray-300 block mb-3">Volume</span>
+                <div className="flex gap-2">
+                  {(['low', 'medium', 'high'] as const).map(lvl => (
+                    <button
+                      key={lvl}
+                      onClick={() => { setVolume(lvl); setVolumeState(lvl); }}
+                      disabled={muted}
+                      className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors capitalize disabled:opacity-30 ${volume === lvl ? 'bg-primary text-white' : 'bg-dark-surface text-gray-400'}`}
+                    >
+                      {lvl === 'low' ? '🔈' : lvl === 'medium' ? '🔉' : '🔊'} {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Time's up flash */}
       <AnimatePresence>

@@ -19,16 +19,33 @@ export type SoundName = keyof typeof SOUND_FILES;
 const cache: Partial<Record<SoundName, HTMLAudioElement>> = {};
 let muted = false;
 
+export type VolumeLevel = 'low' | 'medium' | 'high';
+const VOLUME_MAP: Record<VolumeLevel, number> = { low: 0.3, medium: 0.65, high: 1.0 };
+let currentVolumeLevel: VolumeLevel = 'medium';
+
+function applyVolume(): void {
+  const vol = muted ? 0 : VOLUME_MAP[currentVolumeLevel];
+  Object.values(cache).forEach(el => { if (el) el.volume = vol; });
+}
+
 function getAudio(name: SoundName): HTMLAudioElement | null {
   if (typeof window === 'undefined') return null;
   if (!cache[name]) {
     const el = new Audio(SOUND_FILES[name]);
-    el.volume = 0.5;
+    el.volume = VOLUME_MAP[currentVolumeLevel];
     el.preload = 'auto';
     cache[name] = el;
   }
   return cache[name]!;
 }
+
+export function setVolumeLevel(level: VolumeLevel): void {
+  currentVolumeLevel = level;
+  try { localStorage.setItem('showmatch-volume', level); } catch {}
+  applyVolume();
+}
+
+export function getVolumeLevel(): VolumeLevel { return currentVolumeLevel; }
 
 /** Play a sound. Safe to call anywhere (SSR-safe, catches autoplay errors silently). */
 export function playSound(name: SoundName): void {
@@ -47,7 +64,11 @@ export function toggleMuteSound(): boolean {
 
 export function isSoundMuted(): boolean { return muted; }
 
-// Restore mute preference from localStorage on first import
+// Restore preferences from localStorage on first import
 if (typeof window !== 'undefined') {
   try { muted = localStorage.getItem('showmatch-muted') === 'true'; } catch {}
+  try {
+    const saved = localStorage.getItem('showmatch-volume') as VolumeLevel | null;
+    if (saved && saved in VOLUME_MAP) currentVolumeLevel = saved;
+  } catch {}
 }
