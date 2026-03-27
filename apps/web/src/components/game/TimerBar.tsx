@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { playSound } from '@/lib/sounds';
 
 interface TimerBarProps {
   seconds: number;
@@ -12,8 +13,9 @@ interface TimerBarProps {
 export default function TimerBar({ seconds, isPaused, onExpired, cardKey }: TimerBarProps) {
   const [timeLeft, setTimeLeft] = useState(seconds);
   const intervalRef = useRef<NodeJS.Timeout>();
+  const lastTickRef = useRef<number>(-1);
 
-  useEffect(() => { setTimeLeft(seconds); }, [cardKey, seconds]);
+  useEffect(() => { setTimeLeft(seconds); lastTickRef.current = -1; }, [cardKey, seconds]);
 
   useEffect(() => {
     if (isPaused) {
@@ -28,6 +30,16 @@ export default function TimerBar({ seconds, isPaused, onExpired, cardKey }: Time
     }, 100);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isPaused, cardKey, onExpired]);
+
+  // Tick sound: fire once per integer second in the last 5 s
+  useEffect(() => {
+    if (timeLeft <= 0 || timeLeft > 5) return;
+    const ceil = Math.ceil(timeLeft);
+    if (ceil !== lastTickRef.current) {
+      lastTickRef.current = ceil;
+      playSound('tick');
+    }
+  }, [timeLeft]);
 
   const pct = (timeLeft / seconds) * 100;
   const urgent = pct <= 30;
