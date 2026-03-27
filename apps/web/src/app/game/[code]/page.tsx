@@ -54,6 +54,7 @@ export default function GamePage() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showSuperlikeHint, setShowSuperlikeHint] = useState(false);
   const [showTimesUp, setShowTimesUp] = useState(false);
+  const [showVetoFlash, setShowVetoFlash] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [pendingDecision, setPendingDecision] = useState<'like' | 'pass' | 'superlike' | null>(null);
   const [dragDirection, setDragDirection] = useState<'like' | 'pass' | 'superlike' | null>(null);
@@ -98,6 +99,14 @@ export default function GamePage() {
       }
     } catch {}
   }, [socket, titlePool, currentCardIndex, recordSwipe, soundForDecision, setDragDirection]);
+
+  const handleVeto = useCallback(() => {
+    if (!titlePool[currentCardIndex]) return;
+    const tmdbId = titlePool[currentCardIndex].tmdbId;
+    socket.emit('vetoTitle', tmdbId);
+    setShowVetoFlash(true);
+    setTimeout(() => setShowVetoFlash(false), 700);
+  }, [socket, titlePool, currentCardIndex]);
 
   const handleUndo = useCallback(() => {
     const undone = undoLastSwipe();
@@ -281,7 +290,9 @@ export default function GamePage() {
             onPass={() => setPendingDecision('pass')}
             onLike={() => setPendingDecision('like')}
             onSuperLike={() => setPendingDecision('superlike')}
+            onVeto={handleVeto}
             superLikeUsed={me?.superLikeUsed ?? false}
+            vetoUsed={me?.vetoUsed ?? false}
             disabled={isFinished || !!pendingDecision}
             dragDirection={dragDirection}
           />
@@ -362,6 +373,23 @@ export default function GamePage() {
           >
             <div className="bg-accent-red/20 border border-accent-red/40 text-white text-lg font-bold px-6 py-3 rounded-2xl backdrop-blur-sm">
               ⏱ Time&apos;s up!
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Veto flash */}
+      <AnimatePresence>
+        {showVetoFlash && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <div className="bg-orange-500/20 border border-orange-500/40 text-white text-lg font-bold px-6 py-3 rounded-2xl backdrop-blur-sm">
+              🚫 Vetoed!
             </div>
           </motion.div>
         )}

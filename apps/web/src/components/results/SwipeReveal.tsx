@@ -8,6 +8,7 @@ interface SwipeRevealProps {
     title: TitleCard;
     playerDecisions: Array<{ playerName: string; decision: string }>;
   }>;
+  vetoedTmdbIds?: number[];
 }
 
 function decisionScore(d: string): number {
@@ -16,7 +17,7 @@ function decisionScore(d: string): number {
   return 0;
 }
 
-export default function SwipeReveal({ reveals }: SwipeRevealProps) {
+export default function SwipeReveal({ reveals, vetoedTmdbIds = [] }: SwipeRevealProps) {
   if (reveals.length === 0) return null;
 
   // Only show titles that at least one player liked or superliked
@@ -38,8 +39,9 @@ export default function SwipeReveal({ reveals }: SwipeRevealProps) {
       <h3 className="text-lg font-bold mb-3">Who Liked What</h3>
       <div className="space-y-2 max-h-[400px] overflow-y-auto">
         {sorted.map(({ title, playerDecisions }, i) => {
-          // Only show players who liked or superliked
-          const likers = playerDecisions.filter(pd => pd.decision !== 'pass');
+          // Only show players who liked or superliked (not pass or veto)
+          const likers = playerDecisions.filter(pd => pd.decision === 'like' || pd.decision === 'superlike');
+          const isVetoed = vetoedTmdbIds.includes(title.tmdbId);
           return (
             <motion.div
               key={title.tmdbId}
@@ -52,7 +54,14 @@ export default function SwipeReveal({ reveals }: SwipeRevealProps) {
                 <img src={title.posterPath} alt={title.title} className="w-8 h-12 rounded object-cover shrink-0" />
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-sm truncate" title={title.title}>{title.title}</p>
+                <p className="text-sm truncate flex items-center gap-1.5" title={title.title}>
+                  {title.title}
+                  {isVetoed && (
+                    <span className="shrink-0 text-xs bg-orange-900/40 text-orange-400 px-1.5 py-0.5 rounded font-semibold">
+                      🚫 vetoed
+                    </span>
+                  )}
+                </p>
                 <div className="flex gap-1 mt-1 flex-wrap">
                   {likers.map(pd => (
                     <span
