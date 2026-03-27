@@ -27,6 +27,11 @@ export default function YearRangeSlider({ min, max, value, onChange }: YearRange
   const loPercent = ((lo - min) / (max - min)) * 100;
   const hiPercent = ((hi - min) / (max - min)) * 100;
 
+  // Clamp bubble left so badges never overflow the slider track edges
+  // (20px ≈ half the width of a 4-digit year badge incl. padding)
+  const clampedLeft = (pct: number) =>
+    `max(20px, min(calc(100% - 20px), calc(${pct}% + ${10 - pct * 0.2}px)))`;
+
   const handleLoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const next = Math.min(Number(e.target.value), hi - step);
     onChange([next, hi]);
@@ -69,10 +74,7 @@ export default function YearRangeSlider({ min, max, value, onChange }: YearRange
           /* Merged bubble centered between the two thumbs */
           <div
             className="absolute top-0 flex flex-col items-center pointer-events-none"
-            style={{
-              left: `calc(${(loPercent + hiPercent) / 2}% + ${10 - ((loPercent + hiPercent) / 2) * 0.2}px)`,
-              transform: 'translateX(-50%)',
-            }}
+            style={{ left: clampedLeft((loPercent + hiPercent) / 2), transform: 'translateX(-50%)' }}
           >
             <div className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg tabular-nums whitespace-nowrap" style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}>
               {lo === hi ? lo : `${lo} – ${hi}`}
@@ -84,7 +86,7 @@ export default function YearRangeSlider({ min, max, value, onChange }: YearRange
             {/* Lo thumb bubble */}
             <div
               className="absolute top-0 flex flex-col items-center pointer-events-none"
-              style={{ left: `calc(${loPercent}% + ${10 - loPercent * 0.2}px)`, transform: 'translateX(-50%)' }}
+              style={{ left: clampedLeft(loPercent), transform: 'translateX(-50%)' }}
             >
               <div className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg tabular-nums" style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}>
                 {lo}
@@ -95,7 +97,7 @@ export default function YearRangeSlider({ min, max, value, onChange }: YearRange
             {/* Hi thumb bubble */}
             <div
               className="absolute top-0 flex flex-col items-center pointer-events-none"
-              style={{ left: `calc(${hiPercent}% + ${10 - hiPercent * 0.2}px)`, transform: 'translateX(-50%)' }}
+              style={{ left: clampedLeft(hiPercent), transform: 'translateX(-50%)' }}
             >
               <div className="bg-primary text-white text-[11px] font-black px-2 py-0.5 rounded-lg tabular-nums" style={{ boxShadow: '0 2px 12px rgba(229,9,20,0.5)' }}>
                 {hi}
